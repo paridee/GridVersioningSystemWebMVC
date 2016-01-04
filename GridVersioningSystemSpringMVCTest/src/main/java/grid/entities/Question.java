@@ -130,4 +130,49 @@ public class Question extends GridElement implements Updatable{
 		return returnString;
 	}
 
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		Question other = (Question) obj;
+		if (this.label == null) {	//manually added
+			if (other.getLabel() != null)
+				return false;
+		} else if (!label.equals(other.getLabel()))
+			return false;
+		if (metricList == null) {
+			if (other.metricList != null)
+				return false;
+		} else{
+			if(!(this.getMetricList().size()==other.getMetricList().size())){
+				return false;
+			}
+			else{
+				ArrayList<String> metricLabels			=	new ArrayList<String>();
+				ArrayList<String> otherMetricLabels		=	new ArrayList<String>();
+				for(int i=0;i<this.getMetricList().size();i++){	//both have same size
+					metricLabels.add(this.getMetricList().get(i).getLabel());
+					otherMetricLabels.add(other.getMetricList().get(i).getLabel());
+				}
+				for(int i=0;i<metricLabels.size();i++){
+					if(!otherMetricLabels.contains(metricLabels.get(i))){
+						return false;
+					}
+				}
+			}
+		}
+		if (question == null) {
+			if (other.question != null)
+				return false;
+		} else if (!question.equals(other.question))
+			return false;
+		return true;
+	}
+
+
+
 }

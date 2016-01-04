@@ -184,4 +184,62 @@ public class Metric extends GridElement implements Updatable{
 		return returnString;
 	}
 
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		Metric other = (Metric) obj;
+		if (this.label == null) {	//manually added
+			if (other.getLabel() != null)
+				return false;
+		} else if (!label.equals(other.getLabel()))
+			return false;
+		if (count != other.count)
+			return false;
+		if (description == null) {
+			if (other.description != null)
+				return false;
+		} else if (!description.equals(other.description))
+			return false;
+		if (measUnits == null) {
+			if (other.measUnits != null)
+				return false;
+		} else{
+			if(this.getMeasUnits().size()!=other.getMeasUnits().size()){
+				return false;
+			}
+			ArrayList<String> meas			=	new ArrayList<String>();
+			ArrayList<String> measCheck		=	new ArrayList<String>();
+			for(int i=0;i<this.getMeasUnits().size();i++){	//both have same size
+				meas.add(this.getMeasUnits().get(i));
+				measCheck.add(other.getMeasUnits().get(i));
+			}
+			for(int i=0;i<meas.size();i++){
+				if(!measCheck.contains(meas.get(i))){
+					return	false;
+				}
+			}
+		}
+		if (measurementProcess == null) {
+			if (other.measurementProcess != null)
+				return false;
+		} else if (!measurementProcess.equals(other.measurementProcess))
+			return false;
+		if (metricType == null) {
+			if (other.metricType != null)
+				return false;
+		} else if (!metricType.equals(other.metricType))
+			return false;
+		if (scaleType == null) {
+			if (other.scaleType != null)
+				return false;
+		} else if (!scaleType.equals(other.scaleType))
+			return false;
+		return true;
+	}
+
 }

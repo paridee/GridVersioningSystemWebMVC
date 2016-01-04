@@ -8,6 +8,8 @@ import javax.persistence.Id;
 import javax.persistence.Inheritance;
 import javax.persistence.InheritanceType;
 
+import grid.modification.ObjectModification;
+
 
 /**
  * This abstract class contains all the common elements among all elements belonging to every element of the Grid
@@ -94,4 +96,9 @@ public abstract class GridElement {
 	 * @return string representation
 	 */
 	public abstract  String toString(String prefix,String divider);
+	
+	/**
+	 * Equals, ignore version and checks all t other properties/attributes
+	 */
+	public abstract boolean equals(Object obj);
 }

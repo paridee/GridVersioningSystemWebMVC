@@ -146,4 +146,95 @@ public class MeasurementGoal extends GridElement implements Updatable{
 		return returnString;
 	}
 
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + ((description == null) ? 0 : description.hashCode());
+		result = prime * result + ((interpretationModel == null) ? 0 : interpretationModel.hashCode());
+		result = prime * result + ((questionList == null) ? 0 : questionList.hashCode());
+		return result;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		MeasurementGoal other = (MeasurementGoal) obj;
+		if (this.label == null) {	//manually added
+			if (other.getLabel() != null)
+				return false;
+		} else if (!label.equals(other.getLabel()))
+			return false;
+		if (description == null) {
+			if (other.description != null)
+				return false;
+		} else if (!description.equals(other.description))
+			return false;
+		if (interpretationModel == null) {
+			if (other.interpretationModel != null)
+				return false;
+		} else if (!interpretationModel.equals(other.interpretationModel))
+			return false;
+		if (questionList == null) {
+			if (other.questionList != null)
+				return false;
+		} else{
+			if(!(this.getQuestionList().size()==other.getQuestionList().size())){
+				return false;
+			}
+			ArrayList<String> questionLabels			=	new ArrayList<String>();
+			ArrayList<String> questionLabelsCheck		=	new ArrayList<String>();
+			for(int i=0;i<this.getQuestionList().size();i++){	//both have same size
+				questionLabels.add(this.getQuestionList().get(i).getLabel());
+				questionLabelsCheck.add(other.getQuestionList().get(i).getLabel());
+			}
+			for(int i=0;i<questionLabels.size();i++){
+				if(!questionLabelsCheck.contains(questionLabels.get(i))){
+					return false;
+				}
+			}
+		}
+		return true;
+	}
+
+	
+	/*
+	@Override
+	public boolean equals(Object obj) {
+		if(obj.getClass().equals(this.getClass())){
+			boolean returnValue			=	true;
+			MeasurementGoal 	check	=	(MeasurementGoal)obj;
+			if(!this.getLabel().equals(check.getLabel())){
+				returnValue	=	false;
+			}
+			if(!this.description.equals(check.getDescription())){
+				returnValue	=	false;
+			}
+			if(!this.interpretationModel.equals(check.getInterpretationModel())){
+				returnValue	=	false;
+			}
+			else{
+				//check if refer to same strategies (identified with labels)
+				ArrayList<String> questionLabels			=	new ArrayList<String>();
+				ArrayList<String> questionLabelsCheck		=	new ArrayList<String>();
+				for(int i=0;i<this.getQuestionList().size();i++){	//both have same size
+					questionLabels.add(this.getQuestionList().get(i).getLabel());
+					questionLabelsCheck.add(check.getQuestionList().get(i).getLabel());
+				}
+				for(int i=0;i<questionLabels.size();i++){
+					if(!questionLabelsCheck.contains(questionLabels.get(i))){
+						returnValue	=	false;
+					}
+				}
+			}
+			return returnValue;
+		}
+		return false;
+	} */
+
 }

@@ -197,5 +197,67 @@ public class Goal extends GridElement implements Updatable{
 		}
 		return returnString;
 	}
+	
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		Goal other = (Goal) obj;
+		if (this.label == null) {	//manually added
+			if (other.getLabel() != null)
+				return false;
+		} else if (!label.equals(other.getLabel()))
+			return false;
+		if (assumption == null) {
+			if (other.assumption != null)
+				return false;
+		} else if (!assumption.equals(other.assumption))
+			return false;
+		if (context == null) {
+			if (other.context != null)
+				return false;
+		} else if (!context.equals(other.context))
+			return false;
+		if (description == null) {
+			if (other.description != null)
+				return false;
+		} else if (!description.equals(other.description))
+			return false;
+		if (measurementGoal == null) {
+			if (other.measurementGoal != null)
+				return false;
+		} else if (!measurementGoal.getLabel().equals(other.measurementGoal.getLabel()))
+			return false;
+		if (strategyList == null) {
+			if (other.strategyList != null)
+				return false;
+		} else {
+			if(!(this.getStrategyList().size()==other.getStrategyList().size())){
+				return false;
+			}
+			else{
+				//check if refer to same strategies (identified with labels)
+				ArrayList<String> strategyLabels			=	new ArrayList<String>();
+				ArrayList<String> strategyLabelsCheckGoal	=	new ArrayList<String>();
+				for(int i=0;i<this.getStrategyList().size();i++){	//both have same size
+					strategyLabels.add(this.getStrategyList().get(i).getLabel());
+					strategyLabelsCheckGoal.add(other.getStrategyList().get(i).getLabel());
+				}
+				for(int i=0;i<strategyLabels.size();i++){
+					if(!strategyLabelsCheckGoal.contains(strategyLabels.get(i))){
+						return false;
+					}
+				}
+			}
+		}
+		return true;
+	}
 
 }

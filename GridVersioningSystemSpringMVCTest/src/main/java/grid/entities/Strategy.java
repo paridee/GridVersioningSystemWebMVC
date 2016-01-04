@@ -134,9 +134,57 @@ public class Strategy extends GridElement implements Updatable{
 		returnString	=	returnString+prefix+"terminal: "+this.isTerminal+divider;
 		returnString	=	returnString+prefix+"strategic project: "+this.strategicProjectId+divider;
 		for(int i=0;i<this.goalList.size();i++){
-			returnString	=	returnString+prefix+"goal "+i+": "+this.goalList.get(i).toString()+divider;
+			returnString	=	returnString+prefix+"goal "+i+": "+this.goalList.get(i).toString(prefix,divider)+divider;
 		}
 		return returnString;
 	}
 
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		Strategy other = (Strategy) obj;
+		if (description == null) {
+			if (other.description != null)
+				return false;
+		} else if (!description.equals(other.description))
+			return false;
+		if (goalList == null) {
+			if (other.goalList != null)
+				return false;
+		} else{
+			if(!(this.getGoalList().size()==other.getGoalList().size())){
+				return false;
+			}
+			else{
+				ArrayList<String> goalLabels			=	new ArrayList<String>();
+				ArrayList<String> otherGoalLabels		=	new ArrayList<String>();
+				for(int i=0;i<this.getGoalList().size();i++){	//both have same size
+					goalLabels.add(this.getGoalList().get(i).getLabel());
+					otherGoalLabels.add(other.getGoalList().get(i).getLabel());
+				}
+				for(int i=0;i<goalLabels.size();i++){
+					if(!otherGoalLabels.contains(goalLabels.get(i))){
+						return false;
+					}
+				}
+			}
+		}
+		if (isTerminal != other.isTerminal)
+			return false;
+		if (strategicProjectId == null) {
+			if (other.strategicProjectId != null)
+				return false;
+		} else if (!strategicProjectId.equals(other.strategicProjectId))
+			return false;
+		return true;
+	}
+
+	
+	
 }

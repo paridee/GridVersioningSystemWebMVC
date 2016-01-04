@@ -91,6 +91,9 @@ public class HomeController {
 								strategies.get(j).setDescription("non deve salvare questo");
 								System.out.println("Aggiornato");
 								model.addAttribute("gridString",newGrid.toString("&nbsp&nbsp&nbsp&nbsp", "<br>") );
+								Goal clone2	=	(Goal) clone.clone();
+								clone2.setDescription(clone2.getDescription()+" stocazzo");
+								System.out.println("checkEquals "+clone.equals(clone2));
 							}
 						}
 					}
