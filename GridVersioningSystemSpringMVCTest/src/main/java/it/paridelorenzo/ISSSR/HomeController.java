@@ -1,10 +1,14 @@
 package it.paridelorenzo.ISSSR;
 
 import java.text.DateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 
+import org.javers.core.Javers;
+import org.javers.core.JaversBuilder;
+import org.javers.core.diff.Diff;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,6 +22,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 
 import grid.entities.Goal;
 import grid.entities.Grid;
+import grid.entities.GridElement;
 import grid.entities.Strategy;
 import grid.interfaces.services.GridElementService;
 import grid.interfaces.services.GridService;
@@ -100,6 +105,35 @@ public class HomeController {
 				}
 			}
 		}
+		
+		Goal testdiff	=	new Goal();
+		testdiff.setLabel("pippo");
+		testdiff.setDescription("test tool diff");
+		Strategy testst	=	new Strategy();
+		testst.setLabel("prova");
+		testst.setIsTerminal(true);
+		ArrayList<Strategy> l1	=	new ArrayList<Strategy>();
+		ArrayList<Strategy> l2	=	new ArrayList<Strategy>();
+		l1.add(testst);
+		l2.add((Strategy)testst.clone());
+		Goal testdiff2	=	(Goal)testdiff.clone();
+		testdiff.setStrategyList(l1);
+		testdiff2.setStrategyList(l2);
+		Javers javers	=	JaversBuilder.javers().registerValueObject(GridElement.class).build();
+		Diff diff	=	javers.compare(testdiff, testdiff2);
+		System.out.println("DIFF "+diff);
+		diff	=	javers.compare(testdiff2.getStrategyList(),testdiff.getStrategyList());
+		System.out.println("DIFFLIST1 "+diff);
+		Strategy another	=	new Strategy();
+		another.setLabel("ppppp");
+		l2.add(another);
+		diff	=	javers.compare(testdiff2.getStrategyList(),testdiff.getStrategyList());
+		System.out.println("DIFFLIST2 "+diff);
+		testdiff2.setDescription("pippowww");
+		testdiff2.setVersion(10000);
+		diff	=	javers.compare(testdiff, testdiff2);
+		System.out.println("DIFF2 "+diff);
+		
 		return "home";
 	}
 	

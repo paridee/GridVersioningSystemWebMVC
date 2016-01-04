@@ -28,7 +28,7 @@ public class Strategy extends GridElement implements Updatable{
 	private String 			description;
 	private boolean			isTerminal	=	false;
 	private String			strategicProjectId;
-	private List<Goal>		goalList;
+	private List<Goal>		goalList	=	new ArrayList<Goal>();
 	
 	
 	public String getDescription() {

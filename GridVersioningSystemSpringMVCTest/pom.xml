@@ -166,6 +166,15 @@
 			<version>4.7</version>
 			<scope>test</scope>
 		</dependency>        
+		
+		
+	<!-- Diff Tool -->
+		<dependency>
+		    <groupId>org.javers</groupId>
+		    <artifactId>javers-core</artifactId>
+		    <version>1.4.0</version>
+		</dependency>
+	
 	</dependencies>
     <build>
         <plugins>
