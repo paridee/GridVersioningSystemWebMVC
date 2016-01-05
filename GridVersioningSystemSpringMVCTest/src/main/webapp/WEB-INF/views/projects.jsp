@@ -62,28 +62,12 @@
     <div class="container">
 
       <div class="starter-template">
-        <h1>Lista Griglie</h1>
-        <p class="lead">Trovate: ${nGrids } griglie</p>
+        <h1>Lista Progetti</h1>
+        <p class="lead">Trovati: ${nProjects } progetti</p>
       </div>
 
 		
-		<c:if test="${!empty listGrids}">
-			<h3>Lista Griglie</h3>
-		    <table class="tg">
-		    <tr>
-		        <th width="80">Grid ID</th>
-		        <th width="120">Grid Version</th>
-		        <th width="120">ProjectID</th>
-		    </tr>
-		    <c:forEach items="${listGrids}" var="grid">
-		        <tr>
-		            <td>${grid.id}</td>
-		            <td>${grid.version}</td>
-		            <td>${grid.project.id}</td>
-		        </tr>
-		    </c:forEach>
-		    </table>
-		</c:if>
+		
 
     </div><!-- /.container -->
 
