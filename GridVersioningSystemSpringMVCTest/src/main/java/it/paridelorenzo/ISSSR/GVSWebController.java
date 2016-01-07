@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 
@@ -53,10 +54,18 @@ public class GVSWebController {
         return "grids";
     }
 	
+	@RequestMapping(value = "/grids/{id}")
+    public String getGrid(@PathVariable("id") int id, Model model) {
+		Grid temp= this.gridService.getGridById(id);
+		model.addAttribute("grid", temp);
+        return "grids";
+    }
+	
 	@RequestMapping(value = "/projects", method = RequestMethod.GET)
     public String listAllProjects(Model model) {
 		List<Project> temp = this.projectService.listProjects();
 			model.addAttribute("nProjects", temp.size());
+			model.addAttribute("listProjects", temp);
 			return "projects";
 		
 		

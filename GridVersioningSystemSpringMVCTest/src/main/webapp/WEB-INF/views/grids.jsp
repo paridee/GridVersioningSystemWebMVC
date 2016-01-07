@@ -12,22 +12,22 @@
     <!-- The above 3 meta tags *must* come first in the head; any other head content must come *after* these tags -->
     <meta name="description" content="">
     <meta name="author" content="">
-    <link rel="icon" href="resources/favicon.ico">
+    <link rel="icon" href="/resources/bootstrap/favicon.ico">
 
     <title>Lista Grids</title>
 
     <!-- Bootstrap core CSS -->
-    <link href="./resources/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="/resources/bootstrap/dist/css/bootstrap.min.css" rel="stylesheet">
 
     <!-- IE10 viewport hack for Surface/desktop Windows 8 bug -->
-    <link href="resources/assets/css/ie10-viewport-bug-workaround.css" rel="stylesheet">
+    <link href="/resources/bootstrap/assets/css/ie10-viewport-bug-workaround.css" rel="stylesheet">
 
     <!-- Custom styles for this template -->
-    <link href="resources/starter-template.css" rel="stylesheet">
+    <link href="/resources/bootstrap/starter-template.css" rel="stylesheet">
 
     <!-- Just for debugging purposes. Don't actually copy these 2 lines! -->
     <!--[if lt IE 9]><script src="resources/assets/js/ie8-responsive-file-warning.js"></script><![endif]-->
-    <script src="resources/assets/js/ie-emulation-modes-warning.js"></script>
+    <script src="/resources/bootstrap/assets/js/ie-emulation-modes-warning.js"></script>
 
     <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
     <!--[if lt IE 9]>
@@ -60,31 +60,51 @@
     </nav>
 
     <div class="container">
-
-      <div class="starter-template">
-        <h1>Lista Griglie</h1>
-        <p class="lead">Trovate: ${nGrids } griglie</p>
-      </div>
-
-		
-		<c:if test="${!empty listGrids}">
+    	<c:if test="${grid!= null}">
+		<div class="starter-template">
+			<table class="tg">
+		    <tr>
+		        <th width="80">Grid ID</th>
+		        <th width="120">Grid Version</th>
+		        <th width="120">ProjectID</th>
+		    </tr>
+		    <tr>
+		            <td><a href="<c:url value='/grids/${grid.id}' />" >${grid.id}</a></td>
+		            <td>${grid.version}</td>
+		            <td>${grid.project.id}</td>
+		    </tr>
+		    </table>
+		</div>
+		</c:if>
+      	
+        <c:if test="${!empty listGrids}">
+        <div class="starter-template">
 			<h3>Lista Griglie</h3>
+			<p class="lead">Trovate: ${nGrids } griglie</p>
 		    <table class="tg">
 		    <tr>
 		        <th width="80">Grid ID</th>
 		        <th width="120">Grid Version</th>
 		        <th width="120">ProjectID</th>
 		    </tr>
-		    <c:forEach items="${listGrids}" var="grid">
+		    <c:forEach items="${listGrids}" var="listgriditem">
 		        <tr>
-		            <td>${grid.id}</td>
-		            <td>${grid.version}</td>
-		            <td>${grid.project.id}</td>
+		            <td><a href="<c:url value='/grids/${listgriditem.id}' />" >${listgriditem.id}</a></td>
+		            <td>${listgriditem.version}</td>
+		            <td>${listgriditem.project.id}</td>
 		        </tr>
 		    </c:forEach>
 		    </table>
+		    </div>
 		</c:if>
+		
+		
+		
+		
+</div>
 
+		
+		
     </div><!-- /.container -->
 
 
@@ -92,10 +112,10 @@
     ================================================== -->
     <!-- Placed at the end of the document so the pages load faster -->
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
-    <script>window.jQuery || document.write('<script src="resources/assets/js/vendor/jquery.min.js"><\/script>')</script>
-    <script src="resources/dist/js/bootstrap.min.js"></script>
+    <script>window.jQuery || document.write('<script src="/resources/bootstrap/assets/js/vendor/jquery.min.js"><\/script>')</script>
+    <script src="/resources/bootstrap/dist/js/bootstrap.min.js"></script>
     <!-- IE10 viewport hack for Surface/desktop Windows 8 bug -->
-    <script src="resources/assets/js/ie10-viewport-bug-workaround.js"></script>
+    <script src="/resources/bootstrap/assets/js/ie10-viewport-bug-workaround.js"></script>
   </body>
 </html>
 

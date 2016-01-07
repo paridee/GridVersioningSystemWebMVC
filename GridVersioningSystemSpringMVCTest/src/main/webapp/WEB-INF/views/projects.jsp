@@ -17,17 +17,17 @@
     <title>Lista Grids</title>
 
     <!-- Bootstrap core CSS -->
-    <link href="./resources/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="resources/bootstrap/dist/css/bootstrap.min.css" rel="stylesheet">
 
     <!-- IE10 viewport hack for Surface/desktop Windows 8 bug -->
-    <link href="resources/assets/css/ie10-viewport-bug-workaround.css" rel="stylesheet">
+    <link href="resources/bootstrap/assets/css/ie10-viewport-bug-workaround.css" rel="stylesheet">
 
     <!-- Custom styles for this template -->
-    <link href="resources/starter-template.css" rel="stylesheet">
+    <link href="resources/bootstrap/starter-template.css" rel="stylesheet">
 
     <!-- Just for debugging purposes. Don't actually copy these 2 lines! -->
     <!--[if lt IE 9]><script src="resources/assets/js/ie8-responsive-file-warning.js"></script><![endif]-->
-    <script src="resources/assets/js/ie-emulation-modes-warning.js"></script>
+    <script src="resources/bootstrap/assets/js/ie-emulation-modes-warning.js"></script>
 
     <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
     <!--[if lt IE 9]>
@@ -65,7 +65,25 @@
         <h1>Lista Progetti</h1>
         <p class="lead">Trovati: ${nProjects } progetti</p>
       </div>
-
+		<c:if test="${!empty listProjects}">
+			<h3>Lista Progetti</h3>
+		    <table class="tg">
+		    <tr>
+		        <th width="80">id</th>
+		        <th width="120">ProjectID</th>
+		        <th width="120">description</th>
+		        <th width="120">creationDate</th>
+		    </tr>
+		    <c:forEach items="${listProjects}" var="project">
+		        <tr>
+		            <td><a href="<c:url value='/projects/${project.id}' />">${project.id}</a></td>
+		            <td>${project.projectId}</td>
+		            <td>${project.description}</td>
+		            <td>${project.creationDate}</td>
+		        </tr>
+		    </c:forEach>
+		    </table>
+		</c:if>
 		
 		
 
@@ -76,10 +94,10 @@
     ================================================== -->
     <!-- Placed at the end of the document so the pages load faster -->
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
-    <script>window.jQuery || document.write('<script src="resources/assets/js/vendor/jquery.min.js"><\/script>')</script>
-    <script src="resources/dist/js/bootstrap.min.js"></script>
+    <script>window.jQuery || document.write('<script src="resources/bootstrap/assets/js/vendor/jquery.min.js"><\/script>')</script>
+    <script src="resources/bootstrap/dist/js/bootstrap.min.js"></script>
     <!-- IE10 viewport hack for Surface/desktop Windows 8 bug -->
-    <script src="resources/assets/js/ie10-viewport-bug-workaround.js"></script>
+    <script src="resources/bootstrap/assets/js/ie10-viewport-bug-workaround.js"></script>
   </body>
 </html>
 
