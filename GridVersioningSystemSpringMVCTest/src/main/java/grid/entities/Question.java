@@ -1,6 +1,7 @@
 package grid.entities;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 import javax.persistence.CascadeType;
@@ -173,6 +174,17 @@ public class Question extends GridElement implements Updatable{
 		return true;
 	}
 
-
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public HashMap<String, GridElement> obtainEmbeddedElements() {
+		HashMap<String, GridElement> returnMap	=	new HashMap<String, GridElement>();
+		returnMap.put(this.label, this);
+		for(int i=0;i<this.metricList.size();i++){
+			returnMap.putAll(this.metricList.get(i).obtainEmbeddedElements());
+		}
+		return returnMap;
+	}
 
 }

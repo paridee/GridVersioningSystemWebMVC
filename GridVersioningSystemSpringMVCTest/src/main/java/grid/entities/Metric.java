@@ -1,6 +1,7 @@
 package grid.entities;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 import javax.persistence.CollectionTable;
@@ -240,6 +241,16 @@ public class Metric extends GridElement implements Updatable{
 		} else if (!scaleType.equals(other.scaleType))
 			return false;
 		return true;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public HashMap<String, GridElement> obtainEmbeddedElements() {
+		HashMap<String, GridElement> returnMap	=	new HashMap<String, GridElement>();
+		returnMap.put(this.label, this);
+		return returnMap;
 	}
 
 }

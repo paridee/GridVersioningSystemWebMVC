@@ -1,6 +1,7 @@
 package grid.entities;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 import javax.persistence.CascadeType;
@@ -202,6 +203,19 @@ public class MeasurementGoal extends GridElement implements Updatable{
 		return true;
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public HashMap<String, GridElement> obtainEmbeddedElements() {
+		// TODO Auto-generated method stub
+		HashMap<String, GridElement> returnMap	=	new HashMap<String, GridElement>();
+		returnMap.put(this.label, this);
+		for(int i=0;i<this.questionList.size();i++){
+			returnMap.putAll(this.questionList.get(i).obtainEmbeddedElements());
+		}
+		return returnMap;
+	}
 	
 	/*
 	@Override
