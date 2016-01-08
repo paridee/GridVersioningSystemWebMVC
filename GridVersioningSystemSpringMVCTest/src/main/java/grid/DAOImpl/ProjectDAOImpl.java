@@ -7,6 +7,7 @@ import org.hibernate.SessionFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import grid.entities.Grid;
 import grid.entities.Project;
 import grid.interfaces.DAO.ProjectDAO;
 
@@ -31,5 +32,13 @@ public class ProjectDAOImpl implements ProjectDAO{
         }
         return projectsList;
     }
+	
+	@Override
+	public Project getProjectById(int id) {
+		Session currentSession	=	this.sessionFactory.getCurrentSession();
+		Project	g				=	(Project) currentSession.load(Project.class,new Integer(id));
+		logger.info(g.getClass().getName()+" loaded::"+g);
+		return g;
+	}
 
 }

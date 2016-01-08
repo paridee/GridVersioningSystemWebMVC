@@ -102,7 +102,7 @@ public class Project {
 	 */
 	@ElementCollection
 	@CollectionTable(	name		=	"ProjectMeasUnits", 
-						joinColumns	=	@JoinColumn(name="projID"))
+						joinColumns	=	@JoinColumn(name="id"))
 	@Column(name="measUnit")
 	public List<String> getAvailableMeasUnits() {
 		return availableMeasUnits;

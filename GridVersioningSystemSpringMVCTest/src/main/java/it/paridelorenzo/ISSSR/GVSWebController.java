@@ -70,5 +70,14 @@ public class GVSWebController {
 		
 		
     }
+	@RequestMapping(value = "/projects/{id}")
+    public String getProject(@PathVariable("id") int id, Model model) {
+		Project temp= this.projectService.getProjectById(id);
+		model.addAttribute("reqproject", temp);
+		List<Grid> templist= this.gridService.getGridLog(id);
+		model.addAttribute("nProjectGrids", templist.size());
+        model.addAttribute("listProjectGrids", templist);
+        return "projects";
+    }
      
 }

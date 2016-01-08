@@ -8,4 +8,5 @@ import grid.entities.Project;
 public interface ProjectDAO {
  
     public List<Project> listProjects();
+    public Project getProjectById(int id);
 }

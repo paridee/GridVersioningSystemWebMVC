@@ -19,5 +19,12 @@ public class ProjectServiceImpl implements ProjectService{
 		// TODO Auto-generated method stub
 		return this.projectDAO.listProjects();
 	}
+	
+	@Override
+	public Project getProjectById(int id) {
+		// TODO Auto-generated method stub
+		return this.projectDAO.getProjectById(id);
+	}
+	
 
 }

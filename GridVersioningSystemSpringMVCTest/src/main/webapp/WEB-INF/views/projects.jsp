@@ -12,27 +12,27 @@
     <!-- The above 3 meta tags *must* come first in the head; any other head content must come *after* these tags -->
     <meta name="description" content="">
     <meta name="author" content="">
-    <link rel="icon" href="resources/favicon.ico">
+    <link rel="icon" href="resources/bootstrap/favicon.ico">
 
-    <title>Lista Grids</title>
+    <title>Lista Progetti</title>
 
     <!-- Bootstrap core CSS -->
-    <link href="resources/bootstrap/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="<c:url value='/resources/bootstrap/dist/css/bootstrap.min.css' />" rel="stylesheet">
 
     <!-- IE10 viewport hack for Surface/desktop Windows 8 bug -->
-    <link href="resources/bootstrap/assets/css/ie10-viewport-bug-workaround.css" rel="stylesheet">
+    <link href="<c:url value='/resources/bootstrap/assets/css/ie10-viewport-bug-workaround.css' />" rel="stylesheet">
 
     <!-- Custom styles for this template -->
-    <link href="resources/bootstrap/starter-template.css" rel="stylesheet">
+    <link href="<c:url value='/resources/bootstrap/starter-template.css' />" rel="stylesheet">
 
     <!-- Just for debugging purposes. Don't actually copy these 2 lines! -->
-    <!--[if lt IE 9]><script src="resources/assets/js/ie8-responsive-file-warning.js"></script><![endif]-->
-    <script src="resources/bootstrap/assets/js/ie-emulation-modes-warning.js"></script>
+    <!--[if lt IE 9]><script src="<c:url value='/resources/assets/js/ie8-responsive-file-warning.js' />"></script><![endif]-->
+    <script src="<c:url value='/resources/bootstrap/assets/js/ie-emulation-modes-warning.js' />"></script>
 
     <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
     <!--[if lt IE 9]>
-      <script src="https://oss.maxcdn.com/html5shiv/3.7.2/html5shiv.min.js"></script>
-      <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
+      <script src="https://oss.maxcdn.com/html5shiv/3.7.2/html5shiv.min.js' />"></script>
+      <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js' />"></script>
     <![endif]-->
   </head>
 
@@ -60,12 +60,55 @@
     </nav>
 
     <div class="container">
-
+    	<c:if test="${reqproject!=null}">
+    		<div>
+	    		<table class="tg">
+			    <tr>
+			        <th width="80">id</th>
+			        <th width="120">ProjectID</th>
+			        <th width="120">description</th>
+			        <th width="120">creationDate</th>
+			    </tr>
+			    <tr>
+			            <td><a href="<c:url value='/projects/${project.id}' />">${project.id}</a></td>
+			            <td>${reqproject.projectId}</td>
+			            <td>${reqproject.description}</td>
+			            <td>${reqproject.creationDate}</td>
+			       </tr>
+			    </table>
+		    </div>
+		    <c:if test="${!empty listProjectGrids}">
+		        <div class="starter-template">
+					<h3>Lista Griglie</h3>
+					<p class="lead">Trovate: ${nProjectGrids } griglie</p>
+				    <table class="tg">
+				    <tr>
+				        <th width="80">Grid ID</th>
+				        <th width="120">Grid Version</th>
+				        <th width="120">ProjectID</th>
+				    </tr>
+				    <c:forEach items="${listProjectGrids}" var="listprojectgriditem">
+				        <tr>
+				            <td><a href="<c:url value='/grids/${listprojectgriditem.id}' />" >${listprojectgriditem.id}</a></td>
+				            <td>${listprojectgriditem.version}</td>
+				            <td><a href="<c:url value='/projects/${listprojectgriditem.project.id}' />" >${listprojectgriditem.project.id}</a></td>
+				        </tr>
+				    </c:forEach>
+				    </table>
+			    </div>
+			</c:if>
+    	
+    	
+    	</c:if>
+    
+    
+    
+		<c:if test="${!empty listProjects}">
       <div class="starter-template">
         <h1>Lista Progetti</h1>
         <p class="lead">Trovati: ${nProjects } progetti</p>
       </div>
-		<c:if test="${!empty listProjects}">
+		
 			<h3>Lista Progetti</h3>
 		    <table class="tg">
 		    <tr>
@@ -83,7 +126,7 @@
 		        </tr>
 		    </c:forEach>
 		    </table>
-		</c:if>
+		</c:if> 
 		
 		
 
@@ -94,10 +137,10 @@
     ================================================== -->
     <!-- Placed at the end of the document so the pages load faster -->
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
-    <script>window.jQuery || document.write('<script src="resources/bootstrap/assets/js/vendor/jquery.min.js"><\/script>')</script>
-    <script src="resources/bootstrap/dist/js/bootstrap.min.js"></script>
+    <script>window.jQuery || document.write('<script src="<c:url value='/resources/bootstrap/assets/js/vendor/jquery.min.js' />"><\/script>')</script>
+    <script src="<c:url value='/resources/bootstrap/dist/js/bootstrap.min.js' />"></script>
     <!-- IE10 viewport hack for Surface/desktop Windows 8 bug -->
-    <script src="resources/bootstrap/assets/js/ie10-viewport-bug-workaround.js"></script>
+    <script src="<c:url value='/resources/bootstrap/assets/js/ie10-viewport-bug-workaround.js' />"></script>
   </body>
 </html>
 
