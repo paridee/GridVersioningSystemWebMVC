@@ -1,5 +1,7 @@
 package grid.entities;
 
+import java.util.HashMap;
+
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -101,4 +103,10 @@ public abstract class GridElement {
 	 * Equals, ignore version and checks all t other properties/attributes
 	 */
 	public abstract boolean equals(Object obj);
+	
+	/**
+	 * Gets a map with all the elements embedded in this one
+	 * @return hashmap of all included elements
+	 */
+	public abstract HashMap<String,GridElement> obtainEmbeddedElements();
 }

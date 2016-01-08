@@ -55,4 +55,9 @@ public interface GridElementService {
 	 * @param c class of the object to be removed
 	 */
 	public void removeElement(int id,Class<?> c);
+
+	/**
+	 * Compares two versions of a grid element and check if is add-update
+	 */
+	public boolean isAddUpdate(GridElement oldElement,GridElement newElement);
 }
