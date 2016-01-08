@@ -17,6 +17,7 @@ import grid.entities.Metric;
 import grid.entities.Project;
 import grid.entities.Question;
 import grid.entities.Strategy;
+import grid.interfaces.services.ProjectService;
 
 /**
  * This class provides a method for parsing a Grid from JSON Representation 
@@ -33,7 +34,7 @@ public class JSONFactory {
 	 * @param json grid to be parsed
 	 * @return parsed Grid object
 	 */
-	public static Grid loadFromJson(String json){
+	public static Grid loadFromJson(String json,ProjectService projService){
 		Grid returnGrid					=	new Grid();	//new Grid to be loaded
 		HashMap<String, Object> objects	=	new HashMap<String, Object>();
 		JSONObject obj					=	new JSONObject(json);
@@ -59,7 +60,11 @@ public class JSONFactory {
 		}
 		logger.info("MainClass.java goals loaded "+goals.size());
 		JSONObject projectj						=	(JSONObject) obj.get("project");	//loads project
-		Project project							=	JSONFactory.loadProjectFromJson(projectj.toString(), objects);
+		String 	prjlabel						=	projectj.getString("id");
+		Project project							=	projService.getProjectByProjectId(prjlabel);
+		if(project==null){
+			project								=	JSONFactory.loadProjectFromJson(projectj.toString(), objects);	
+		}
 		JSONArray qList							=	(JSONArray) obj.get("questionList");//loads questions
 		ArrayList<Question> questionList		=	new ArrayList<Question>();
 		for(int i=0;i<qList.length();i++){

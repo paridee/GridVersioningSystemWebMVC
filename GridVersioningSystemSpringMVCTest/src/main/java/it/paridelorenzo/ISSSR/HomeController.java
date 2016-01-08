@@ -27,12 +27,17 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 
+import grid.DAOImpl.ProjectDAOImpl;
 import grid.entities.Goal;
 import grid.entities.Grid;
 import grid.entities.GridElement;
+import grid.entities.Project;
 import grid.entities.Strategy;
+import grid.interfaces.DAO.ProjectDAO;
 import grid.interfaces.services.GridElementService;
 import grid.interfaces.services.GridService;
+import grid.interfaces.services.ProjectService;
+import grid.services.ProjectServiceImpl;
 
 /**
  * Handles requests for the application home page.
@@ -42,6 +47,7 @@ public class HomeController {
 	
 	private GridElementService 	gridElementService;
 	private GridService			gridService;
+	private ProjectService		projectService;
 	
 	@Autowired(required=true)
 	@Qualifier(value="gridElementService")
@@ -54,6 +60,13 @@ public class HomeController {
 	public void setGridService(GridService gridService) {
 		this.gridService = gridService;
 	}
+
+	@Autowired(required=true)
+	@Qualifier(value="projectService")
+	public void setProjectService(ProjectService projectService) {
+		this.projectService = projectService;
+	}
+
 
 	private static final Logger logger = LoggerFactory.getLogger(HomeController.class);
 	
@@ -248,6 +261,14 @@ public class HomeController {
 		test2.remove(2);
 		diff	=	javers.compare(test1,test2);
 		System.out.println("DIFF TEST STRING after deletion "+diff);
+		
+		Project testpr	=	iesima.getProject();
+		String test	=	testpr.getProjectId()+" "+testpr.getDescription();
+		System.out.println(test);
+		System.out.println(gridService.getGridLog(testpr.getId()));
+		
+		Project prova	=	this.projectService.getProjectByProjectId("progetto di prova cazzo");
+		System.out.println("PROGETTO TROVATO "+prova);
 		return "home";
 	}
 	

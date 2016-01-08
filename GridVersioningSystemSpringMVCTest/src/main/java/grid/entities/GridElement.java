@@ -10,9 +10,6 @@ import javax.persistence.Id;
 import javax.persistence.Inheritance;
 import javax.persistence.InheritanceType;
 
-import grid.modification.ObjectModification;
-
-
 /**
  * This abstract class contains all the common elements among all elements belonging to every element of the Grid
  * @author Paride Casulli

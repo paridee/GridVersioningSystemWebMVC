@@ -16,14 +16,17 @@ public class ProjectServiceImpl implements ProjectService{
 
 	@Override
 	public List<Project> listProjects() {
-		// TODO Auto-generated method stub
 		return this.projectDAO.listProjects();
 	}
 	
 	@Override
 	public Project getProjectById(int id) {
-		// TODO Auto-generated method stub
 		return this.projectDAO.getProjectById(id);
+	}
+
+	@Override
+	public Project getProjectByProjectId(String id) {
+		return this.projectDAO.getProjectByProjectId(id);
 	}
 	
 
