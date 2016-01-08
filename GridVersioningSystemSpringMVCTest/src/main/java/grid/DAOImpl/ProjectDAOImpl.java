@@ -41,4 +41,16 @@ public class ProjectDAOImpl implements ProjectDAO{
 		return g;
 	}
 
+	@SuppressWarnings("unchecked")
+	@Override
+	public Project getProjectByProjectId(String id) {
+		Session session	=	this.sessionFactory.getCurrentSession();
+		List<Project> returnres	=	session.createQuery("from Project P where P.projectId = \'"+id+"\'").list();
+		if(returnres.size()==0){
+			return null;
+		}
+		Project project	=	(Project) returnres.get(0) ;
+		return project;
+	}
+
 }
