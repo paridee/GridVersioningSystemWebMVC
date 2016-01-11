@@ -121,6 +121,7 @@ public class Strategy extends GridElement implements Updatable{
 		cloned.setGoalList(clonedList);
 		cloned.setIsTerminal(this.isTerminal);
 		cloned.setStrategicProjectId(this.strategicProjectId);
+		cloned.setState(this.state);
 		return cloned;		
 	}
 
@@ -128,6 +129,7 @@ public class Strategy extends GridElement implements Updatable{
 	@Override
 	public String toString(String prefix, String divider) {
 		String returnString	=	prefix+"Strategy "+divider;
+		returnString	=	returnString+prefix+"state: "+this.state+divider;
 		returnString	=	returnString+prefix+"label: "+this.label+divider;
 		returnString	=	returnString+prefix+"version: "+this.version+divider;
 		returnString	=	returnString+prefix+"id: "+this.idElement+divider;

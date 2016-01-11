@@ -122,6 +122,7 @@ public class MeasurementGoal extends GridElement implements Updatable{
 		mg.setVersion(this.version);
 		mg.setDescription(this.description);
 		mg.setInterpretationModel(this.interpretationModel);
+		mg.setState(this.state);
 		List<Question> clonedList	=	new ArrayList<Question>();
 		for(int i=0;i<this.questionList.size();i++){
 			clonedList.add(questionList.get(i));
@@ -136,6 +137,7 @@ public class MeasurementGoal extends GridElement implements Updatable{
 	@Override
 	public String toString(String prefix, String divider) {
 		String returnString	=	prefix+"MeasurementGoal "+divider;
+		returnString		=	returnString+prefix+"state: "+this.state+divider;
 		returnString		=	returnString+prefix+"label: "+this.label+divider;
 		returnString		=	returnString+prefix+"version: "+this.version+divider;
 		returnString		=	returnString+prefix+"id: "+this.idElement+divider;

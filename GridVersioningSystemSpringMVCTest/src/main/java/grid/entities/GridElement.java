@@ -1,14 +1,22 @@
 package grid.entities;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 
+import javax.persistence.CascadeType;
+import javax.persistence.CollectionTable;
 import javax.persistence.Column;
+import javax.persistence.ElementCollection;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Inheritance;
 import javax.persistence.InheritanceType;
+import javax.persistence.JoinColumn;
+import javax.persistence.JoinTable;
+import javax.persistence.ManyToMany;
 
 /**
  * This abstract class contains all the common elements among all elements belonging to every element of the Grid
@@ -19,6 +27,11 @@ import javax.persistence.InheritanceType;
 @Entity
 @Inheritance(strategy=InheritanceType.TABLE_PER_CLASS)
 public abstract class GridElement {
+	public enum State{
+		WORKING, MAJOR_UPDATING, MINOR_UPDATING, FINAL_KO
+	}
+	
+	protected State 	state	=	State.WORKING;
 	
 	@Column(name 		= 	"label", 
 			nullable 	= 	false, 
@@ -32,6 +45,7 @@ public abstract class GridElement {
 			length 		= 	20)
 	protected int 	version=1;
 	
+	private List<String> authors;
 	/**
 	 * Returns a label for this Grid Entity (in Grid is named as ID, depending on the type of Element
 	 * @return label of this element
@@ -83,6 +97,42 @@ public abstract class GridElement {
 		this.version = version;
 	}
 	
+	/**
+	 * Gets the state for this object
+	 * @return state of this object
+	 */
+	public State getState() {
+		return state;
+	}
+
+	/**
+	 * Sets the state for this object
+	 * @return state to be set
+	 */
+	public void setState(State state) {
+		this.state = state;
+	}
+
+	/**
+	 * Get the authors list for this element
+	 * @return authors list
+	 */
+	@ElementCollection
+	@CollectionTable(	name		=	"GridElementToAuthors", 
+						joinColumns	=	@JoinColumn(name="gridElementID"))
+	@Column(name="author")
+	public List<String> getAuthors() {
+		return authors;
+	}
+
+	/**
+	 * Set the authors list for this element
+	 * @param authors authors to be set
+	 */
+	public void setAuthors(List<String> authors) {
+		this.authors = authors;
+	}
+
 	/**
 	 * Clones this object and creates a copy of references (doesn't copy the referenced objects!)
 	 */

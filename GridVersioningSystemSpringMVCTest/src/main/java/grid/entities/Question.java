@@ -105,6 +105,7 @@ public class Question extends GridElement implements Updatable{
 		Question cloned	=	new Question();
 		cloned.setLabel(this.label);
 		cloned.setVersion(this.version);
+		cloned.setState(this.state);
 		List<Metric> clonedList	=	new ArrayList<Metric>();
 		for(int i=0;i<this.metricList.size();i++){
 			clonedList.add(metricList.get(i));
@@ -120,6 +121,7 @@ public class Question extends GridElement implements Updatable{
 	@Override
 	public String toString(String prefix, String divider) {
 		String returnString	=	prefix+"Question "+divider;
+		returnString	=	returnString+prefix+"state: "+this.state+divider;
 		returnString	=	returnString+prefix+"label: "+this.label+divider;
 		returnString	=	returnString+prefix+"version: "+this.version+divider;
 		returnString	=	returnString+prefix+"id: "+this.idElement+divider;

@@ -162,6 +162,7 @@ public class Metric extends GridElement implements Updatable{
 		newMetric.setMeasurementProcess(this.measurementProcess);
 		newMetric.setMetricType(this.metricType);
 		newMetric.setScaleType(this.scaleType);
+		newMetric.setState(this.state);
 		return newMetric;
 	}
 
@@ -171,6 +172,7 @@ public class Metric extends GridElement implements Updatable{
 	@Override
 	public String toString(String prefix, String divider) {
 		String returnString	=	prefix+"Metric "+divider;
+		returnString	=	returnString+prefix+"state: "+this.state+divider;
 		returnString	=	returnString+prefix+"label: "+this.label+divider;
 		returnString	=	returnString+prefix+"version: "+this.version+divider;
 		returnString	=	returnString+prefix+"id: "+this.idElement+divider;

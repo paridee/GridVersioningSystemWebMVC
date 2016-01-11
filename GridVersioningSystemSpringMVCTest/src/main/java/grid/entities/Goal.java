@@ -172,6 +172,7 @@ public class Goal extends GridElement implements Updatable{
 		newGoal.setContext(this.context);
 		newGoal.setDescription(this.description);
 		newGoal.setMeasurementGoal(this.measurementGoal);
+		newGoal.setState(this.state);
 		List<Strategy> clonedList	=	new ArrayList<Strategy>();
 		for(int i=0;i<this.strategyList.size();i++){
 			clonedList.add(strategyList.get(i));
@@ -186,6 +187,7 @@ public class Goal extends GridElement implements Updatable{
 	@Override
 	public String toString(String prefix,String divider) {
 		String returnString		=	prefix+"Goal "+divider;
+		returnString			=	returnString+prefix+"state: "+this.state+divider;
 		returnString			=	returnString+prefix+"label: "+this.label+divider;
 		returnString			=	returnString+prefix+"version: "+this.version+divider;
 		returnString			=	returnString+prefix+"id: "+this.idElement+divider;

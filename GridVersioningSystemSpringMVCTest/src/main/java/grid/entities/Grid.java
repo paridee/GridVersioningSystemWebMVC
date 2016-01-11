@@ -1,7 +1,10 @@
 package grid.entities;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Set;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Entity;
@@ -15,6 +18,7 @@ import javax.persistence.ManyToMany;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
 
+import grid.entities.GridElement.State;
 import grid.interfaces.Updatable;
 
 /**
@@ -26,7 +30,9 @@ import grid.interfaces.Updatable;
 @Entity
 @Table(name="Grid")
 public class Grid implements Updatable{
-
+	public enum GridState{
+		WORKING,UPDATING,FINAL_KO
+	}
 	private int 		id;
 	private	int 		version=1; //TODO make String Version
 	private List<Goal> 	mainGoals				=	null;
@@ -121,6 +127,28 @@ public class Grid implements Updatable{
 	public ArrayList<GridElement> update(GridElement ge) {
 		// TODO Auto-generated method stub
 		return null;
+	}
+	
+	
+	public GridState getGridState(){
+		HashMap<String,GridElement>	allElements	=	new HashMap<String,GridElement>();
+		for(int i=0;i<this.mainGoals.size();i++){
+			allElements.putAll(this.mainGoals.get(i).obtainEmbeddedElements());
+		}
+		GridState		returnState	=	GridState.WORKING;
+		Set<String>	keySet		=	allElements.keySet();
+		Iterator<String> anIterator	=	keySet.iterator();
+		while(anIterator.hasNext()){
+			String key		=	anIterator.next();
+			State aState	=	allElements.get(key).getState();
+			if(aState	==	State.FINAL_KO){
+				return GridState.FINAL_KO;
+			}
+			if((aState	==	State.MAJOR_UPDATING)||(aState	==	State.MINOR_UPDATING)){
+				returnState	=	GridState.UPDATING;
+			}
+		}
+		return returnState;
 	}
 	
 	/**
