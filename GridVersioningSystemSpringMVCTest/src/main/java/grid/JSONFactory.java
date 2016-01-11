@@ -60,7 +60,7 @@ public class JSONFactory {
 		}
 		logger.info("MainClass.java goals loaded "+goals.size());
 		JSONObject projectj						=	(JSONObject) obj.get("project");	//loads project
-		String 	prjlabel						=	projectj.getString("id");
+		String 	prjlabel						=	projectj.getString("projectId");
 		Project project							=	projService.getProjectByProjectId(prjlabel);
 		if(project==null){
 			project								=	JSONFactory.loadProjectFromJson(projectj.toString(), objects);	

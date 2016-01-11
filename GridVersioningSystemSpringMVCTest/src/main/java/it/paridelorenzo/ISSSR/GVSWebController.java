@@ -8,10 +8,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.ResponseBody;
 
+import grid.JSONFactory;
 import grid.entities.Grid;
 import grid.entities.Project;
 import grid.interfaces.services.GridElementService;
@@ -25,6 +29,7 @@ public class GVSWebController {
 	private GridElementService 	gridElementService;
 	private GridService			gridService;
 	private ProjectService		projectService;
+	private JSONFactory 		jFact;
 	
 	@Autowired(required=true)
 	@Qualifier(value="gridElementService")
@@ -61,6 +66,9 @@ public class GVSWebController {
         return "grids";
     }
 	
+	
+	
+	
 	@RequestMapping(value = "/projects", method = RequestMethod.GET)
     public String listAllProjects(Model model) {
 		List<Project> temp = this.projectService.listProjects();
@@ -78,6 +86,29 @@ public class GVSWebController {
 		model.addAttribute("nProjectGrids", templist.size());
         model.addAttribute("listProjectGrids", templist);
         return "projects";
+    }
+	
+/*
+	@RequestMapping(value = "/grids/add")
+    public String addGrid(@RequestParam("jsonData") String jsonData, Model model) {
+		model.addAttribute("addedGrid", "true");
+		System.out.println(jsonData);
+		return "addgrid";
+    }
+	*/
+	
+	@RequestMapping(value = "/grids/add")
+    public @ResponseBody String addGrid(@ModelAttribute(value="jsonData") String jsonData, BindingResult result) {
+		Grid temp=JSONFactory.loadFromJson(jsonData, this.projectService);
+		this.gridService.addGrid(temp);
+		return "ok";
+    }
+	
+	
+	
+	@RequestMapping(value = "/addgrid", method = RequestMethod.GET)
+    public String addGridPage(Model model) {
+		return "addgrid";
     }
      
 }
