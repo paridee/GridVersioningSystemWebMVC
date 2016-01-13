@@ -30,9 +30,9 @@ import grid.interfaces.Updatable;
 @Entity
 @Table(name="Grid")
 public class Grid implements Updatable{
-	public enum GridState{
-		WORKING,UPDATING,FINAL_KO
-	}
+	//public enum GridState{
+	//	WORKING,UPDATING,FINAL_KO
+	//}
 	private int 		id;
 	private	int 		version=1; //TODO make String Version
 	private List<Goal> 	mainGoals				=	null;
@@ -129,7 +129,7 @@ public class Grid implements Updatable{
 		return null;
 	}
 	
-	public GridState obtainGridState(){
+	/*public GridState obtainGridState(){
 		HashMap<String,GridElement>	allElements	=	new HashMap<String,GridElement>();
 		for(int i=0;i<this.mainGoals.size();i++){
 			allElements.putAll(this.mainGoals.get(i).obtainEmbeddedElements());
@@ -148,7 +148,7 @@ public class Grid implements Updatable{
 			}
 		}
 		return returnState;
-	}
+	}*/
 	
 	/**
 	 * Calls Grid Element custom toString

@@ -1,10 +1,8 @@
 package grid.entities;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
-import javax.persistence.CascadeType;
 import javax.persistence.CollectionTable;
 import javax.persistence.Column;
 import javax.persistence.ElementCollection;
@@ -15,8 +13,6 @@ import javax.persistence.Id;
 import javax.persistence.Inheritance;
 import javax.persistence.InheritanceType;
 import javax.persistence.JoinColumn;
-import javax.persistence.JoinTable;
-import javax.persistence.ManyToMany;
 
 /**
  * This abstract class contains all the common elements among all elements belonging to every element of the Grid
