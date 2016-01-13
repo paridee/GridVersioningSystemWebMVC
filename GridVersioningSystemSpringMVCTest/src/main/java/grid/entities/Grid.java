@@ -129,8 +129,7 @@ public class Grid implements Updatable{
 		return null;
 	}
 	
-	
-	public GridState getGridState(){
+	public GridState obtainGridState(){
 		HashMap<String,GridElement>	allElements	=	new HashMap<String,GridElement>();
 		for(int i=0;i<this.mainGoals.size();i++){
 			allElements.putAll(this.mainGoals.get(i).obtainEmbeddedElements());
