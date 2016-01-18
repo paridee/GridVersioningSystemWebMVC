@@ -1,5 +1,8 @@
 package it.paridelorenzo.ISSSR;
 
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.io.IOException;
 import java.lang.reflect.Field;
 import java.text.DateFormat;
 import java.util.ArrayList;
@@ -27,6 +30,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 
+import grid.JSONFactory;
 import grid.DAOImpl.ProjectDAOImpl;
 import grid.entities.Goal;
 import grid.entities.Grid;
@@ -275,6 +279,33 @@ public class HomeController {
 		
 		Project prova	=	this.projectService.getProjectByProjectId("progetto di prova cazzo");
 		System.out.println("PROGETTO TROVATO "+prova);
+		
+		
+		//PARSING GRID
+		String everything	=	"";
+		try(BufferedReader br = new BufferedReader(new FileReader("grid2.txt"))) {
+		    StringBuilder sb = new StringBuilder();
+		    String line = br.readLine();
+
+		    while (line != null) {
+		        sb.append(line);
+		        sb.append(System.lineSeparator());
+		        line = br.readLine();
+		    }
+		    everything = sb.toString();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		Grid testGrid;
+		try {
+			testGrid = JSONFactory.loadFromJson(everything, projectService);
+			this.gridService.addGrid(testGrid);
+			System.out.println("CARICATA GRID DA JSON "+everything);
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 		return "home";
 	}
 	

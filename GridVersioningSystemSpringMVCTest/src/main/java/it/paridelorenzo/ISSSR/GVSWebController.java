@@ -99,8 +99,14 @@ public class GVSWebController {
 	
 	@RequestMapping(value = "/grids/add")
     public @ResponseBody String addGrid(@ModelAttribute(value="jsonData") String jsonData, BindingResult result) {
-		Grid temp=JSONFactory.loadFromJson(jsonData, this.projectService);
-		this.gridService.addGrid(temp);
+		Grid temp;
+		try {
+			temp = JSONFactory.loadFromJson(jsonData, this.projectService);
+			this.gridService.addGrid(temp);
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 		return "ok";
     }
 	
