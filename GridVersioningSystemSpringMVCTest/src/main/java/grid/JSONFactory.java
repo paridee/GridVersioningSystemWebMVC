@@ -38,8 +38,19 @@ public class JSONFactory {
 	public static Grid loadFromJson(String json,ProjectService projService) throws Exception{
 		Grid returnGrid					=	new Grid();	//new Grid to be loaded
 		HashMap<String, Object> objects	=	new HashMap<String, Object>();
-		JSONObject obj					=	new JSONObject(json);
-		JSONArray metricList			=	(JSONArray)obj.get("metricList");
+		JSONArray metricList	=	null;
+		JSONObject obj	=	null;
+		try{
+			obj					=	new JSONObject(json);
+			metricList			=	(JSONArray)obj.get("metricList");
+		}
+		catch(Exception e){
+			e.printStackTrace();
+			JSONObject	errObject	=	new JSONObject();
+			errObject.put("errorType", "Error while loading project from the given JSON");
+			errObject.put("faultyJson", json);
+			throw new Exception(errObject.toString());
+		}
 		ArrayList<Metric> metrics		=	new ArrayList<Metric>();
 		for(int i=0;i<metricList.length();i++){			//loads the Grid metrics, makes it Before other objects optimizing reading
 			Metric aMetric	=	JSONFactory.loadMetricFromJson(metricList.get(i).toString(), objects);

@@ -81,12 +81,6 @@ public interface GridService {
 	public void removeGrid(int id);
 	
 	/**
-	 * Returns all the embedded elements belonging to this Grid
-	 * @return hashmap with all the grid elements within
-	 */
-	public HashMap<String,GridElement> getAllEmbeddedElements(Grid g);
-	
-	/**
 	 * Check if a grid is an add update of another one
 	 */
 	

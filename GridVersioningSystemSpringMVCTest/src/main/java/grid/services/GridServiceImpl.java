@@ -164,18 +164,6 @@ public class GridServiceImpl implements GridService {
 		return updated;
 	}
 
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	public HashMap<String, GridElement> getAllEmbeddedElements(Grid g) {
-		HashMap<String,GridElement> returnMap	=	new HashMap<String,GridElement>();
-		for(int i=0;i<g.getMainGoals().size();i++){
-			returnMap.putAll(g.getMainGoals().get(i).obtainEmbeddedElements());
-		}
-		return returnMap;
-	}
-
 	@Override
 	public boolean isAddUpdate(Grid oldGrid, Grid newGrid) {
 		List<Goal>	oldMainGoal						=	oldGrid.getMainGoals();
@@ -191,8 +179,8 @@ public class GridServiceImpl implements GridService {
 			}
 		}
 		//check if all the elements of the old grid had only "add updates" in the new grid
-		HashMap<String, GridElement>	oldElements	=	this.getAllEmbeddedElements(oldGrid);
-		HashMap<String, GridElement>	newElements	=	this.getAllEmbeddedElements(newGrid);
+		HashMap<String, GridElement>	oldElements	=	oldGrid.obtainAllEmbeddedElements();
+		HashMap<String, GridElement>	newElements	=	newGrid.obtainAllEmbeddedElements();
 		Iterator<String> 				oldIterator	=	oldElements.keySet().iterator();
 		while(oldIterator.hasNext()){
 			String currentLabel		=	oldIterator.next();

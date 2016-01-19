@@ -8,7 +8,8 @@
 <h1>
 	Hello world!  
 </h1>
-
 <P>  The time on the server is ${serverTime}. <br> ${gridString}</P>
+<br><br>${jsonError}
+
 </body>
 </html>

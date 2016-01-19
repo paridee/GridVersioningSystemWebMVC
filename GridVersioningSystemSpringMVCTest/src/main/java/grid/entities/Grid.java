@@ -129,6 +129,19 @@ public class Grid implements Updatable{
 		return null;
 	}
 	
+	/**
+	 * Returns all the embedded elements belonging to this Grid
+	 * @return hashmap with all the grid elements within
+	 */
+	public HashMap<String, GridElement> obtainAllEmbeddedElements() {
+		HashMap<String,GridElement> returnMap	=	new HashMap<String,GridElement>();
+		for(int i=0;i<this.getMainGoals().size();i++){
+			returnMap.putAll(this.getMainGoals().get(i).obtainEmbeddedElements());
+		}
+		return returnMap;
+	}
+
+	
 	/*public GridState obtainGridState(){
 		HashMap<String,GridElement>	allElements	=	new HashMap<String,GridElement>();
 		for(int i=0;i<this.mainGoals.size();i++){
