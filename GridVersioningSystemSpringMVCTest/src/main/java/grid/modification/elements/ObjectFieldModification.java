@@ -1,22 +1,26 @@
 package grid.modification.elements;
 
 import java.lang.reflect.Field;
-import java.util.ArrayList;
 import java.util.HashMap;
 
 import grid.entities.Grid;
 import grid.entities.GridElement;
 
+/**
+ * This class models a value change in a simple attribute on a Grid Element
+ * @author Paride Casulli
+ * @author Lorenzo La Banca
+ *
+ */
 public class ObjectFieldModification extends GridElementModification {
 	
 	private String 	fieldToBeChanged;
 	private Object	newValue;
-	public String getSubjectLabel() {
-		return subjectLabel;
-	}
-	public void setSubjectLabel(String subjectLabel) {
-		this.subjectLabel = subjectLabel;
-	}
+
+	/**
+	 * Gets the name of the property involved by this change
+	 * @return name of the field to be changed
+	 */
 	public String getFieldToBeChanged() {
 		return fieldToBeChanged;
 	}

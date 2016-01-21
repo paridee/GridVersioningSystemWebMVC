@@ -48,6 +48,7 @@ import grid.modification.elements.GridElementModification;
 import grid.modification.elements.Modification;
 import grid.modification.elements.ObjectModificationService;
 import grid.modification.grid.GridModificationService;
+import grid.services.GridElementServiceImpl;
 import grid.services.ProjectServiceImpl;
 
 /**
@@ -113,6 +114,8 @@ public class HomeController {
 		mg2.add(pippo2);
 		mg2.add(testMG);
 		test2.setMainGoals(mg2);
+		String jsonV	=	this.gridElementService.obtainJson(pippo2, GridElementServiceImpl.JSONType.FIRST).toString();
+		System.out.println("JSON Ottenuto "+jsonV);
 		List<Modification> mod;
 		try {
 			mod = GridModificationService.getModification(test, test2);

@@ -10,7 +10,6 @@ import org.javers.core.JaversBuilder;
 import org.javers.core.diff.Change;
 import org.javers.core.diff.Diff;
 import org.javers.core.diff.changetype.ValueChange;
-import org.javers.core.diff.changetype.container.ContainerElementChange;
 import org.javers.core.diff.changetype.container.ListChange;
 import org.javers.core.diff.changetype.map.EntryAdded;
 import org.javers.core.diff.changetype.map.EntryChange;
@@ -20,6 +19,14 @@ import org.javers.core.diff.changetype.map.MapChange;
 import grid.entities.GridElement;
 
 public class ObjectModificationService {
+	
+	/**
+	 * Gets the modifications between two GridElement
+	 * @param oldElement older element
+	 * @param newElement newer element
+	 * @return differences 
+	 * @throws Exception in case of problems
+	 */
 	public static ArrayList<GridElementModification> getModification(GridElement oldElement, GridElement newElement) throws Exception{
 		if(!(oldElement.getClass().equals(newElement.getClass()))){
 			throw new Exception("Objects of different class");
@@ -48,14 +55,14 @@ public class ObjectModificationService {
 			}
 			else if(current.getClass().equals(ListChange.class)){
 				ListChange thisChange	=	(ListChange)current;
-				List<ContainerElementChange>	listchanges		=	thisChange.getChanges();	
-				System.out.println("cambio a livello lista tipo "+thisChange.getChanges()+" prop "+thisChange.getPropertyName()+" object "+thisChange.getAffectedObject().get());
 				Field field;
 				Object subject	=	thisChange.getAffectedObject().get();
 				field = subject.getClass().getDeclaredField(thisChange.getPropertyName());
 				field.setAccessible(true);
+				@SuppressWarnings("rawtypes")
 				List 	oldList 	= 	(List)field.get(oldElement);
 				HashMap		<String,Object>	oldListMap	=	new HashMap<String,Object>();
+				@SuppressWarnings("rawtypes")
 				List 	newList 	= 	(List)field.get(newElement);
 				HashMap		<String,Object>	newListMap	=	new HashMap<String,Object>();
 				for(int j=0;j<oldList.size();j++){

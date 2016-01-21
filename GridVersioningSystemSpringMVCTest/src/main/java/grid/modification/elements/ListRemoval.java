@@ -8,12 +8,6 @@ public class ListRemoval extends GridElementModification {
 	private String 	listNameToBeChanged;
 	private String	removedObjectLabel;
 	
-	public String getSubjectLabel() {
-		return subjectLabel;
-	}
-	public void setSubjectLabel(String subjectLabel) {
-		this.subjectLabel = subjectLabel;
-	}
 	public String getListNameToBeChanged() {
 		return listNameToBeChanged;
 	}

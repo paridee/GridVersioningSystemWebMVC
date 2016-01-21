@@ -1,6 +1,5 @@
 package grid.interfaces.services;
 
-import java.util.HashMap;
 import java.util.List;
 
 import grid.entities.Grid;

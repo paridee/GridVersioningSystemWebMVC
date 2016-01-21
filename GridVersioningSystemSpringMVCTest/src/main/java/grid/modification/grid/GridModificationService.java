@@ -18,16 +18,30 @@ import org.javers.core.diff.changetype.map.MapChange;
 import grid.entities.Goal;
 import grid.entities.Grid;
 import grid.entities.GridElement;
-import grid.modification.elements.ListAppend;
-import grid.modification.elements.ListRemoval;
 import grid.modification.elements.Modification;
 import grid.modification.elements.ObjectModificationService;
 
+/**
+ * This class owns the task of calculating differences between two grids
+ * @author Paride Casulli
+ * @author Lorenzo La Banca
+ *
+ */
 public class GridModificationService {
+	
+	/**
+	 * Calculate the differences between two grids
+	 * @param oldGrid older grid
+	 * @param newGrid newer grid
+	 * @return differences
+	 * @throws Exception in case of errors
+	 */
 	public static ArrayList<Modification> getModification(Grid oldGrid,Grid newGrid) throws Exception{
 		ArrayList<Modification>	allMods		=	new ArrayList<Modification>();
+		//get main goals from both grids
 		List<Goal>		oldMainGoals		=	oldGrid.getMainGoals();
 		List<Goal>		newMainGoals		=	newGrid.getMainGoals();
+		//put all these goals in a map
 		HashMap<String,Goal> oldGoalsMap	=	new HashMap<String,Goal>();
 		HashMap<String,Goal> newGoalsMap	=	new HashMap<String,Goal>();
 		for(int i=0;i<oldMainGoals.size();i++){
@@ -36,23 +50,27 @@ public class GridModificationService {
 		for(int i=0;i<newMainGoals.size();i++){
 			newGoalsMap.put(newMainGoals.get(i).getLabel(), newMainGoals.get(i));
 		}
+		//find the differences with javers lib
 		Javers 					javers			=	JaversBuilder.javers().registerValueObject(GridElement.class).build();
 		Diff diff			=	javers.compare(oldGoalsMap, newGoalsMap);
 		List<Change> changesInner	=	diff.getChanges();
-		System.out.println("DIFF "+diff);
+		//for be safe, there will be (at most) 1 change of type MapChange
 		for(int j=0;j<changesInner.size();j++){
 			Change innerChange	=	changesInner.get(j);
 			if(innerChange.getClass().equals(MapChange.class)){
+				//gets all the changes in the map
 				MapChange mapChange	=	(MapChange)innerChange;
 				List<EntryChange> entryChanges	=	mapChange.getEntryChanges();
 				for(int k=0;k<entryChanges.size();k++){
 					EntryChange entryChange	=	entryChanges.get(k);
+					//manage an entry insertion
 					if(entryChange.getClass().equals(EntryAdded.class)){
 						EntryAdded thisAdd	=	(EntryAdded)entryChange;
 						MainGoalAdd append	=	new MainGoalAdd();
 						append.setAppendedObjectLabel(thisAdd.getKey().toString());
 						allMods.add(append);
 					}
+					//manage an entry deletion
 					else if(entryChange.getClass().equals(EntryRemoved.class)){
 						EntryRemoved 	thisRem	=	(EntryRemoved)entryChange;
 						MainGoalRemove	remove	=	new MainGoalRemove();
@@ -63,16 +81,19 @@ public class GridModificationService {
 			}
 		}
 
+		//as before put all the embedded elements of the grid in a map
 		HashMap<String,GridElement> oldElementsMap	=	oldGrid.obtainAllEmbeddedElements();
 		HashMap<String,GridElement> newElementsMap	=	newGrid.obtainAllEmbeddedElements();
 		Set<String>	keySet							=	oldElementsMap.keySet();
 		Iterator<String> anIterator					=	keySet.iterator();
+		//check the changes in the attributes of the elements belonging to the intersection of older and newer elements
 		while(anIterator.hasNext()){
 			String key	=	anIterator.next();
 			if(newElementsMap.containsKey(key)){
 				allMods.addAll(ObjectModificationService.getModification(oldElementsMap.get(key), newElementsMap.get(key)));
 			}
 		}
+		//take insertion and delections
 		diff			=	javers.compare(oldElementsMap, newElementsMap);
 		changesInner	=	diff.getChanges();
 		System.out.println("DIFF "+diff);

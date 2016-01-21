@@ -3,19 +3,17 @@ package grid.modification.elements;
 import grid.entities.Grid;
 import grid.entities.GridElement;
 
+/**
+ * This class models an addition of an element to a List belonging to a GridElement
+ * @author Paride Casulli
+ * @author Lorenzo La Banza
+ *
+ */
 public class ListAppend extends GridElementModification {
 
 	private String 	listNameToBeChanged;
 	private String	appendedObjectLabel;
 	
-	public String getSubjectLabel() {
-		return subjectLabel;
-	}
-
-	public void setSubjectLabel(String subjectLabel) {
-		this.subjectLabel = subjectLabel;
-	}
-
 	public String getListNameToBeChanged() {
 		return listNameToBeChanged;
 	}
