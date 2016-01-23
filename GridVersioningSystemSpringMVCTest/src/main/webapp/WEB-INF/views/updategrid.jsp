@@ -39,7 +39,7 @@
     	
     	
     function submitForm() {
-    	jQuery.get('http://localhost:8080/ISSSR/resources/grid.txt', function(data) {
+    	jQuery.get('http://localhost:8080/ISSSR/resources/grid2.txt', function(data) {
     		//alert(data);
     		/*$.post("grids/add",
     				data,

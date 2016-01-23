@@ -45,7 +45,8 @@ public class ObjectModificationService {
 			if(current.getClass().equals(ValueChange.class)){
 				ValueChange 		thisChange	=	(ValueChange)current;
 				GridElement 		changed		=	(GridElement)thisChange.getAffectedObject().get();
-				if(!thisChange.getPropertyName().equals("idElement")){
+				if(!(thisChange.getPropertyName().equals("idElement")||(thisChange.getPropertyName().equals("version")))){
+					System.out.println("Adding modification on "+changed.getLabel()+" field "+thisChange.getPropertyName()+" old value "+thisChange.getLeft()+" new value "+thisChange.getRight());
 					ObjectFieldModification 	thisMod		=	new ObjectFieldModification();
 					thisMod.setSubjectLabel(changed.getLabel());
 					thisMod.setFieldToBeChanged(thisChange.getPropertyName());

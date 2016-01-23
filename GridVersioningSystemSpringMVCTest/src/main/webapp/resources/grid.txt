@@ -58,7 +58,7 @@
           "strategyType": "TERMINAL"
         },
         {
-          "descrizione": "strat2",
+          "descrizione": "strat2 modificata",
           "goalList": [
           ],
           "strategicProjectId": 0,
@@ -71,7 +71,7 @@
   "measGoalList": [
     {
       "descrizione": "meas goal 1",
-      "interpretationModel": "interpr1",
+      "interpretationModel": "interpr1 pippo",
       "mgId": "mg1",
       "questionList": [
         {
