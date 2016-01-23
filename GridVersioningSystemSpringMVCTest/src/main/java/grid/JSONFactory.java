@@ -33,12 +33,24 @@ public class JSONFactory {
 	 * This method takes a JSON string as parameter and parses and loads the contents in a Grid entity
 	 * @param json grid to be parsed
 	 * @return parsed Grid object
+	 * @throws Exception notifies error while loading a JSON
 	 */
-	public static Grid loadFromJson(String json,ProjectService projService){
+	public static Grid loadFromJson(String json,ProjectService projService) throws Exception{
 		Grid returnGrid					=	new Grid();	//new Grid to be loaded
 		HashMap<String, Object> objects	=	new HashMap<String, Object>();
-		JSONObject obj					=	new JSONObject(json);
-		JSONArray metricList			=	(JSONArray)obj.get("metricList");
+		JSONArray metricList	=	null;
+		JSONObject obj	=	null;
+		try{
+			obj					=	new JSONObject(json);
+			metricList			=	(JSONArray)obj.get("metricList");
+		}
+		catch(Exception e){
+			e.printStackTrace();
+			JSONObject	errObject	=	new JSONObject();
+			errObject.put("errorType", "Error while loading project from the given JSON");
+			errObject.put("faultyJson", json);
+			throw new Exception(errObject.toString());
+		}
 		ArrayList<Metric> metrics		=	new ArrayList<Metric>();
 		for(int i=0;i<metricList.length();i++){			//loads the Grid metrics, makes it Before other objects optimizing reading
 			Metric aMetric	=	JSONFactory.loadMetricFromJson(metricList.get(i).toString(), objects);
@@ -63,7 +75,16 @@ public class JSONFactory {
 		String 	prjlabel						=	projectj.getString("projectId");
 		Project project							=	projService.getProjectByProjectId(prjlabel);
 		if(project==null){
-			project								=	JSONFactory.loadProjectFromJson(projectj.toString(), objects);	
+			try {
+				project								=	JSONFactory.loadProjectFromJson(projectj.toString(), objects);
+			} catch (Exception e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+				JSONObject	errObject	=	new JSONObject();
+				errObject.put("errorType", "Error while loading project from the given JSON");
+				errObject.put("faultyJson", projectj.toString());
+				throw new Exception(errObject.toString());
+			}	
 		}
 		JSONArray qList							=	(JSONArray) obj.get("questionList");//loads questions
 		ArrayList<Question> questionList		=	new ArrayList<Question>();
@@ -85,7 +106,7 @@ public class JSONFactory {
 		return returnGrid;
 	}
 	
-	private static Project loadProjectFromJson(String string, HashMap<String, Object> loaded) {
+	private static Project loadProjectFromJson(String string, HashMap<String, Object> loaded) throws Exception{
 		JSONObject	obj		=	new JSONObject(string);
 		String projectId	=	obj.getString("projectId");
 		if(loaded.containsKey(projectId)){

@@ -6,13 +6,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.http.MediaType;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
@@ -91,18 +89,27 @@ public class GVSWebController {
     }
 	
 /*
-	/*@RequestMapping(value = "/grids/add")
+	@RequestMapping(value = "/grids/add")
+    public String addGrid(@RequestParam("jsonData") String jsonData, Model model) {
+		model.addAttribute("addedGrid", "true");
+		System.out.println(jsonData);
+		return "addgrid";
+    }
+	*/
+	
+	@RequestMapping(value = "/grids/add")
     public @ResponseBody String addGrid(@ModelAttribute(value="jsonData") String jsonData, BindingResult result) {
-		Grid temp=JSONFactory.loadFromJson(jsonData, this.projectService);
-		System.out.println(temp.toString());
-		this.gridService.addGrid(temp);
-		return "ok";
-    }*/
-	@RequestMapping(value = "/grids/add", method=RequestMethod.POST)
-    public @ResponseBody String addGrid(@RequestBody String jsonData) {
-		//Grid temp=JSONFactory.loadFromJson(jsonData, this.projectService);
-		System.out.println(jsonData.toString());
-		//this.gridService.addGrid(temp);
+		Grid temp;
+		try {
+			temp = JSONFactory.loadFromJson(jsonData, this.projectService);
+			System.out.println(temp.toString());
+			this.gridService.addGrid(temp);
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		
 		return "ok";
     }
 	
@@ -111,20 +118,6 @@ public class GVSWebController {
 	@RequestMapping(value = "/addgrid", method = RequestMethod.GET)
     public String addGridPage(Model model) {
 		return "addgrid";
-    }
-	
-	@RequestMapping(value = "/grids/update")
-    public @ResponseBody String updateGrid(@ModelAttribute(value="jsonData") String jsonData, BindingResult result) {
-		Grid temp=JSONFactory.loadFromJson(jsonData, this.projectService);
-		this.gridService.updateGrid(temp);
-		return "ok";
-    }
-	
-	
-	
-	@RequestMapping(value = "/updategrid", method = RequestMethod.GET)
-    public String updateGridPage(Model model) {
-		return "updategrid";
     }
      
 }

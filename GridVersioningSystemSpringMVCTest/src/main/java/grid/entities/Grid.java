@@ -2,9 +2,7 @@ package grid.entities;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
-import java.util.Set;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Entity;
@@ -17,8 +15,6 @@ import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
-
-import grid.entities.GridElement.State;
 import grid.interfaces.Updatable;
 
 /**
@@ -128,6 +124,19 @@ public class Grid implements Updatable{
 		// TODO Auto-generated method stub
 		return null;
 	}
+	
+	/**
+	 * Returns all the embedded elements belonging to this Grid
+	 * @return hashmap with all the grid elements within
+	 */
+	public HashMap<String, GridElement> obtainAllEmbeddedElements() {
+		HashMap<String,GridElement> returnMap	=	new HashMap<String,GridElement>();
+		for(int i=0;i<this.getMainGoals().size();i++){
+			returnMap.putAll(this.getMainGoals().get(i).obtainEmbeddedElements());
+		}
+		return returnMap;
+	}
+
 	
 	/*public GridState obtainGridState(){
 		HashMap<String,GridElement>	allElements	=	new HashMap<String,GridElement>();

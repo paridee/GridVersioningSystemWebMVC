@@ -1,5 +1,9 @@
 package it.paridelorenzo.ISSSR;
 
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileReader;
+import java.io.IOException;
 import java.lang.reflect.Field;
 import java.text.DateFormat;
 import java.util.ArrayList;
@@ -14,6 +18,7 @@ import org.javers.core.Javers;
 import org.javers.core.JaversBuilder;
 import org.javers.core.diff.Change;
 import org.javers.core.diff.Diff;
+import org.javers.core.diff.changetype.ValueChange;
 import org.javers.core.diff.changetype.container.ContainerElementChange;
 import org.javers.core.diff.changetype.container.ListChange;
 import org.slf4j.Logger;
@@ -27,6 +32,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 
+import grid.JSONFactory;
 import grid.DAOImpl.ProjectDAOImpl;
 import grid.entities.Goal;
 import grid.entities.Grid;
@@ -38,6 +44,11 @@ import grid.interfaces.DAO.ProjectDAO;
 import grid.interfaces.services.GridElementService;
 import grid.interfaces.services.GridService;
 import grid.interfaces.services.ProjectService;
+import grid.modification.elements.GridElementModification;
+import grid.modification.elements.Modification;
+import grid.modification.elements.ObjectModificationService;
+import grid.modification.grid.GridModificationService;
+import grid.services.GridElementServiceImpl;
 import grid.services.ProjectServiceImpl;
 
 /**
@@ -71,6 +82,63 @@ public class HomeController {
 
 	private static final Logger logger = LoggerFactory.getLogger(HomeController.class);
 	
+	/**
+	 * Simply selects the home view to render by returning its name.
+	 */
+	@RequestMapping(value = "/test", method = RequestMethod.GET)
+	public String hometest(Locale locale, Model model) {
+		Goal pippo	=	new Goal();
+		pippo.setAssumption("pippoassumption");
+		pippo.setLabel("stocazzo");
+		this.gridElementService.addGridElement(pippo);
+		System.out.println("prova load");
+		Goal pippo2	=	(Goal) pippo.clone();
+		pippo2.setDescription("popopop");
+		Strategy pipps	=	new Strategy();
+		pipps.setLabel("stocazzo_strategy");
+		pippo2.getStrategyList().add(pipps);
+		try {
+			List<GridElementModification>	modList	=	ObjectModificationService.getModification(pippo2, pippo);
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		Grid test	=	new Grid();
+		ArrayList<Goal> mg1	=	new ArrayList<Goal>();
+		mg1.add(pippo);
+		test.setMainGoals(mg1);
+		Grid test2	=	new Grid();
+		Goal testMG	=	new Goal();
+		testMG.setLabel("test main goal");
+		ArrayList<Goal> mg2	=	new ArrayList<Goal>();
+		mg2.add(pippo2);
+		mg2.add(testMG);
+		test2.setMainGoals(mg2);
+		String jsonV	=	this.gridElementService.obtainJson(pippo2, GridElementServiceImpl.JSONType.FIRST).toString();
+		System.out.println("JSON Ottenuto "+jsonV);
+		List<Modification> mod;
+		try {
+			mod = GridModificationService.getModification(test, test2);
+			System.out.println("Mie modifiche");
+			for(int i=0;i<mod.size();i++){
+				System.out.println(mod.get(i).toString());
+			}
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		try {
+			mod	=	GridModificationService.getModification(test2, test);
+			System.out.println("Mie modifiche 2");
+			for(int i=0;i<mod.size();i++){
+				System.out.println(mod.get(i).toString());
+			}
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return "home";
+	}
 	/**
 	 * Simply selects the home view to render by returning its name.
 	 */
@@ -130,16 +198,16 @@ public class HomeController {
 				}
 			}
 		}
-		HashMap<String,GridElement> map			=	gridService.getAllEmbeddedElements(iesima);
-		Set<String> keys						=	gridService.getAllEmbeddedElements(iesima).keySet();
+		HashMap<String,GridElement> map			=	iesima.obtainAllEmbeddedElements();
+		Set<String> keys						=	iesima.obtainAllEmbeddedElements().keySet();
 		ArrayList<GridElement> elements1		=	new ArrayList<GridElement>();
 		Iterator<String> iterator	=	keys.iterator();
 		while(iterator.hasNext()){
 			elements1.add(map.get(iterator.next()));
 		}
 		
-		HashMap<String,GridElement> map2			=	gridService.getAllEmbeddedElements(preced);
-		keys						=	gridService.getAllEmbeddedElements(preced).keySet();
+		HashMap<String,GridElement> map2			=	preced.obtainAllEmbeddedElements();
+		keys						=	preced.obtainAllEmbeddedElements().keySet();
 		ArrayList<GridElement> elements2		=	new ArrayList<GridElement>();
 		iterator	=	keys.iterator();
 		while(iterator.hasNext()){
@@ -216,7 +284,59 @@ public class HomeController {
 		for(int i=0;i<changes.size();i++){
 			Change current	=	changes.get(i);
 			System.out.println(current.getClass().getName()+" "+current.getAffectedObject().get());
-			if(current.getClass().equals(ListChange.class)){
+			if(current.getClass().equals(ValueChange.class)){
+				ValueChange thisChange	=	(ValueChange)current;
+				Object changed	=	thisChange.getAffectedObject().get();
+				//try {
+					System.out.println("Classe oggetto "+changed.getClass());
+					Field[] attributes	=	changed.getClass().getDeclaredFields();
+					ArrayList<String> superClassFields	=	new ArrayList();
+					Field[] supAttributes	=	GridElement.class.getDeclaredFields();
+					for(int z=0;z<supAttributes.length;z++){
+						System.out.println("ATTRIBUTO"+supAttributes[z].getName());
+						superClassFields.add(supAttributes[z].getName());
+					}
+					if(superClassFields.contains(thisChange.getPropertyName())){
+						System.out.println("attributo della superclasse");
+						Field test;
+						try {
+							test = GridElement.class.getDeclaredField(thisChange.getPropertyName());
+							test.setAccessible(true);
+						} catch (NoSuchFieldException e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						} catch (SecurityException e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						}
+					}
+					else{
+						System.out.println("attributo non della superclasse");
+						Field test;
+						try {
+							test = changed.getClass().getDeclaredField(thisChange.getPropertyName());
+							test.setAccessible(true);
+						} catch (NoSuchFieldException e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						} catch (SecurityException e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						}
+					}
+					//System.out.println("Campi oggetto "+attributes);
+					GridElement changedGE	=	(GridElement)changed;
+					System.out.println("Cambiato valore su "+changedGE.getLabel()+" attributo "+thisChange.getPropertyName()+" da "+thisChange.getLeft()+" a "+thisChange.getRight()+" tipo attributo "+thisChange.getLeft().getClass());//+attribute.getClass());
+					/*
+				} catch (NoSuchFieldException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				} catch (SecurityException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}*/
+			}
+			else if(current.getClass().equals(ListChange.class)){
 				ListChange thisChange	=	(ListChange)current;
 				List<ContainerElementChange>	listchanges		=	thisChange.getChanges();	
 				System.out.println("cambio a livello lista tipo "+thisChange.getChanges()+" prop "+thisChange.getPropertyName()+" object "+thisChange.getAffectedObject().get());
@@ -247,7 +367,7 @@ public class HomeController {
 				}
 			}
 		}
-		diff	=	javers.compare(gridService.getAllEmbeddedElements(testupdate),gridService.getAllEmbeddedElements(iesima));
+		diff	=	javers.compare(testupdate.obtainAllEmbeddedElements(),testupdate.obtainAllEmbeddedElements());
 		System.out.println("DIFF3 "+diff);
 		System.out.println("DIFF4 ");
 		ArrayList<String> test1	=	new ArrayList<String>();
@@ -275,6 +395,42 @@ public class HomeController {
 		
 		Project prova	=	this.projectService.getProjectByProjectId("progetto di prova cazzo");
 		System.out.println("PROGETTO TROVATO "+prova);
+		
+		
+		//PARSING GRID
+		File file	=	new File("grid.txt");
+		try {
+			System.out.println(file.getAbsolutePath()+" "+file.getCanonicalPath());
+		} catch (IOException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
+		String everything	=	"";
+		try(BufferedReader br = new BufferedReader(new FileReader(new File("grid.txt")))) {
+		    StringBuilder sb = new StringBuilder();
+		    String line = br.readLine();
+
+		    while (line != null) {
+		        sb.append(line);
+		        sb.append(System.lineSeparator());
+		        line = br.readLine();
+		    }
+		    everything = sb.toString();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		Grid testGrid;
+		try {
+			testGrid = JSONFactory.loadFromJson(everything, projectService);
+			this.gridService.addGrid(testGrid);
+			System.out.println("CARICATA GRID DA JSON "+everything);
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			System.out.println("HomeController stampo errore json");
+			e.printStackTrace();
+			model.addAttribute("jsonError", e.getMessage());
+		}
 		return "home";
 	}
 	
