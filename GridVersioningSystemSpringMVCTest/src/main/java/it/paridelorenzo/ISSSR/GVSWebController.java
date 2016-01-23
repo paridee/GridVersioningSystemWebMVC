@@ -1,5 +1,6 @@
 package it.paridelorenzo.ISSSR;
 
+import java.util.HashMap;
 import java.util.List;
 
 import org.json.JSONObject;
@@ -17,11 +18,13 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 import grid.JSONFactory;
 import grid.entities.Grid;
+import grid.entities.GridElement;
 import grid.entities.Project;
 import grid.interfaces.services.GridElementService;
 import grid.interfaces.services.GridService;
 import grid.interfaces.services.ProjectService;
 import grid.modification.elements.Modification;
+import grid.modification.elements.ObjectFieldModification;
 import grid.modification.grid.GridModificationService;
  
  
@@ -161,7 +164,25 @@ public class GVSWebController {
 				if(mods.size()==0){
 					return "non ci sono modifiche";
 				}
-				else return "modifiche";
+				else{
+					Grid 						newVersion	=	this.gridService.upgradeGrid(latest);
+					HashMap<String,GridElement> elements	=	temp.obtainAllEmbeddedElements();
+					for(int i=0;i<mods.size();i++){
+						Modification 	aMod	=	mods.get(i);
+						if(aMod instanceof ObjectFieldModification){
+							GridElement 	subj;
+							if(elements.containsKey(((ObjectFieldModification) aMod).getSubjectLabel())){
+								subj	=	elements.get(((ObjectFieldModification) aMod).getSubjectLabel());
+								subj	=	this.gridElementService.upgradeGridElement(subj);
+								((ObjectFieldModification) aMod).apply(subj, newVersion);
+								newVersion.update(subj);
+							}
+							else return "error";
+						}
+					}
+					this.gridService.updateGrid(newVersion);
+					return "modifiche";
+				}
 			}
 		} catch (Exception e) {
 			// TODO Auto-generated catch block

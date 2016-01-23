@@ -44,6 +44,7 @@ public class ObjectFieldModification extends GridElementModification {
 		}
 		if(fieldsMap.containsKey(this.fieldToBeChanged)){
 			Field	aField	=	fieldsMap.get(this.fieldToBeChanged);
+			aField.setAccessible(true);
 			aField.set(anElement, newValue);
 		}
 		//is not a superclass field, check if is subclass field
@@ -55,6 +56,7 @@ public class ObjectFieldModification extends GridElementModification {
 			}
 			if(fieldsMap.containsKey(this.fieldToBeChanged)){
 				Field	aField	=	fieldsMap.get(this.fieldToBeChanged);
+				aField.setAccessible(true);
 				aField.set(anElement, newValue);
 			}
 			else{
