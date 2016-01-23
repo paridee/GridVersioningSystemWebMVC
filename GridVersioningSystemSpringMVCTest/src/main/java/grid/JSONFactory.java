@@ -242,7 +242,7 @@ public class JSONFactory {
 
 	private static Metric loadMetricFromJson(String string, HashMap<String, Object> loaded) {
 		String first	=	string.substring(0,1);
-		if(!first.equals("{")){	//gestisco formato a cazzo JSON
+		if(!first.equals("{")){	//gestisco formato a non standard JSON
 			if(loaded.containsKey(string)){
 				System.out.println("Metric.java Metric "+string+" already exists");
 				return (Metric)loaded.get(string);

@@ -42,7 +42,7 @@ public class GridDAOImpl implements GridDAO {
 	public void addGrid(Grid g) {
 		Session	session	=	this.sessionFactory.getCurrentSession();
 		session.persist(g);
-		logger.info("GoalDAOImpl: added a new Goal on persistence layer");		
+		logger.info(" added a new Grid Element on persistence layer");		
 	}
 
 	/**

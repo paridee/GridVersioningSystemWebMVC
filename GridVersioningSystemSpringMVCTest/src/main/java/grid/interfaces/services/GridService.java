@@ -2,8 +2,11 @@ package grid.interfaces.services;
 
 import java.util.List;
 
+import org.json.JSONObject;
+
 import grid.entities.Grid;
 import grid.entities.GridElement;
+import grid.services.GridElementServiceImpl.JSONType;
 
 /**
  * Interface defining methods for a Grid service, following CRUD operations and more
@@ -82,6 +85,13 @@ public interface GridService {
 	/**
 	 * Check if a grid is an add update of another one
 	 */
-	
 	public boolean isAddUpdate(Grid oldGrid, Grid newGrid);
+	
+	/**
+	 * Obtain a json representation for this Grid
+	 * @param element grid to be serialized
+	 * @param type type of json output
+	 * @return Json
+	 */
+	public JSONObject obtainJson(Grid element,JSONType type);
 }

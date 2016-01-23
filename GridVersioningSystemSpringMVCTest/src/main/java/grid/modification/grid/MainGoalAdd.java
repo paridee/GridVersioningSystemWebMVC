@@ -1,6 +1,11 @@
 package grid.modification.grid;
 
+import java.util.HashMap;
+import java.util.List;
+
+import grid.entities.Goal;
 import grid.entities.Grid;
+import grid.entities.GridElement;
 
 /**
  * Models an inserction of a main goal to a Grid
@@ -34,8 +39,17 @@ public class MainGoalAdd extends GridModification {
 	 */
 	@Override
 	public void apply(Grid grid) throws Exception {
-		// TODO Auto-generated method stub
-
+		HashMap<String,GridElement> elements	=	grid.obtainAllEmbeddedElements();
+		if(elements.containsKey(this.appendedObjectLabel)){
+			GridElement	ge	=	elements.get(this.appendedObjectLabel);
+			if(ge instanceof Goal){
+				List<Goal>	list	=	grid.getMainGoals();
+				Goal aGoal		=	(Goal)ge;
+				list.add(aGoal);
+			}
+			else throw new Exception("Object "+this.appendedObjectLabel+" is not a Goal, cannot add it to maingoals");
+		}
+		else throw new Exception("Goal not found in elements, not possible to add as main goal");
 	}
 
 	/**

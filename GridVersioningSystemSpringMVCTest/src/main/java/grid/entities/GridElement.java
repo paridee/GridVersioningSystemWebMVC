@@ -1,8 +1,10 @@
 package grid.entities;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
+import javax.persistence.CascadeType;
 import javax.persistence.CollectionTable;
 import javax.persistence.Column;
 import javax.persistence.ElementCollection;
@@ -13,6 +15,8 @@ import javax.persistence.Id;
 import javax.persistence.Inheritance;
 import javax.persistence.InheritanceType;
 import javax.persistence.JoinColumn;
+import javax.persistence.JoinTable;
+import javax.persistence.ManyToMany;
 
 /**
  * This abstract class contains all the common elements among all elements belonging to every element of the Grid
@@ -26,6 +30,7 @@ public abstract class GridElement {
 	public enum State{
 		WORKING, MAJOR_UPDATING, MINOR_UPDATING, FINAL_KO
 	}
+	protected List<Practitioner> authors	=	new ArrayList<Practitioner>();
 	
 	protected State 	state	=	State.WORKING;
 	
@@ -41,7 +46,6 @@ public abstract class GridElement {
 			length 		= 	20)
 	protected int 	version=1;
 	
-	private List<String> authors;
 	/**
 	 * Returns a label for this Grid Entity (in Grid is named as ID, depending on the type of Element
 	 * @return label of this element
@@ -113,11 +117,18 @@ public abstract class GridElement {
 	 * Get the authors list for this element
 	 * @return authors list
 	 */
-	@ElementCollection
-	@CollectionTable(	name		=	"GridElementToAuthors", 
-						joinColumns	=	@JoinColumn(name="gridElementID"))
-	@Column(name="author")
-	public List<String> getAuthors() {
+	@ManyToMany(cascade = CascadeType.ALL)
+	@JoinTable(	name = "GridElementToAuthors", 
+				joinColumns 		= 	{ 
+						@JoinColumn(name 		=	"gridElementID", 
+									nullable 	= 	false, 
+									updatable 	= 	false)}, 
+				inverseJoinColumns 	= 	{ 
+						@JoinColumn(name 		= 	"author", 
+									nullable 	= 	false, 
+									updatable 	= 	false)}
+			)
+	public List<Practitioner> getAuthors() {
 		return authors;
 	}
 
@@ -125,7 +136,7 @@ public abstract class GridElement {
 	 * Set the authors list for this element
 	 * @param authors authors to be set
 	 */
-	public void setAuthors(List<String> authors) {
+	public void setAuthors(List<Practitioner> authors) {
 		this.authors = authors;
 	}
 
