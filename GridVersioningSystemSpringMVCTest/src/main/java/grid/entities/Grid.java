@@ -13,6 +13,7 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
+import javax.persistence.ManyToOne;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
 import grid.interfaces.Updatable;
@@ -101,7 +102,7 @@ public class Grid implements Updatable{
 	 * Getter method for project owning this Grid
 	 * @return project owner
 	 */
-	@OneToOne(	fetch	=	FetchType.LAZY)
+	@ManyToOne(	fetch	=	FetchType.EAGER)
 	@JoinColumn(name	=	"projID")
 	public Project getProject() {
 		return project;

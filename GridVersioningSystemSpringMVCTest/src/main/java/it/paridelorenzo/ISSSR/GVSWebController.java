@@ -188,6 +188,8 @@ public class GVSWebController {
 					}
 					if(toBeRemoved!=null){
 						System.out.println("Removing Grid with ID "+toBeRemoved.getId());
+						toBeRemoved.setMainGoals(null);
+						this.gridService.updateGrid(toBeRemoved);
 						this.gridService.removeGrid(toBeRemoved.getId());
 					}
 					return "modifiche";
