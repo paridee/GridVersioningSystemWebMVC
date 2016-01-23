@@ -15,6 +15,13 @@
     <link rel="icon" href="resources/bootstrap/favicon.ico">
 
     <title>Lista Grids</title>
+    <!--Treant core CSS -->
+	<link rel="stylesheet" href="/resources/treant-js-master/Treant.css">
+    <link rel="stylesheet" href="/resources/treant-js-master/collapsable.css">
+    
+    <link rel="stylesheet" href="/resources/treant-js-master/vendor/perfect-scrollbar/perfect-scrollbar.css">
+
+
 
     <!-- Bootstrap core CSS -->
     <link href="<c:url value='/resources/bootstrap/dist/css/bootstrap.min.css' />" rel="stylesheet">
@@ -80,6 +87,21 @@
 		    </tr>
 		    </table>
 		</div>
+		<div>${gridTreeString}
+		</div>
+		<div class="chart" id="collapsable-example"></div>
+		    <script src="<c:url value='/resources/treant-js-master/vendor/raphael.js'/>"></script>
+		    <script src="<c:url value='/resources/treant-js-master/Treant.js'/>"></script>
+		    
+		    <script src="<c:url value='/resources/treant-js-master/vendor/jquery.min.js'/>"></script>
+		    <script src="<c:url value='/resources/treant-js-master/vendor/jquery.easing.js'/>"></script>
+		    
+		    
+		    <script src="<c:url value='/resources/treant-js-master/examples/collapsable/img/collapsable.js'/>"></script>
+		    <script>
+		    	//alert(${gridTreeString});
+		        tree = new Treant(${gridTreeString});
+		    </script>
 		</c:if>
       	
         <c:if test="${!empty listGrids}">

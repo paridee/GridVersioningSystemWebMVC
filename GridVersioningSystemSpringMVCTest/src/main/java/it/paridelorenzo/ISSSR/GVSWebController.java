@@ -68,6 +68,10 @@ public class GVSWebController {
     public String getGrid(@PathVariable("id") int id, Model model) {
 		Grid temp= this.gridService.getGridById(id);
 		model.addAttribute("grid", temp);
+		//create string for collapsable tree
+		String toTree="{ chart: { container: \"#tree-simple\" },  nodeStructure: { text: { name: \"Parent node\" },        children: [{                text: { name: \"First child\" }            },            {                text: { name: \"Second child\" }            }        ]    }}";
+		//
+		model.addAttribute("gridTreeString",toTree);
         return "grids";
     }
 	
