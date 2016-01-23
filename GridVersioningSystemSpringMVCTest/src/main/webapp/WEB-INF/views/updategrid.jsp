@@ -39,23 +39,17 @@
     	
     	
     function submitForm() {
-    	jQuery.get('http://localhost:8080/ISSSR/resources/grid.txt', function(data) {
-    		//alert(data);
-    		/*$.post("grids/add",
-    				data,
-    			    function(resp, status){
-    			        alert("Data: " + resp + "\nStatus: " + status);
-    			    });*/
+    	jQuery.get('http://localhost:8080/ISSSR/resources/gridtoupdate.txt', function(data) {
     		jQuery.ajax({
            		type: "POST",
-      	   		url: "grids/add",
-	      	   	contentType: "application/json; charset=utf-8",
-	      	    dataType: "json",
-    	  	   	data: data,
-    	  	  	success: function (msg) 
-              	{ alert(msg) },
-      			error: function (err)
-      			{ alert(err.responseText)}
+      	   		url: "grids/update",
+    	  	   	data: { 
+    	  	        'jsonData': data, 
+    	  	    },
+           	   	success: function(msg){
+       	     		alert(msg);
+       	     		
+           	   	}
                 
             });
     	});
