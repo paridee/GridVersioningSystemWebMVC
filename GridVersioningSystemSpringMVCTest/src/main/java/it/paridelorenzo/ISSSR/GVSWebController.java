@@ -8,9 +8,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.validation.BindingResult;
-import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
@@ -97,21 +96,22 @@ public class GVSWebController {
     }
 	*/
 	
-	@RequestMapping(value = "/grids/add")
-    public @ResponseBody String addGrid(@ModelAttribute(value="jsonData") String jsonData, BindingResult result) {
+	@RequestMapping(value = "/grids/add", method=RequestMethod.POST)
+    public @ResponseBody String addGrid(@RequestBody String jsonData) {
+		//Grid temp=JSONFactory.loadFromJson(jsonData, this.projectService);
+		System.out.println(jsonData.toString());
+		//this.gridService.addGrid(temp);
 		Grid temp;
 		try {
 			temp = JSONFactory.loadFromJson(jsonData, this.projectService);
-			System.out.println(temp.toString());
 			this.gridService.addGrid(temp);
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		
-		
 		return "ok";
     }
+
 	
 	
 	
