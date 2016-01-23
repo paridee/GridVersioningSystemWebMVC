@@ -105,7 +105,8 @@ public class GridServiceImpl implements GridService {
 	 */
 	@Override
 	public Grid getLatestGrid(int projid) {
-		return this.gridDao.getGridById(projid);
+		
+		return this.gridDao.getLatestGrid(projid);
 	}
 
 	/**

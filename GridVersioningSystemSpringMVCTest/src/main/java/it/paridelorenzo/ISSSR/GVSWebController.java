@@ -2,6 +2,7 @@ package it.paridelorenzo.ISSSR;
 
 import java.util.List;
 
+import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,6 +21,8 @@ import grid.entities.Project;
 import grid.interfaces.services.GridElementService;
 import grid.interfaces.services.GridService;
 import grid.interfaces.services.ProjectService;
+import grid.modification.elements.Modification;
+import grid.modification.grid.GridModificationService;
  
  
 @Controller
@@ -101,15 +104,31 @@ public class GVSWebController {
 		//Grid temp=JSONFactory.loadFromJson(jsonData, this.projectService);
 		System.out.println(jsonData.toString());
 		//this.gridService.addGrid(temp);
+		JSONObject response	=	new JSONObject();
 		Grid temp;
 		try {
 			temp = JSONFactory.loadFromJson(jsonData, this.projectService);
-			this.gridService.addGrid(temp);
+			Grid latest	=	this.gridService.getLatestGrid(temp.getProject().getId());
+			if(latest	==	null){
+				this.gridService.addGrid(temp);
+			}
+			else{
+				response.put("result", "error");
+				response.put("detail", " a grid already exists for this project");
+				String res	=	response.toString();	
+				return "errore";
+			}
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
+			response.put("result", "error");
+			response.put("detail", " exception catched in grid saving, generic error");
+			String res	=	response.toString();	
+			return res+"";
 		}
-		return "ok";
+		response.put("result", "OK");
+		String res	=	response.toString();	
+		return res+"";
     }
 
 	
@@ -118,6 +137,46 @@ public class GVSWebController {
 	@RequestMapping(value = "/addgrid", method = RequestMethod.GET)
     public String addGridPage(Model model) {
 		return "addgrid";
+    }
+	
+	@RequestMapping(value = "/grids/update", method=RequestMethod.POST)
+    public @ResponseBody String updateGrid(@RequestBody String jsonData) {
+		//Grid temp=JSONFactory.loadFromJson(jsonData, this.projectService);
+		System.out.println(jsonData.toString());
+		//this.gridService.addGrid(temp);
+		JSONObject response	=	new JSONObject();
+		Grid temp;
+		try {
+			temp = JSONFactory.loadFromJson(jsonData, this.projectService);
+			Grid latest	=	this.gridService.getLatestGrid(temp.getProject().getId());
+			if(latest	==	null){
+				return "non esiste grid per questo progetto";
+			}
+			else{
+				//TODO se e' update nel "nostro formato" vai a prendere la grid di riferimento e fai il check per i conflitti
+				List<Modification>	mods	=	GridModificationService.getModification(latest, temp);
+				for(int i=0;i<mods.size();i++){
+					System.out.println("found modification "+mods.get(i).toString());
+				}
+				if(mods.size()==0){
+					return "non ci sono modifiche";
+				}
+				else return "modifiche";
+			}
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			return "error: generic exception";
+		}
+		
+    }
+
+	
+	
+	
+	@RequestMapping(value = "/updategrid", method = RequestMethod.GET)
+    public String updateGridPage(Model model) {
+		return "updategrid";
     }
      
 }

@@ -22,7 +22,6 @@ public class GridElementAdd extends GridModification {
 
 	@Override
 	public String toString() {
-		// TODO Auto-generated method stub
 		return "GridElementAdd added GridElement "+this.appendedObjectLabel;
 	}
 

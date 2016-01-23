@@ -84,8 +84,15 @@ public class GridDAOImpl implements GridDAO {
 	 */
 	@Override
 	public Grid getLatestGrid(int projid) {
-		// TODO Auto-generated method stub
-		return null;
+		Session session				=	this.sessionFactory.getCurrentSession();
+		@SuppressWarnings("unchecked")
+		List<Grid> gridElList	=	session.createQuery("from Grid G where G.project.id = "+projid+" ORDER BY version DESC").list();
+		if(gridElList.size()>0){
+			Grid latest		=	gridElList.get(0);
+			logger.info("Grid:: latest grid found"+latest);
+			return latest;
+		}
+		else return null;
 	}
 
 	/**

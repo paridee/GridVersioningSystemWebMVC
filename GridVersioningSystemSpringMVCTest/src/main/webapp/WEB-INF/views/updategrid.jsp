@@ -14,7 +14,7 @@
     <meta name="author" content="">
     <link rel="icon" href="resources/bootstrap/favicon.ico">
 
-    <title>Add Grid</title>
+    <title>Update</title>
 
     <!-- Bootstrap core CSS -->
     <link href="<c:url value='/resources/bootstrap/dist/css/bootstrap.min.css' />" rel="stylesheet">
@@ -39,17 +39,23 @@
     	
     	
     function submitForm() {
-    	jQuery.get('http://localhost:8080/ISSSR/resources/gridtoupdate.txt', function(data) {
+    	jQuery.get('http://localhost:8080/ISSSR/resources/grid.txt', function(data) {
+    		//alert(data);
+    		/*$.post("grids/add",
+    				data,
+    			    function(resp, status){
+    			        alert("Data: " + resp + "\nStatus: " + status);
+    			    });*/
     		jQuery.ajax({
            		type: "POST",
       	   		url: "grids/update",
-    	  	   	data: { 
-    	  	        'jsonData': data, 
-    	  	    },
-           	   	success: function(msg){
-       	     		alert(msg);
-       	     		
-           	   	}
+	      	   	contentType: "application/json; charset=utf-8",
+	      	    dataType: "json",
+    	  	   	data: data,
+    	  	  	success: function (msg) 
+              	{ alert(msg) },
+      			error: function (err)
+      			{ alert(err.responseText)}
                 
             });
     	});
