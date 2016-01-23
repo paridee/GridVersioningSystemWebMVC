@@ -38,6 +38,7 @@ import grid.entities.Goal;
 import grid.entities.Grid;
 import grid.entities.GridElement;
 import grid.entities.GridElement.State;
+import grid.entities.MeasurementGoal;
 import grid.entities.Project;
 import grid.entities.Strategy;
 import grid.interfaces.DAO.ProjectDAO;
@@ -96,7 +97,13 @@ public class HomeController {
 		pippo2.setDescription("popopop");
 		Strategy pipps	=	new Strategy();
 		pipps.setLabel("stocazzo_strategy");
-		pippo2.getStrategyList().add(pipps);
+		List strList	=	pippo2.getStrategyList();
+		MeasurementGoal stub	=	new MeasurementGoal();
+		stub.setLabel("stubMG");
+		pippo2.setMeasurementGoal(stub);
+		pippo.setMeasurementGoal(stub);
+		System.out.print("clone: "+pippo2.toString("\t\t", "\n"));
+		strList.add(pipps);
 		try {
 			List<GridElementModification>	modList	=	ObjectModificationService.getModification(pippo2, pippo);
 		} catch (Exception e) {
@@ -137,6 +144,9 @@ public class HomeController {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+		Goal test3	=	(Goal)testMG.clone();
+		test3.getStrategyList().add(pipps);
+		System.out.println("TESTISSIMO "+test3.toString("\t\t","\n"));
 		return "home";
 	}
 	/**

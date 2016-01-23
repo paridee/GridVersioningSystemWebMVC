@@ -115,6 +115,11 @@ public class Strategy extends GridElement implements Updatable{
 		cloned.setVersion(this.version);
 		cloned.setDescription(this.description);
 		List<Goal> clonedList	=	new ArrayList<Goal>();
+		List<Practitioner> clonedListP	=	new ArrayList<Practitioner>();
+		for(int i=0;i<this.getAuthors().size();i++){
+			clonedListP.add(this.getAuthors().get(i));
+		}
+		cloned.setAuthors(clonedListP);
 		for(int i=0;i<this.goalList.size();i++){
 			clonedList.add(goalList.get(i));
 		}

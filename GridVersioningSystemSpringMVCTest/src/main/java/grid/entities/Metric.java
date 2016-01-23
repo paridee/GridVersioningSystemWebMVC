@@ -154,6 +154,11 @@ public class Metric extends GridElement implements Updatable{
 		newMetric.setVersion(this.getVersion());
 		newMetric.setCount(this.count);
 		newMetric.setDescription(this.description);
+		List<Practitioner> clonedListP	=	new ArrayList<Practitioner>();
+		for(int i=0;i<this.getAuthors().size();i++){
+			clonedListP.add(this.getAuthors().get(i));
+		}
+		newMetric.setAuthors(clonedListP);
 		List<String> clonedList	=	new ArrayList<String>();
 		for(int i=0;i<this.measUnits.size();i++){
 			clonedList.add(measUnits.get(i));

@@ -89,7 +89,7 @@ public class GridDAOImpl implements GridDAO {
 		List<Grid> gridElList	=	session.createQuery("from Grid G where G.project.id = "+projid+" ORDER BY version DESC").list();
 		if(gridElList.size()>0){
 			Grid latest		=	gridElList.get(0);
-			logger.info("Grid:: latest grid found"+latest);
+			logger.info("Grid:: latest grid found"+latest+" version "+latest.getVersion());
 			return latest;
 		}
 		else return null;
@@ -114,11 +114,16 @@ public class GridDAOImpl implements GridDAO {
 	 */
 	@Override
 	public void removeGrid(int id) {
+		System.out.println("GRIDDaoImpl removing "+id);
 		Session session	=	this.sessionFactory.getCurrentSession();
 		Grid	g		=	(Grid)	session.load(Grid.class, new Integer(id));
+		g.setMainGoals(new ArrayList<Goal>());
 		if(g!=null){
+			System.out.println("GRIDDaoImpl removing found "+id+" version "+g.getVersion()+" project "+g.getProject().getProjectId());
+			logger.info(g.getClass().getName()+" item to be deleted found");
 			session.delete(g);
 		}
+		System.out.println("GRIDDaoImpl removed "+id);
 		logger.info(g.getClass().getName()+" deleted successfully");		
 	}
 

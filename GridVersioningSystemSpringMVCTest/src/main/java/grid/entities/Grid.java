@@ -101,8 +101,7 @@ public class Grid implements Updatable{
 	 * Getter method for project owning this Grid
 	 * @return project owner
 	 */
-	@OneToOne(	fetch	=	FetchType.LAZY,
-				cascade = 	CascadeType.ALL)
+	@OneToOne(	fetch	=	FetchType.LAZY)
 	@JoinColumn(name	=	"projID")
 	public Project getProject() {
 		return project;

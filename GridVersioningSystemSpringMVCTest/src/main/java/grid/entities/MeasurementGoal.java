@@ -123,6 +123,11 @@ public class MeasurementGoal extends GridElement implements Updatable{
 		mg.setDescription(this.description);
 		mg.setInterpretationModel(this.interpretationModel);
 		mg.setState(this.state);
+		List<Practitioner> clonedListP	=	new ArrayList<Practitioner>();
+		for(int i=0;i<this.getAuthors().size();i++){
+			clonedListP.add(this.getAuthors().get(i));
+		}
+		mg.setAuthors(clonedListP);
 		List<Question> clonedList	=	new ArrayList<Question>();
 		for(int i=0;i<this.questionList.size();i++){
 			clonedList.add(questionList.get(i));
