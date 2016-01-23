@@ -1,9 +1,6 @@
 package grid.interfaces.services;
 
 import java.util.List;
-
-import org.hibernate.Session;
-
 import grid.entities.Practitioner;
 
 public interface PractitionerService {
