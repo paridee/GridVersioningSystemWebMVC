@@ -237,7 +237,7 @@ public class HomeController {
 		String me	=	"paride.casulli@gmail.com";
 		ArrayList<String> authors	=	new ArrayList<String>();
 		authors.add(me);
-		g22.setAuthors(authors);
+		//g22.setAuthors(authors);
 		diff	=	javers.compare(g22, g21);
 		System.out.println("DIFF goals"+diff);
 		System.out.println("DIFF elements "+diff);

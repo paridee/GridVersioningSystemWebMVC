@@ -17,7 +17,7 @@ public class GridElementAdd extends GridModification {
 	@Override
 	public void apply(Grid grid) throws Exception {
 		// TODO Auto-generated method stub
-
+		//nothing to do, this check is implied by a GridElementModification
 	}
 
 	@Override

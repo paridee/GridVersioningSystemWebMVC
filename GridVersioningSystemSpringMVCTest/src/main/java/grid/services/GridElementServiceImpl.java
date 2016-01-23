@@ -1,6 +1,7 @@
 package grid.services;
 
 import java.lang.reflect.Field;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -19,6 +20,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import grid.entities.GridElement;
 import grid.entities.MeasurementGoal;
+import grid.entities.Practitioner;
 import grid.interfaces.DAO.GridElementDao;
 import grid.interfaces.services.GridElementService;
 /**
@@ -192,6 +194,14 @@ public class GridElementServiceImpl implements GridElementService {
 		if(typeC.equals("measurementgoal")){
 			typeC	=	"mg";
 		}
+		List authors		=	element.getAuthors();
+		JSONArray autEmail	=	new JSONArray();
+		for(int i=0;i<authors.size();i++){
+			Practitioner aPract	=	(Practitioner)authors.get(i);
+			autEmail.put(aPract.getEmail());
+		}
+		JSONObject	auth	=	new JSONObject();
+		auth.put("authors", autEmail);
 		typeC						=	typeC+"Id";
 		returnObject.put(typeC, id);
 		//gets the fields list of the elemen
