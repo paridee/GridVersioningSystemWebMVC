@@ -107,7 +107,6 @@ public class GVSWebController {
 		//Grid temp=JSONFactory.loadFromJson(jsonData, this.projectService);
 		System.out.println(jsonData.toString());
 		//this.gridService.addGrid(temp);
-		JSONObject response	=	new JSONObject();
 		Grid temp;
 		try {
 			temp = JSONFactory.loadFromJson(jsonData, this.projectService);
@@ -116,22 +115,24 @@ public class GVSWebController {
 				this.gridService.addGrid(temp);
 			}
 			else{
-				response.put("result", "error");
-				response.put("detail", " a grid already exists for this project");
-				String res	=	response.toString();	
-				return "errore";
+				JSONObject jsonObject = new JSONObject();
+				jsonObject.put("msg", "error");
+				jsonObject.put("resp", "grid esistente");
+				return jsonObject.toString();
+				
 			}
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
-			response.put("result", "error");
-			response.put("detail", " exception catched in grid saving, generic error");
-			String res	=	response.toString();	
-			return res+"";
+			JSONObject jsonObject = new JSONObject();
+			jsonObject.put("msg", "error");
+			jsonObject.put("resp", "eccezione generica");
+			return jsonObject.toString();
 		}
-		response.put("result", "OK");
-		String res	=	response.toString();	
-		return res+"";
+		JSONObject jsonObject = new JSONObject();
+		jsonObject.put("msg", "result");
+		jsonObject.put("resp", "ok");
+		return jsonObject.toString();
     }
 
 	

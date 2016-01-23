@@ -53,7 +53,7 @@
 	      	    dataType: "json",
     	  	   	data: data,
     	  	  	success: function (msg) 
-              	{ alert(msg) },
+              	{ alert(JSON.stringify(msg)) },
       			error: function (err)
       			{ alert(err.responseText)}
                 
