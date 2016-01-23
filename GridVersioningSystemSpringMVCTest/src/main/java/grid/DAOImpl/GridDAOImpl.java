@@ -11,7 +11,6 @@ import org.springframework.stereotype.Repository;
 
 import grid.entities.Goal;
 import grid.entities.Grid;
-import grid.entities.GridElement;
 import grid.interfaces.DAO.GridDAO;
 
 /**

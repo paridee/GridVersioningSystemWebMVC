@@ -270,5 +270,6 @@ public class JSONFactory {
 		aMetric.setScaleType(obj.getString("scaleType"));
 		loaded.put(aMetric.getLabel(), aMetric);
 		return aMetric;
+		
 	}
 }
