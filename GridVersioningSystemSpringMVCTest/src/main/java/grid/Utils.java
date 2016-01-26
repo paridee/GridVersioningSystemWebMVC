@@ -3,8 +3,10 @@ package grid;
 import java.util.ArrayList;
 import java.util.HashMap;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import grid.entities.GridElement;
-import javassist.bytecode.Descriptor.Iterator;
 
 /**
  * Utilities class with singletons methods
@@ -12,6 +14,9 @@ import javassist.bytecode.Descriptor.Iterator;
  * @author Lorenzo La Banca
  */
 public class Utils {
+	
+	private static final Logger logger	=	LoggerFactory.getLogger(Utils.class);
+	
 	/**
 	 * Given 2 arraylists adds the non-duplicate elements in the first one
 	 * @param one first list (will be also the result of merge operation)

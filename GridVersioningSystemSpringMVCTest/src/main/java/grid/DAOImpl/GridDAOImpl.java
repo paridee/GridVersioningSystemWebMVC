@@ -84,7 +84,7 @@ public class GridDAOImpl implements GridDAO {
 	 */
 	@Override
 	public Grid getLatestGrid(int projid) {
-		Session session				=	this.sessionFactory.getCurrentSession();
+		Session session			=	this.sessionFactory.getCurrentSession();
 		@SuppressWarnings("unchecked")
 		List<Grid> gridElList	=	session.createQuery("from Grid G where G.project.id = "+projid+" ORDER BY version DESC").list();
 		if(gridElList.size()>0){
@@ -100,7 +100,7 @@ public class GridDAOImpl implements GridDAO {
 	 */
 	@Override
 	public List<Grid> getGridLog(int projid) {
-		Session session				=	this.sessionFactory.getCurrentSession();
+		Session session			=	this.sessionFactory.getCurrentSession();
 		@SuppressWarnings("unchecked")
 		List<Grid> gridElList	=	session.createQuery("from Grid G where G.project.id = "+projid).list();
 		for(Grid g : gridElList){
@@ -114,16 +114,16 @@ public class GridDAOImpl implements GridDAO {
 	 */
 	@Override
 	public void removeGrid(int id) {
-		System.out.println("GRIDDaoImpl removing "+id);
+		logger.info("GRIDDaoImpl removing "+id);
 		Session session	=	this.sessionFactory.getCurrentSession();
 		Grid	g		=	(Grid)	session.load(Grid.class, new Integer(id));
 		g.setMainGoals(new ArrayList<Goal>());
 		if(g!=null){
-			System.out.println("GRIDDaoImpl removing found "+id+" version "+g.getVersion()+" project "+g.getProject().getProjectId());
+			logger.info("GRIDDaoImpl removing found "+id+" version "+g.getVersion()+" project "+g.getProject().getProjectId());
 			logger.info(g.getClass().getName()+" item to be deleted found");
 			session.delete(g);
 		}
-		System.out.println("GRIDDaoImpl removed "+id);
+		logger.info("GRIDDaoImpl removed "+id);
 		logger.info(g.getClass().getName()+" deleted successfully");		
 	}
 
@@ -132,10 +132,10 @@ public class GridDAOImpl implements GridDAO {
 	 */
 	@Override
 	public Grid upgradeGrid(Grid g) {
-		Grid upgraded	=	new Grid();
+		Grid upgraded				=	new Grid();
 		upgraded.setProject(g.getProject());
 		ArrayList<Goal> mainGoals	=	new ArrayList<Goal>();
-		List<Goal> oldGoals	=	g.getMainGoals();
+		List<Goal> oldGoals			=	g.getMainGoals();
 		for(int i=0;i<oldGoals.size();i++){
 			mainGoals.add(oldGoals.get(i));
 		}

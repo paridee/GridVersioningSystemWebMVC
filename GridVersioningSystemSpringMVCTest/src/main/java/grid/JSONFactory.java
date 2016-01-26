@@ -7,7 +7,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
-
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -45,6 +44,10 @@ public class JSONFactory {
 	@SuppressWarnings("rawtypes")
 	HashMap<Class,HashMap<String,String>> attributesMap	=	new HashMap<Class,HashMap<String,String>>();
 	
+	
+	/**
+	 * Default constructor, needed to initialize some dictionaries
+	 */
 	public JSONFactory(){
 		HashMap<String,String> goalMap	=	new HashMap<String,String>();	//first column json attr, second column my name, only differences
 		goalMap.put("goalId", "label");
@@ -115,7 +118,6 @@ public class JSONFactory {
 			try {
 				project								=	JSONFactory.loadProjectFromJson(projectj.toString(), objects);
 			} catch (Exception e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 				JSONObject	errObject	=	new JSONObject();
 				errObject.put("errorType", "Error while loading project from the given JSON");
@@ -150,6 +152,7 @@ public class JSONFactory {
 	 * @return Modification array
 	 * @throws JSONException in case of wrong format
 	 */
+	@SuppressWarnings({ "rawtypes", "unchecked" })
 	public ArrayList<Modification> loadModificationJson(String json,Grid refGrid) throws JSONException{
 		ArrayList<Modification> response	=	new ArrayList<Modification>();
 		JSONObject	obj;
@@ -171,7 +174,7 @@ public class JSONFactory {
 				GridElement		oldObj=null;
 				if(currentObj.has("goalId")){
 					objLabel	=	currentObj.getString("goalId");
-					oldObj	=	gridElements.get(objLabel);
+					oldObj		=	gridElements.get(objLabel);
 					objClass	=	Goal.class;
 					if(oldObj!=null){
 						if(oldObj.getClass().isInstance(Goal.class)){
@@ -181,7 +184,7 @@ public class JSONFactory {
 				}
 				else if(currentObj.has("mgId")){
 					objLabel	=	currentObj.getString("mgId");
-					oldObj	=	gridElements.get(objLabel);
+					oldObj		=	gridElements.get(objLabel);
 					objClass	=	MeasurementGoal.class;
 					if(oldObj!=null){
 						if(oldObj.getClass().isInstance(MeasurementGoal.class)){
@@ -191,7 +194,7 @@ public class JSONFactory {
 				}
 				else if(currentObj.has("strategyId")){
 					objLabel	=	currentObj.getString("strategyId");
-					oldObj	=	gridElements.get(objLabel);
+					oldObj		=	gridElements.get(objLabel);
 					objClass	=	Strategy.class;
 					if(oldObj!=null){
 						if(oldObj.getClass().isInstance(Strategy.class)){
@@ -201,7 +204,7 @@ public class JSONFactory {
 				}
 				else if(currentObj.has("metricId")){
 					objLabel	=	currentObj.getString("metricId");
-					oldObj	=	gridElements.get(objLabel);
+					oldObj		=	gridElements.get(objLabel);
 					objClass	=	Metric.class;
 					if(oldObj!=null){
 						if(oldObj.getClass().isInstance(Metric.class)){
@@ -226,19 +229,17 @@ public class JSONFactory {
 						cons = objClass.getConstructor();
 						gEl		=	(GridElement) cons.newInstance();
 					} catch (NoSuchMethodException | SecurityException | InstantiationException | IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
-						// TODO Auto-generated catch block
 						e.printStackTrace();
 					}
 					gEl.setLabel(objLabel);
-					System.out.println(" created new object type "+objClass+" label "+objLabel);
+					logger.info(" created new object type "+objClass+" label "+objLabel);
 					oldObj	=	gEl;
 					GridElementAdd	add	=	new GridElementAdd();
 					add.setAppendedObjectLabel(objLabel);
 					add.setGridElementAdded(gEl);
 					response.add(add);
 				}
-				System.out.println("old element label "+objLabel);
-				//GridElement oldElement		=	gridElements.get(objLabel);
+				logger.info("old element label "+objLabel);
 				Iterator<String> anIterator	=	currentObj.keys();
 				while(anIterator.hasNext()){
 					String attrName			=	(String) anIterator.next();
@@ -260,10 +261,10 @@ public class JSONFactory {
 									GridElement anElement			=	loadGridObj(anArray.getString(j),Utils.convertHashMap(gridElements));
 									newElements.add(anElement);
 								}
-								System.out.println("list value "+value+" on field "+aField.getName()+" on object "+objLabel);
+								logger.info("list value "+value+" on field "+aField.getName()+" on object "+objLabel);
 								response.addAll(ObjectModificationService.getListModification((List)value, newElements, aField.getName(), objLabel));
 							}
-							else if(GridElement.class.isAssignableFrom(aField.getType())){ //TODO not working... aField.getType is a class, cannot be subclass of GridElement
+							else if(GridElement.class.isAssignableFrom(aField.getType())){
 								if(attrName.equals("measurementGoal")){
 									MeasurementGoal aMg	=	loadMeasurementGoalFromJson(currentObj.getString(JSONname), Utils.convertHashMap(gridElements));
 									ObjectFieldModification aModification	=	new ObjectFieldModification();
@@ -274,7 +275,7 @@ public class JSONFactory {
 								}
 							}
 							else{
-								System.out.println("modification value "+currentObj.get(JSONname)+" "+aField.getName()+" "+aField.getType().isAssignableFrom(GridElement.class)+" "+aField.getType()+GridElement.class.isAssignableFrom(aField.getType()));
+								logger.info("modification value "+currentObj.get(JSONname)+" "+aField.getName()+" "+aField.getType().isAssignableFrom(GridElement.class)+" "+aField.getType()+GridElement.class.isAssignableFrom(aField.getType()));
 								if(!(value.equals(currentObj.get(JSONname)))){
 									ObjectFieldModification aModification	=	new ObjectFieldModification();
 									aModification.setFieldToBeChanged(attrName);
@@ -320,11 +321,18 @@ public class JSONFactory {
 		return null;
 	}
 
+	/**
+	 * Loads a Project from a JSON representation
+	 * @param string json
+	 * @param loaded maps with objects already loaded
+	 * @return loaded object
+	 * @throws Exception in case of error
+	 */
 	private static Project loadProjectFromJson(String string, HashMap<String, Object> loaded) throws Exception{
 		JSONObject	obj		=	new JSONObject(string);
 		String projectId	=	obj.getString("projectId");
 		if(loaded.containsKey(projectId)){
-			System.out.println("Project.java Project "+projectId+" already exists");
+			logger.info("Project.java Project "+projectId+" already exists");
 			return (Project)loaded.get(projectId);
 		}
 		Project aProject	=	new Project();
@@ -342,6 +350,12 @@ public class JSONFactory {
 		return aProject;
 	}
 
+	/**
+	 * Load a goal from a given Json
+	 * @param json json to be parsed
+	 * @param loaded objects already loaded
+	 * @return loaded object
+	 */
 	public static Goal loadGoalFromJson(String json,HashMap<String, Object> loaded){
 		JSONObject obj		=	new JSONObject(json);
 		String assumption	=	obj.getString("assumption");
@@ -349,11 +363,11 @@ public class JSONFactory {
 		String description	=	obj.getString("descrizione");
 		String goalID		=	obj.getString("goalId");
 		if(loaded.containsKey(goalID)){	//if already exists return
-			System.out.println("Goal.java goal "+goalID+" already exists");
+			logger.info("Goal.java goal "+goalID+" already exists");
 			return (Goal)loaded.get(goalID);
 		}
 		JSONArray strategies=	(JSONArray)obj.get("strategyList");
-		System.out.println("Goal.java elementi caricati in array: "+strategies.length());
+		logger.info("Goal.java elementi caricati in array: "+strategies.length());
 		Goal newGoal		=	new Goal();
 		newGoal.setAssumption(assumption);
 		newGoal.setContext(context);
@@ -364,14 +378,20 @@ public class JSONFactory {
 		ArrayList<Strategy> strategiesIDList	=	new ArrayList<Strategy>();
 		for(int i=0;i<strategies.length();i++){
 			JSONObject innerObj	=	(JSONObject)strategies.get(i);
-			System.out.println("\n\n"+innerObj.toString()+"\n\n");
+			logger.info("\n\n"+innerObj.toString()+"\n\n");
 			strategiesIDList.add(JSONFactory.loadStrategyFromJson(innerObj.toString(),loaded));
-			System.out.println("Goal.java added strategy "+innerObj.getString("strategyId"));
+			logger.info("Goal.java added strategy "+innerObj.getString("strategyId"));
 		}
 		newGoal.setStrategyList(strategiesIDList);
 		return newGoal;
 	}
 
+	/**
+	 * Load a strategy from a given JSON
+	 * @param string json string
+	 * @param loaded loaded objects
+	 * @return loaded strategy
+	 */
 	public static Strategy loadStrategyFromJson(String string, HashMap<String, Object> loaded) {
 		JSONObject obj	=	new JSONObject(string);
 		String type		=	obj.getString("strategyType");
@@ -379,7 +399,7 @@ public class JSONFactory {
 		String	strategyID			=	obj.getString("strategyId");
 		String	strategicProjectId	=	obj.get("strategicProjectId").toString();
 		if(loaded.containsKey(strategyID)){
-			System.out.println("Strategy.java strategy "+strategyID+" already exists");
+			logger.info("Strategy.java strategy "+strategyID+" already exists");
 			return (Strategy)loaded.get(strategyID);	//if already loaded returns
 		}
 		Strategy aStrategy	= new Strategy();
@@ -397,11 +417,17 @@ public class JSONFactory {
 		return aStrategy;
 	}
 
+	/**
+	 * Load a measurement goal from a given json 
+	 * @param string json to be loaded
+	 * @param loaded objects already loaded
+	 * @return loaded measurement goal
+	 */
 	public static MeasurementGoal loadMeasurementGoalFromJson(String string, HashMap<String, Object> loaded) {
 		String first	=	string.substring(0,1);
 		if(!first.equals("{")){
 			if(loaded.containsKey(string)){
-				System.out.println("MeasurementGoal.java MeasurementGoal "+string+" already exists");
+				logger.info("MeasurementGoal.java MeasurementGoal "+string+" already exists");
 				return (MeasurementGoal)loaded.get(string);
 			}
 			else throw new JSONException("MeasurementGoal.java object not found or wrong format String "+string+" found "+loaded.containsKey(string));
@@ -409,7 +435,7 @@ public class JSONFactory {
 		JSONObject obj	=	new JSONObject(string);
 		String mgId		=	obj.getString("mgId");
 		if(loaded.containsKey(mgId)){
-			System.out.println("MeasurementGoal.java MeasurementGoal "+mgId+" already exists");
+			logger.info("MeasurementGoal.java MeasurementGoal "+mgId+" already exists");
 			return (MeasurementGoal)loaded.get(mgId);
 		}
 		String description					=	obj.getString("descrizione");
@@ -428,11 +454,17 @@ public class JSONFactory {
 		return temp;
 	}
 
+	/**
+	 * Loads a question from a JSON
+	 * @param string string to be loaded
+	 * @param loaded objects already loaded
+	 * @return loaded question
+	 */
 	private static Question loadQuestionFromJson(String string, HashMap<String, Object> loaded) {
 		JSONObject obj	=	new JSONObject(string);
 		String qId		=	obj.getString("questionId");
 		if(loaded.containsKey(qId)){
-			System.out.println("Question.java question "+qId+" already loaded");
+			logger.info("Question.java question "+qId+" already loaded");
 			return (Question)loaded.get(qId);
 		}
 		String question			=	obj.getString("question");
@@ -443,18 +475,24 @@ public class JSONFactory {
 		JSONArray metricList	=	(JSONArray)obj.get("metricList");
 		ArrayList<Metric> metrics	=	new ArrayList<Metric>();
 		for(int i=0;i<metricList.length();i++){
-			System.out.println(metricList.get(i).toString());
+			logger.info(metricList.get(i).toString());
 			metrics.add(JSONFactory.loadMetricFromJson(metricList.get(i).toString(),loaded));
 		}
 		aNewQuestion.setMetricList(metrics);
 		return aNewQuestion;
 	}
 
+	/**
+	 * Load a metric from a json
+	 * @param string json to be parsed
+	 * @param loaded objects already loaded
+	 * @return loaded metric
+	 */
 	private static Metric loadMetricFromJson(String string, HashMap<String, Object> loaded) {
 		String first	=	string.substring(0,1);
 		if(!first.equals("{")){	//gestisco formato a non standard JSON
 			if(loaded.containsKey(string)){
-				System.out.println("Metric.java Metric "+string+" already exists");
+				logger.info("Metric.java Metric "+string+" already exists");
 				return (Metric)loaded.get(string);
 			}
 			else throw new JSONException("Metric.java object not found or wrong format String "+string+" found "+loaded.containsKey(string));
@@ -462,7 +500,7 @@ public class JSONFactory {
 		JSONObject obj	=	new JSONObject(string);
 		String metricId	=	obj.getString("metricId");
 		if(loaded.containsKey(metricId)){
-			System.out.println("Metric.java Metric "+metricId+" already exists");
+			logger.info("Metric.java Metric "+metricId+" already exists");
 			return (Metric)loaded.get(metricId);
 		}
 		Metric aMetric			=	new Metric();
