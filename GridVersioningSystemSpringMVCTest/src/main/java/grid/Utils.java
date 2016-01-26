@@ -1,6 +1,10 @@
 package grid;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+
+import grid.entities.GridElement;
+import javassist.bytecode.Descriptor.Iterator;
 
 /**
  * Utilities class with singletons methods
@@ -20,5 +24,20 @@ public class Utils {
 				one.add(two.get(i));
 			}
 		}
+	}
+	
+	/**
+	 * Converts hashmap of <String,GridElement> to an hashmap <String,Object>
+	 * @param map input map
+	 * @return output map
+	 */
+	public static HashMap<String,Object> convertHashMap(HashMap<String,GridElement> map){
+		HashMap<String,Object> retMap	=	new HashMap<String,Object>();
+		java.util.Iterator<String> anIterator				=	map.keySet().iterator();
+		while(anIterator.hasNext()){
+			String key	=	anIterator.next();
+			retMap.put(key, map.get(key));
+		}
+		return retMap;
 	}
 }

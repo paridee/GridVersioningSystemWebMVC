@@ -28,7 +28,7 @@ public class Metric extends GridElement implements Updatable{
 	public int 					count				=	0;
 	@Column(name="description")
 	public String				description			=	"";
-	public List<String>	measUnits;
+	public List<String>	measUnits					=	new ArrayList<String>();
 	@Column(name="measurementProcess")
 	public String				measurementProcess	=	"";
 	@Column(name="metricType")

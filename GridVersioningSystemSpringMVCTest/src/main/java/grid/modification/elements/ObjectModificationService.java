@@ -42,6 +42,7 @@ public class ObjectModificationService {
 		for(int i=0;i<changes.size();i++){
 			Change current	=	changes.get(i);
 			System.out.println(current.getClass().getName()+" "+current.getAffectedObject().get());
+			//TODO gestire se cambio measurement goal!!!
 			if(current.getClass().equals(ValueChange.class)){
 				ValueChange 		thisChange	=	(ValueChange)current;
 				GridElement 		changed		=	(GridElement)thisChange.getAffectedObject().get();
@@ -55,66 +56,17 @@ public class ObjectModificationService {
 				}
 			}
 			else if(current.getClass().equals(ListChange.class)){
-				ListChange thisChange	=	(ListChange)current;
+				ListChange 	thisChange	=	(ListChange)current;
+				String		listname	=	thisChange.getPropertyName();
 				Field field;
 				Object subject	=	thisChange.getAffectedObject().get();
 				field = subject.getClass().getDeclaredField(thisChange.getPropertyName());
 				field.setAccessible(true);
 				@SuppressWarnings("rawtypes")
 				List 	oldList 	= 	(List)field.get(oldElement);
-				HashMap		<String,Object>	oldListMap	=	new HashMap<String,Object>();
 				@SuppressWarnings("rawtypes")
 				List 	newList 	= 	(List)field.get(newElement);
-				HashMap		<String,Object>	newListMap	=	new HashMap<String,Object>();
-				for(int j=0;j<oldList.size();j++){
-					Object listElement	=	oldList.get(j);
-					if(listElement instanceof GridElement){
-						GridElement	thisElement	=	(GridElement) listElement;
-						oldListMap.put(thisElement.getLabel(), thisElement);
-					}
-					else{
-						oldListMap.put(listElement.toString(), listElement);
-					}
-				}
-				for(int j=0;j<newList.size();j++){
-					Object listElement	=	newList.get(j);
-					if(listElement instanceof GridElement){
-						GridElement	thisElement	=	(GridElement) listElement;
-						newListMap.put(thisElement.getLabel(), thisElement);
-					}
-					else{
-						newListMap.put(listElement.toString(), listElement);
-					}
-				}
-				diff			=	javers.compare(oldListMap, newListMap);
-				List<Change> changesInner	=	diff.getChanges();
-				System.out.println("DIFF "+diff);
-				for(int j=0;j<changesInner.size();j++){
-					Change innerChange	=	changesInner.get(j);
-					if(innerChange.getClass().equals(MapChange.class)){
-						MapChange mapChange	=	(MapChange)innerChange;
-						List<EntryChange> entryChanges	=	mapChange.getEntryChanges();
-						for(int k=0;k<entryChanges.size();k++){
-							EntryChange entryChange	=	entryChanges.get(k);
-							if(entryChange.getClass().equals(EntryAdded.class)){
-								EntryAdded thisAdd	=	(EntryAdded)entryChange;
-								ListAppend append	=	new ListAppend();
-								append.setAppendedObjectLabel(thisAdd.getKey().toString());
-								append.setListNameToBeChanged(thisChange.getPropertyName());
-								append.setSubjectLabel(oldElement.getLabel());
-								modifications.add(append);
-							}
-							else if(entryChange.getClass().equals(EntryRemoved.class)){
-								EntryRemoved 	thisRem	=	(EntryRemoved)entryChange;
-								ListRemoval		remove	=	new ListRemoval();
-								remove.setRemovedObjectLabel(thisRem.getKey().toString());
-								remove.setListNameToBeChanged(thisChange.getPropertyName());
-								remove.setSubjectLabel(oldElement.getLabel());
-								modifications.add(remove);
-							}
-						}
-					}
-				}
+				modifications.addAll(getListModification(oldList,newList,listname,oldElement.getLabel()));
 			}
 		}
 		//TODO remove: testing purpose
@@ -123,6 +75,66 @@ public class ObjectModificationService {
 			System.out.println(modifications.get(i));
 		}
 		
+		return modifications;
+	}
+	
+	public static ArrayList<GridElementModification> getListModification(List oldList,List newList,String listname,String involvedObjlabel){
+		HashMap		<String,Object>	oldListMap	=	new HashMap<String,Object>();
+		HashMap		<String,Object>	newListMap	=	new HashMap<String,Object>();
+		ArrayList<GridElementModification> modifications	=	new ArrayList<GridElementModification>();
+		for(int j=0;j<oldList.size();j++){
+			Object listElement	=	oldList.get(j);
+			if(listElement instanceof GridElement){
+				GridElement	thisElement	=	(GridElement) listElement;
+				oldListMap.put(thisElement.getLabel(), thisElement);
+			}
+			else{
+				oldListMap.put(listElement.toString(), listElement);
+			}
+		}
+		for(int j=0;j<newList.size();j++){
+			Object listElement	=	newList.get(j);
+			if(listElement instanceof GridElement){
+				GridElement	thisElement	=	(GridElement) listElement;
+				newListMap.put(thisElement.getLabel(), thisElement);
+			}
+			else{
+				newListMap.put(listElement.toString(), listElement);
+			}
+		}
+		Javers 					javers			=	JaversBuilder.javers().registerValueObject(GridElement.class).build();
+		Diff diff			=	javers.compare(oldListMap, newListMap);
+		List<Change> changesInner	=	diff.getChanges();
+		System.out.println("DIFF "+diff);
+		for(int j=0;j<changesInner.size();j++){
+			Change innerChange	=	changesInner.get(j);
+			if(innerChange.getClass().equals(MapChange.class)){
+				MapChange mapChange	=	(MapChange)innerChange;
+				List<EntryChange> entryChanges	=	mapChange.getEntryChanges();
+				for(int k=0;k<entryChanges.size();k++){
+					EntryChange entryChange	=	entryChanges.get(k);
+					if(entryChange.getClass().equals(EntryAdded.class)){
+						EntryAdded thisAdd	=	(EntryAdded)entryChange;
+						ListAppend append	=	new ListAppend();
+						append.setAppendedObjectLabel(thisAdd.getKey().toString());
+						append.setListNameToBeChanged(listname);
+						append.setSubjectLabel(involvedObjlabel);
+						if(thisAdd.getValue() instanceof GridElement){
+							append.setNewLoadedObject(thisAdd.getValue());
+						}
+						modifications.add(append);
+					}
+					else if(entryChange.getClass().equals(EntryRemoved.class)){
+						EntryRemoved 	thisRem	=	(EntryRemoved)entryChange;
+						ListRemoval		remove	=	new ListRemoval();
+						remove.setRemovedObjectLabel(thisRem.getKey().toString());
+						remove.setListNameToBeChanged(listname);
+						remove.setSubjectLabel(involvedObjlabel);
+						modifications.add(remove);
+					}
+				}
+			}
+		}
 		return modifications;
 	}
 }

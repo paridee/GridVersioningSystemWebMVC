@@ -26,9 +26,9 @@ import grid.interfaces.Updatable;
 @Table(name="Strategy")
 public class Strategy extends GridElement implements Updatable{
 	
-	private String 			description;
-	private boolean			isTerminal	=	false;
-	private String			strategicProjectId;
+	private String 			description		=	"";
+	private String			strategyType	=	"TERMINAL";
+	private String			strategicProjectId	=	"";
 	private List<Goal>		goalList	=	new ArrayList<Goal>();
 	
 	
@@ -41,13 +41,13 @@ public class Strategy extends GridElement implements Updatable{
 		this.description = description;
 	}
 
-	public boolean getIsTerminal() {
-		return isTerminal;
+	public String getStrategyType() {
+		return strategyType;
 	}
 
 
-	public void setIsTerminal(boolean isTerminal) {
-		this.isTerminal = isTerminal;
+	public void setStrategyType(String strategyType) {
+		this.strategyType = strategyType;
 	}
 
 
@@ -124,7 +124,7 @@ public class Strategy extends GridElement implements Updatable{
 			clonedList.add(goalList.get(i));
 		}
 		cloned.setGoalList(clonedList);
-		cloned.setIsTerminal(this.isTerminal);
+		cloned.setStrategyType(strategyType+"");
 		cloned.setStrategicProjectId(this.strategicProjectId);
 		cloned.setState(this.state);
 		return cloned;		
@@ -139,7 +139,7 @@ public class Strategy extends GridElement implements Updatable{
 		returnString	=	returnString+prefix+"version: "+this.version+divider;
 		returnString	=	returnString+prefix+"id: "+this.idElement+divider;
 		returnString	=	returnString+prefix+"description: "+this.label+divider;
-		returnString	=	returnString+prefix+"terminal: "+this.isTerminal+divider;
+		returnString	=	returnString+prefix+"terminal: "+this.strategyType+divider;
 		returnString	=	returnString+prefix+"strategic project: "+this.strategicProjectId+divider;
 		for(int i=0;i<this.goalList.size();i++){
 			returnString	=	returnString+prefix+"goal "+i+": "+this.goalList.get(i).toString(prefix,divider)+divider;
@@ -183,7 +183,7 @@ public class Strategy extends GridElement implements Updatable{
 				}
 			}
 		}
-		if (isTerminal != other.isTerminal)
+		if (!this.strategyType.equals(other.getStrategyType()))
 			return false;
 		if (strategicProjectId == null) {
 			if (other.strategicProjectId != null)

@@ -1,23 +1,31 @@
 package grid;
 
+import java.lang.reflect.Constructor;
+import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import grid.DAOImpl.GridDAOImpl;
 import grid.entities.Goal;
 import grid.entities.Grid;
+import grid.entities.GridElement;
 import grid.entities.MeasurementGoal;
 import grid.entities.Metric;
 import grid.entities.Project;
 import grid.entities.Question;
 import grid.entities.Strategy;
 import grid.interfaces.services.ProjectService;
+import grid.modification.elements.Modification;
+import grid.modification.elements.ObjectFieldModification;
+import grid.modification.elements.ObjectModificationService;
+import grid.modification.grid.GridElementAdd;
 
 /**
  * This class provides a method for parsing a Grid from JSON Representation 
@@ -26,8 +34,37 @@ import grid.interfaces.services.ProjectService;
  *
  */
 public class JSONFactory {
+	/**
+	 * Struct returned if a modification json is submitted, contains all the changes and new elements to be added
+	 * @author Paride Casulli
+	 * @author Lorenzo La Banca
+	 *
+	 */
 	
-	private static final Logger logger	=	LoggerFactory.getLogger(GridDAOImpl.class);
+	private static final Logger logger	=	LoggerFactory.getLogger(JSONFactory.class);
+	@SuppressWarnings("rawtypes")
+	HashMap<Class,HashMap<String,String>> attributesMap	=	new HashMap<Class,HashMap<String,String>>();
+	
+	public JSONFactory(){
+		HashMap<String,String> goalMap	=	new HashMap<String,String>();	//first column json attr, second column my name, only differences
+		goalMap.put("goalId", "label");
+		goalMap.put("descrizione","description");
+		attributesMap.put(Goal.class, goalMap);
+		HashMap<String,String> measurementGoalMap	=	new HashMap<String,String>();
+		measurementGoalMap.put("mgId", "label");
+		measurementGoalMap.put("decrizione3", "description");
+		attributesMap.put(MeasurementGoal.class, measurementGoalMap);
+		HashMap<String,String> metricMap	=	new HashMap<String,String>();
+		metricMap.put("metricId", "label");
+		attributesMap.put(Metric.class, metricMap);
+		HashMap<String,String> questionMap	=	new HashMap<String,String>();
+		questionMap.put("questionId", "label");
+		attributesMap.put(Question.class, questionMap);
+		HashMap<String,String> strategyMap	=	new HashMap<String,String>();
+		strategyMap.put("strategyId", "label");
+		strategyMap.put("descrizione", "description");
+		attributesMap.put(Strategy.class, strategyMap);
+	}
 	
 	/**
 	 * This method takes a JSON string as parameter and parses and loads the contents in a Grid entity
@@ -38,8 +75,8 @@ public class JSONFactory {
 	public static Grid loadFromJson(String json,ProjectService projService) throws Exception{
 		Grid returnGrid					=	new Grid();	//new Grid to be loaded
 		HashMap<String, Object> objects	=	new HashMap<String, Object>();
-		JSONArray metricList	=	null;
-		JSONObject obj	=	null;
+		JSONArray 	metricList	=	null;
+		JSONObject 	obj			=	null;
 		try{
 			obj					=	new JSONObject(json);
 			metricList			=	(JSONArray)obj.get("metricList");
@@ -106,6 +143,183 @@ public class JSONFactory {
 		return returnGrid;
 	}
 	
+	/**
+ 	 * Returns all the modifications defined in this json
+	 * @param json json string to be parsed
+	 * @param refGrid reference grid
+	 * @return Modification array
+	 * @throws JSONException in case of wrong format
+	 */
+	public ArrayList<Modification> loadModificationJson(String json,Grid refGrid) throws JSONException{
+		ArrayList<Modification> response	=	new ArrayList<Modification>();
+		JSONObject	obj;
+		JSONObject	mods;
+		obj											=	new JSONObject(json);
+		mods										=	(JSONObject)obj.get("modifiche");
+		HashMap<String,GridElement> gridElements	=	refGrid.obtainAllEmbeddedElements();
+		ArrayList<JSONArray>	changesArray		=	new ArrayList<JSONArray>();
+		changesArray.add((JSONArray)mods.get("goals"));
+		changesArray.add((JSONArray)mods.get("metrics"));
+		changesArray.add((JSONArray)mods.get("questions"));
+		changesArray.add((JSONArray)mods.get("strategies"));
+		for(int t=0;t<changesArray.size();t++){
+			JSONArray currentArray	=	changesArray.get(t);
+			for(int i=0;i<currentArray.length();i++){
+				JSONObject	currentObj					=	currentArray.getJSONObject(i);
+				String objLabel="";
+				Class  objClass	=	GridElement.class;
+				GridElement		oldObj=null;
+				if(currentObj.has("goalId")){
+					objLabel	=	currentObj.getString("goalId");
+					oldObj	=	gridElements.get(objLabel);
+					objClass	=	Goal.class;
+					if(oldObj!=null){
+						if(oldObj.getClass().isInstance(Goal.class)){
+							throw new JSONException("class mismatch Goal - "+oldObj.getClass());
+						}
+					}
+				}
+				else if(currentObj.has("mgId")){
+					objLabel	=	currentObj.getString("mgId");
+					oldObj	=	gridElements.get(objLabel);
+					objClass	=	MeasurementGoal.class;
+					if(oldObj!=null){
+						if(oldObj.getClass().isInstance(MeasurementGoal.class)){
+							throw new JSONException("class mismatch MeasurementGoal - "+oldObj.getClass());
+						}
+					}
+				}
+				else if(currentObj.has("strategyId")){
+					objLabel	=	currentObj.getString("strategyId");
+					oldObj	=	gridElements.get(objLabel);
+					objClass	=	Strategy.class;
+					if(oldObj!=null){
+						if(oldObj.getClass().isInstance(Strategy.class)){
+							throw new JSONException("class mismatch MeasurementGoal - "+oldObj.getClass());
+						}
+					}
+				}
+				else if(currentObj.has("metricId")){
+					objLabel	=	currentObj.getString("metricId");
+					oldObj	=	gridElements.get(objLabel);
+					objClass	=	Metric.class;
+					if(oldObj!=null){
+						if(oldObj.getClass().isInstance(Metric.class)){
+							throw new JSONException("class mismatch MeasurementGoal - "+oldObj.getClass());
+						}
+					}
+				}
+				else if(currentObj.has("questionId")){
+					objLabel	=	currentObj.get("questionId")+"";
+					oldObj	=	gridElements.get(objLabel);
+					objClass	=	Question.class;
+					if(oldObj!=null){
+						if(oldObj.getClass().isInstance(Question.class)){
+							throw new JSONException("class mismatch MeasurementGoal - "+oldObj.getClass());
+						}
+					}
+				}
+				if(oldObj	==	null){
+					Constructor cons	=	null;
+					GridElement gEl		=	null;
+					try {
+						cons = objClass.getConstructor();
+						gEl		=	(GridElement) cons.newInstance();
+					} catch (NoSuchMethodException | SecurityException | InstantiationException | IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+					gEl.setLabel(objLabel);
+					System.out.println(" created new object type "+objClass+" label "+objLabel);
+					oldObj	=	gEl;
+					GridElementAdd	add	=	new GridElementAdd();
+					add.setAppendedObjectLabel(objLabel);
+					add.setGridElementAdded(gEl);
+					response.add(add);
+				}
+				System.out.println("old element label "+objLabel);
+				//GridElement oldElement		=	gridElements.get(objLabel);
+				Iterator<String> anIterator	=	currentObj.keys();
+				while(anIterator.hasNext()){
+					String attrName			=	(String) anIterator.next();
+					String JSONname			=	attrName;
+					logger.info("old element class "+objClass);
+					HashMap<String,String> attrNameMap	=	this.attributesMap.get(objClass);
+					if(attrNameMap.containsKey(attrName)){
+						attrName			=	attrNameMap.get(attrName);
+					}
+					if(attrName!="label"){
+						try{
+							Field aField		=	objClass.getDeclaredField(attrName);
+							aField.setAccessible(true);
+							Object value	=	aField.get(oldObj);
+							if(List.class.isAssignableFrom(aField.getType())){
+								ArrayList<GridElement> 	newElements	=	new ArrayList<GridElement>();
+								JSONArray	anArray					=	currentObj.getJSONArray(JSONname);
+								for(int j=0;j<anArray.length();j++){
+									GridElement anElement			=	loadGridObj(anArray.getString(j),Utils.convertHashMap(gridElements));
+									newElements.add(anElement);
+								}
+								System.out.println("list value "+value+" on field "+aField.getName()+" on object "+objLabel);
+								response.addAll(ObjectModificationService.getListModification((List)value, newElements, aField.getName(), objLabel));
+							}
+							else if(GridElement.class.isAssignableFrom(aField.getType())){ //TODO not working... aField.getType is a class, cannot be subclass of GridElement
+								if(attrName.equals("measurementGoal")){
+									MeasurementGoal aMg	=	loadMeasurementGoalFromJson(currentObj.getString(JSONname), Utils.convertHashMap(gridElements));
+									ObjectFieldModification aModification	=	new ObjectFieldModification();
+									aModification.setFieldToBeChanged(attrName);
+									aModification.setSubjectLabel(objLabel);
+									aModification.setNewValue(aMg);
+									response.add(aModification);
+								}
+							}
+							else{
+								System.out.println("modification value "+currentObj.get(JSONname)+" "+aField.getName()+" "+aField.getType().isAssignableFrom(GridElement.class)+" "+aField.getType()+GridElement.class.isAssignableFrom(aField.getType()));
+								if(!(value.equals(currentObj.get(JSONname)))){
+									ObjectFieldModification aModification	=	new ObjectFieldModification();
+									aModification.setFieldToBeChanged(attrName);
+									aModification.setSubjectLabel(objLabel);
+									aModification.setNewValue(currentObj.get(JSONname));
+									response.add(aModification);
+								}
+							}
+						}
+						catch(NoSuchFieldException | IllegalArgumentException | IllegalAccessException e){
+							e.printStackTrace();
+						}
+					}
+				}
+			}
+		}
+		return response;
+	}
+	
+	/**
+	 * Switch function, returns an of a proper type from a JSON
+	 * @param objectStr JSON string
+	 * @param loaded objects already loaded
+	 * @return proper object
+	 */
+	private static GridElement loadGridObj(String objectStr,HashMap<String,Object> loaded) {
+		JSONObject object	=	new JSONObject(objectStr);
+		if(object.has("goalId")){
+			return JSONFactory.loadGoalFromJson(objectStr, loaded);
+		}
+		else if(object.has("mgId")){
+			return JSONFactory.loadMeasurementGoalFromJson(objectStr, loaded);
+		}
+		else if(object.has("strategyId")){
+			return JSONFactory.loadStrategyFromJson(objectStr, loaded);
+		}
+		else if(object.has("metricId")){
+			return JSONFactory.loadMetricFromJson(objectStr, loaded);
+		}
+		else if(object.has("questionId")){
+			return JSONFactory.loadMetricFromJson(objectStr, loaded);
+		}
+		return null;
+	}
+
 	private static Project loadProjectFromJson(String string, HashMap<String, Object> loaded) throws Exception{
 		JSONObject	obj		=	new JSONObject(string);
 		String projectId	=	obj.getString("projectId");
@@ -161,10 +375,6 @@ public class JSONFactory {
 	public static Strategy loadStrategyFromJson(String string, HashMap<String, Object> loaded) {
 		JSONObject obj	=	new JSONObject(string);
 		String type		=	obj.getString("strategyType");
-		boolean terminal=	false;
-		if(type.equals("TERMINAL")){
-			terminal	=	true;
-		}
 		String 	description			=	obj.getString("descrizione");
 		String	strategyID			=	obj.getString("strategyId");
 		String	strategicProjectId	=	obj.get("strategicProjectId").toString();
@@ -175,7 +385,7 @@ public class JSONFactory {
 		Strategy aStrategy	= new Strategy();
 		aStrategy.setDescription(description);
 		aStrategy.setLabel(strategyID);
-		aStrategy.setIsTerminal(terminal);
+		aStrategy.setStrategyType(type);
 		aStrategy.setStrategicProjectId(strategicProjectId);
 		loaded.put(strategyID, aStrategy);	//added in loaded objects list
 		JSONArray goals	=	(JSONArray)obj.get("goalList");

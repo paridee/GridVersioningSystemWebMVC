@@ -54,7 +54,7 @@ public class GVSWebController {
 		this.projectService = projectService;
 	}
 
-	private static final Logger logger = LoggerFactory.getLogger(HomeController.class);
+	private static final Logger logger = LoggerFactory.getLogger(GVSWebController.class);
      
 	@RequestMapping(value = "/grids", method = RequestMethod.GET)
     public String listAllGrids(Model model) {
