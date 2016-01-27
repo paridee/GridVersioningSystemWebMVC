@@ -1,5 +1,6 @@
 package it.paridelorenzo.ISSSR;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
@@ -17,9 +18,11 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import grid.JSONFactory;
+import grid.entities.Goal;
 import grid.entities.Grid;
 import grid.entities.GridElement;
 import grid.entities.Project;
+import grid.entities.Strategy;
 import grid.interfaces.services.GridElementService;
 import grid.interfaces.services.GridService;
 import grid.interfaces.services.ProjectService;
@@ -66,14 +69,65 @@ public class GVSWebController {
 	
 	@RequestMapping(value = "/grids/{id}")
     public String getGrid(@PathVariable("id") int id, Model model) {
-		Grid temp= this.gridService.getGridById(id);
-		model.addAttribute("grid", temp);
-		//create string for collapsable tree
-		String toTree="{ chart: { container: \"#tree-simple\" },  nodeStructure: { text: { name: \"Parent node\" },        children: [{                text: { name: \"First child\" }            },            {                text: { name: \"Second child\" }            }        ]    }}";
-		//
-		model.addAttribute("gridTreeString",toTree);
+		Grid tempGrid= this.gridService.getGridById(id);
+		model.addAttribute("grid", tempGrid);
+		String chart=createChart(tempGrid);
+		System.out.println(chart);
+		model.addAttribute("gridTreeString",chart);
         return "grids";
     }
+	
+	private String createChart(Grid g){
+		if(g.getMainGoals().size()!=0){
+			List<Object> stack = new ArrayList<Object>();
+			stack.addAll(g.getMainGoals());
+			String chart="chart_config = {chart: { container: \"#gridChart\", animateOnInit: true,node: {collapsable: true},animation: {nodeAnimation: \"easeOutBounce\",nodeSpeed: 700,connectorsAnimation: \"bounce\",connectorsSpeed: 700}},";		
+			chart=chart+"nodeStructure: {image:\"/ISSSR/resources/Treant/cheryl.png\", text: { name: \""+g.getProject().getProjectId()+"\",desc: \""+g.getProject().getDescription()+"\" },children: [";
+			chart=chart+updateChart(stack)+"]}};";
+			return chart;
+		}
+		else {
+			JSONObject jsonObject = new JSONObject();
+			jsonObject.put("msg", "error");
+			jsonObject.put("resp", "grid main goal error");
+			return jsonObject.toString();
+		}
+		
+	}
+	
+	private String updateChart(List<Object> stack){
+		String chart="";
+		for(int i=0; i<stack.size(); i++){
+			String image="";
+			String name="";
+			String desc="";
+			List<Object> newStack=new ArrayList<Object>();
+			if(stack.get(i).getClass().getSimpleName().equals("Goal")){
+				Goal tempGoal=(Goal)stack.get(i);
+				name=tempGoal.getLabel();
+				newStack.addAll(tempGoal.getStrategyList());
+			}
+			else if(stack.get(i).getClass().getSimpleName().equals("Strategy")){
+				Strategy tempStrategy=(Strategy)stack.get(i);
+				name=tempStrategy.getLabel();
+				newStack.addAll(tempStrategy.getGoalList());
+			}
+			else {
+				name=stack.get(i).getClass().getSimpleName();
+			}
+			
+			chart=chart+"{text: { name: \""+name+"\" }, collapsed: true";
+			if(newStack.size()>0){
+				chart=chart+",children: [";
+				chart=chart+updateChart(newStack);
+				chart=chart+"]";
+			}
+			chart=chart+"}";
+			if (i<stack.size()-1) chart=chart+",";
+		}
+		return chart;
+		
+	}
 	
 	
 	

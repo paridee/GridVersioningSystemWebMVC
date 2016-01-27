@@ -16,12 +16,9 @@
 
     <title>Lista Grids</title>
     <!--Treant core CSS -->
-	<link rel="stylesheet" href="/resources/treant-js-master/Treant.css">
-    <link rel="stylesheet" href="/resources/treant-js-master/collapsable.css">
-    
-    <link rel="stylesheet" href="/resources/treant-js-master/vendor/perfect-scrollbar/perfect-scrollbar.css">
-
-
+	    <link rel="stylesheet" href="<c:url value='/resources/Treant/Treant.css' />" type="text/css"/>
+	    <link href="<c:url value='/resources/Treant/vendor/perfect-scrollbar/perfect-scrollbar.css' />" rel="stylesheet" type="text/css"/>
+		<link rel="stylesheet" href="<c:url value='/resources/Treant/layoutChart.css' />" type="text/css"/>
 
     <!-- Bootstrap core CSS -->
     <link href="<c:url value='/resources/bootstrap/dist/css/bootstrap.min.css' />" rel="stylesheet">
@@ -87,21 +84,8 @@
 		    </tr>
 		    </table>
 		</div>
-		<div>${gridTreeString}
-		</div>
-		<div class="chart" id="collapsable-example"></div>
-		    <script src="<c:url value='/resources/treant-js-master/vendor/raphael.js'/>"></script>
-		    <script src="<c:url value='/resources/treant-js-master/Treant.js'/>"></script>
+		<div id="gridChart"> </div>
 		    
-		    <script src="<c:url value='/resources/treant-js-master/vendor/jquery.min.js'/>"></script>
-		    <script src="<c:url value='/resources/treant-js-master/vendor/jquery.easing.js'/>"></script>
-		    
-		    
-		    <script src="<c:url value='/resources/treant-js-master/examples/collapsable/img/collapsable.js'/>"></script>
-		    <script>
-		    	//alert(${gridTreeString});
-		        tree = new Treant(${gridTreeString});
-		    </script>
 		</c:if>
       	
         <c:if test="${!empty listGrids}">
@@ -143,9 +127,18 @@
     <script src="<c:url value='/resources/bootstrap/dist/js/bootstrap.min.js' />"></script>
     <!-- IE10 viewport hack for Surface/desktop Windows 8 bug -->
     <script src="<c:url value='/resources/bootstrap/assets/js/ie10-viewport-bug-workaround.js' />"></script>
+  
+      <!-- Treant javascript -->
+    <script src="<c:url value='/resources/Treant/vendor/raphael.js' />"></script>
+    <script src="<c:url value='/resources/Treant/Treant.min.js' />"></script>
+    <script src="<c:url value='/resources/Treant/vendor/jquery.easing.js' />"></script>
+	<script src="<c:url value='/resources/Treant/vendor/perfect-scrollbar/jquery.mousewheel.js' />"></script>
+	<script src="<c:url value='/resources/Treant/vendor/perfect-scrollbar/perfect-scrollbar.js' />"></script><script>
+    	${gridTreeString};
+    	var my_chart = new Treant(chart_config);
+   	</script>
+  
   </body>
 </html>
-
-
 
 
