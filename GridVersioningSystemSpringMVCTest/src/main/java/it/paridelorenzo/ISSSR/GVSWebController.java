@@ -1,5 +1,6 @@
 package it.paridelorenzo.ISSSR;
 
+import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -18,11 +19,9 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import grid.JSONFactory;
-import grid.entities.Goal;
 import grid.entities.Grid;
 import grid.entities.GridElement;
 import grid.entities.Project;
-import grid.entities.Strategy;
 import grid.interfaces.services.GridElementService;
 import grid.interfaces.services.GridService;
 import grid.interfaces.services.ProjectService;
@@ -101,8 +100,9 @@ public class GVSWebController {
 			String image="";
 			String name="";
 			String desc="";
+			//
 			List<Object> newStack=new ArrayList<Object>();
-			if(stack.get(i).getClass().getSimpleName().equals("Goal")){
+			/*if(stack.get(i).getClass().getSimpleName().equals("Goal")){
 				Goal tempGoal=(Goal)stack.get(i);
 				name=tempGoal.getLabel();
 				newStack.addAll(tempGoal.getStrategyList());
@@ -114,9 +114,42 @@ public class GVSWebController {
 			}
 			else {
 				name=stack.get(i).getClass().getSimpleName();
+			}*/
+			GridElement ge=(GridElement)stack.get(i);
+			name=ge.getLabel()+"-v"+ge.getVersion();
+			desc="";
+			Field[] fields=ge.getClass().getDeclaredFields();
+			for(int j=0; j<fields.length;j++){
+				Field tempField=fields[j];
+				tempField.setAccessible(true);
+				try {
+					Object fieldValue=tempField.get(ge);
+					if(fieldValue instanceof GridElement){
+						newStack.add(fieldValue);
+					}
+					else if(fieldValue instanceof List){
+						List myList 	=	(List)fieldValue;
+						if(myList.size()>0){
+							Object	first	=	 myList.get(0);
+							if(first instanceof GridElement){
+								newStack.addAll(myList);
+							}
+							//TODO gestire array stringhe
+						}
+					}
+					else{
+						String fieldValueStr	=	(String)fieldValue.toString();
+						desc=desc+tempField.getName()+":"+fieldValueStr;
+					}
+				} catch (IllegalArgumentException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				} catch (IllegalAccessException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
 			}
-			
-			chart=chart+"{text: { name: \""+name+"\" }, collapsed: true";
+			chart=chart+"{text: { name: \""+name+"\", desc: \""+desc+"\" }, collapsed: true";
 			if(newStack.size()>0){
 				chart=chart+",children: [";
 				chart=chart+updateChart(newStack);

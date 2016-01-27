@@ -4,7 +4,7 @@ address,caption,cite,code,dfn,em,strong,th,var { font-style:normal; font-weight:
 caption,th { text-align:left; }
 
 /* optional Container STYLES */
-.Treant > .node {  background-color:none;  padding: 10px;border:1px solid black; border-radius: 10px;  line-height: 12px;width: 200px; min-height: 30px;}
+.Treant > .node {  background-color:none;  padding: 10px;border:1px solid black; border-radius: 10px;  line-height: 12px;min-width: 200px; min-height: 30px;}
 .Treant > .node img { width: 30%;  float:left; padding-right:5px;}
 
 .Treant .collapse-switch { width: 100%; height: 100%; border: none; }
