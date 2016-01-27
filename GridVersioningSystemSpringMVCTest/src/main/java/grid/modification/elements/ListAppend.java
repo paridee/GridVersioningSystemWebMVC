@@ -17,6 +17,7 @@ public class ListAppend extends GridElementModification {
 
 	private String 	listNameToBeChanged;
 	private String	appendedObjectLabel;
+	private Object  newLoadedObject;
 	
 	public String getListNameToBeChanged() {
 		return listNameToBeChanged;
@@ -34,6 +35,15 @@ public class ListAppend extends GridElementModification {
 		this.appendedObjectLabel = appendedObjectLabel;
 	}
 
+	
+	public Object getNewLoadedObject() {
+		return newLoadedObject;
+	}
+
+	public void setNewLoadedObject(Object newLoadedObject) {
+		this.newLoadedObject = newLoadedObject;
+	}
+
 	@Override
 	public void apply(GridElement anElement, Grid grid) throws Exception {
 		Field aField	=	anElement.getClass().getDeclaredField(this.listNameToBeChanged);
@@ -46,7 +56,12 @@ public class ListAppend extends GridElementModification {
 				GridElement	element	=	elMap.get(this.appendedObjectLabel);
 				aList.add(element);
 			}
-			else throw new Exception("Object to be added not found in current Grid");	
+			else if(this.newLoadedObject!=null){	//i have to append a new object
+				aList.add(this.newLoadedObject);
+			}
+			else{
+				throw new Exception("Object to be added not found in current Grid");	
+			}
 		}
 		else{
 			throw new Exception("Trying to make list modification to a non list object");

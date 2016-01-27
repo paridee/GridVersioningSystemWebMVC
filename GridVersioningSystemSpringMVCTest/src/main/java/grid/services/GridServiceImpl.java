@@ -121,7 +121,9 @@ public class GridServiceImpl implements GridService {
 	 * {@inheritDoc}
 	 */
 	@Override
+	@Transactional
 	public void removeGrid(int id) {
+		System.out.println("GridServiceImpl going to remove grid id "+id);
 		this.gridDao.removeGrid(id);
 	}
 
@@ -131,7 +133,9 @@ public class GridServiceImpl implements GridService {
 	@Override
 	@Transactional
 	public Grid updateGridElement(Grid g,GridElement ge) {
+		//elements already checked
 		HashMap<String,GridElement> checked	=	new HashMap<String,GridElement>();
+		//elements to be checked
 		ArrayList<GridElement> toBeChecked	=	new ArrayList<GridElement>();	
 		toBeChecked.add(ge);
 		while(toBeChecked.size()>0){

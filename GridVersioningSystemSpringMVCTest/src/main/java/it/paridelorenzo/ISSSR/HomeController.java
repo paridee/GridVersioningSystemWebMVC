@@ -2,6 +2,7 @@ package it.paridelorenzo.ISSSR;
 
 import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.lang.reflect.Field;
@@ -38,6 +39,7 @@ import grid.entities.Goal;
 import grid.entities.Grid;
 import grid.entities.GridElement;
 import grid.entities.GridElement.State;
+import grid.entities.MeasurementGoal;
 import grid.entities.Project;
 import grid.entities.Strategy;
 import grid.interfaces.DAO.ProjectDAO;
@@ -96,7 +98,13 @@ public class HomeController {
 		pippo2.setDescription("popopop");
 		Strategy pipps	=	new Strategy();
 		pipps.setLabel("stocazzo_strategy");
-		pippo2.getStrategyList().add(pipps);
+		List strList	=	pippo2.getStrategyList();
+		MeasurementGoal stub	=	new MeasurementGoal();
+		stub.setLabel("stubMG");
+		pippo2.setMeasurementGoal(stub);
+		pippo.setMeasurementGoal(stub);
+		System.out.print("clone: "+pippo2.toString("\t\t", "\n"));
+		strList.add(pipps);
 		try {
 			List<GridElementModification>	modList	=	ObjectModificationService.getModification(pippo2, pippo);
 		} catch (Exception e) {
@@ -134,6 +142,54 @@ public class HomeController {
 				System.out.println(mod.get(i).toString());
 			}
 		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		Goal test3	=	(Goal)testMG.clone();
+		test3.getStrategyList().add(pipps);
+		System.out.println("TESTISSIMO "+test3.toString("\t\t","\n"));
+		return "home";
+	}
+	
+	@RequestMapping(value = "/modifiche", method = RequestMethod.GET)
+	public String hometestmod(Locale locale, Model model) {
+		logger.info("Welcome home! The client locale is {}.", locale);
+		
+		Date date = new Date();
+		DateFormat dateFormat = DateFormat.getDateTimeInstance(DateFormat.LONG, DateFormat.LONG, locale);
+		
+		String formattedDate = dateFormat.format(date);
+		
+		model.addAttribute("serverTime", formattedDate );	
+		try {
+			logger.info("loadfile");
+			BufferedReader reader	=	new BufferedReader(new FileReader("modifiche.txt"));
+			String text	=	"";
+			String line	=	reader.readLine();
+			while(line!=null){
+				text	=	text+line;
+				line	=	reader.readLine();
+			}
+			ArrayList<Modification> mods;
+			Grid refGrid	=	this.gridService.getLatestGrid(1);
+			
+			//test
+			HashMap<String,GridElement> elements	=	refGrid.obtainAllEmbeddedElements();
+			System.out.println("###elementi su grid "+elements.keySet());
+			
+			JSONFactory testFactory	=	new JSONFactory();
+			logger.info("JSON loaded "+text);
+			mods	=	testFactory.loadModificationJson(text, refGrid);
+			for(int i=0;i<mods.size();i++){
+				System.out.println(mods.get(i).toString());
+			}
+			
+		} catch (FileNotFoundException e) {
+			logger.info("file not found");
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (IOException e) {
+			logger.info("io exception");
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
@@ -221,7 +277,7 @@ public class HomeController {
 		testdiff.setDescription("test tool diff");
 		Strategy testst	=	new Strategy();
 		testst.setLabel("prova");
-		testst.setIsTerminal(true);
+		testst.setStrategyType("TERMINAL");
 		ArrayList<Strategy> l1	=	new ArrayList<Strategy>();
 		ArrayList<Strategy> l2	=	new ArrayList<Strategy>();
 		l1.add(testst);

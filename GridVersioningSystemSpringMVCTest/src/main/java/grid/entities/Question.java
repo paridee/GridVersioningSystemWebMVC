@@ -27,7 +27,7 @@ import grid.interfaces.Updatable;
 public class Question extends GridElement implements Updatable{
 
 	private List<Metric> 	metricList	=	new ArrayList<Metric>();
-	private String 			question;
+	private String 			question	=	"";
 	
 	@ManyToMany(cascade = CascadeType.ALL)
 	@JoinTable(name = "QuestionToMetric", joinColumns = { 
@@ -106,6 +106,11 @@ public class Question extends GridElement implements Updatable{
 		cloned.setLabel(this.label);
 		cloned.setVersion(this.version);
 		cloned.setState(this.state);
+		List<Practitioner> clonedListP	=	new ArrayList<Practitioner>();
+		for(int i=0;i<this.getAuthors().size();i++){
+			clonedListP.add(this.getAuthors().get(i));
+		}
+		cloned.setAuthors(clonedListP);
 		List<Metric> clonedList	=	new ArrayList<Metric>();
 		for(int i=0;i<this.metricList.size();i++){
 			clonedList.add(metricList.get(i));

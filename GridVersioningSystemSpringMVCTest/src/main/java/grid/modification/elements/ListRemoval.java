@@ -24,9 +24,11 @@ public class ListRemoval extends GridElementModification {
 	public void setRemovedObjectLabel(String removedObjectLabel) {
 		this.removedObjectLabel = removedObjectLabel;
 	}
+	
+	
+	@SuppressWarnings("rawtypes")
 	@Override
 	public void apply(GridElement anElement, Grid aGrid) throws Exception {
-		// TODO Auto-generated method stub
 		Field aField	=	anElement.getClass().getDeclaredField(this.listNameToBeChanged);
 		aField.setAccessible(true);
 		Object myList	=	aField.get(anElement);

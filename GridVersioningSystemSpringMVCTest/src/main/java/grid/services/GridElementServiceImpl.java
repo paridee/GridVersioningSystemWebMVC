@@ -1,7 +1,6 @@
 package grid.services;
 
 import java.lang.reflect.Field;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -185,6 +184,7 @@ public class GridElementServiceImpl implements GridElementService {
 	/**
 	 * {@inheritDoc}
 	 */
+	@SuppressWarnings("rawtypes")
 	public JSONObject obtainJson(GridElement element,JSONType type){
 		JSONObject	returnObject	=	new JSONObject();
 		String		id				=	element.getLabel();

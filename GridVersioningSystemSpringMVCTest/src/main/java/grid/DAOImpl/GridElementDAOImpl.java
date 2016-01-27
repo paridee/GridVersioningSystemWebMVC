@@ -1,15 +1,11 @@
 package grid.DAOImpl;
 
-import java.util.ArrayList;
 import java.util.List;
-
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Repository;
-
-import grid.entities.Goal;
 import grid.entities.GridElement;
 import grid.interfaces.DAO.GridElementDao;
 
@@ -50,6 +46,7 @@ public class GridElementDAOImpl implements GridElementDao {
 	/**
 	 * {@inheritDoc}
 	 */
+	@SuppressWarnings("rawtypes")
 	@Override
 	public List<GridElement> listElement(Class c) {
 		Session session					=	this.sessionFactory.getCurrentSession();
@@ -64,6 +61,7 @@ public class GridElementDAOImpl implements GridElementDao {
 	/**
 	 * {@inheritDoc}
 	 */
+	@SuppressWarnings("rawtypes")
 	@Override
 	public GridElement getElementById(int id, Class c) {
 		Session currentSession	=	this.sessionFactory.getCurrentSession();
@@ -75,6 +73,7 @@ public class GridElementDAOImpl implements GridElementDao {
 	/**
 	 * {@inheritDoc}
 	 */
+	@SuppressWarnings({ "rawtypes", "unchecked" })
 	@Override
 	public List<GridElement> getElementLog(String label, Class c) {
 		Session session				=	this.sessionFactory.getCurrentSession();
@@ -88,6 +87,7 @@ public class GridElementDAOImpl implements GridElementDao {
 	/**
 	 * {@inheritDoc}
 	 */
+	@SuppressWarnings("rawtypes")
 	@Override
 	public void removeElement(int id, Class c) {
 		Session session			=	this.sessionFactory.getCurrentSession();

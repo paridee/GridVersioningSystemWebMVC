@@ -6,6 +6,7 @@ import java.util.List;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
@@ -89,7 +90,7 @@ public class Goal extends GridElement implements Updatable{
 	 * Returns a measurement goal referenced for this goal
 	 * @return measurement goal instance
 	 */
-	@ManyToOne(cascade = CascadeType.ALL)
+	@ManyToOne(cascade = CascadeType.ALL,fetch = FetchType.EAGER)
 	@JoinColumn(name="measurementGoal")
 	public MeasurementGoal getMeasurementGoal() {
 		return measurementGoal;
@@ -107,7 +108,7 @@ public class Goal extends GridElement implements Updatable{
 	 * Returns the list of strategies for this goal
 	 * @return list of strategies
 	 */
-	@ManyToMany(cascade = CascadeType.ALL)
+	@ManyToMany(cascade = CascadeType.ALL,fetch = FetchType.EAGER)
 	@JoinTable(	name = "GoalToStrategyList", 
 				joinColumns 		= 	{ 
 						@JoinColumn(name 		=	"goalID", 
@@ -139,7 +140,9 @@ public class Goal extends GridElement implements Updatable{
 		boolean addThis						=	false;	
 		Goal updated						=	(Goal) this.clone();
 		updated.setVersion(this.getVersion()+1);
+		System.out.println("updating Goal attribute reference");
 		if(this.measurementGoal.getLabel().equals(ge.getLabel())){
+			System.out.println("is a MeasurementGoal, replacing");
 			updated.setMeasurementGoal((MeasurementGoal)ge);
 			addThis	=	true;
 		}
@@ -158,7 +161,7 @@ public class Goal extends GridElement implements Updatable{
 		}
 		return returnList;
 	}
-
+	
 	/**
 	 * {@inheritDoc}
 	 */
@@ -173,6 +176,11 @@ public class Goal extends GridElement implements Updatable{
 		newGoal.setDescription(this.description);
 		newGoal.setMeasurementGoal(this.measurementGoal);
 		newGoal.setState(this.state);
+		List<Practitioner> clonedListP	=	new ArrayList<Practitioner>();
+		for(int i=0;i<this.getAuthors().size();i++){
+			clonedListP.add(this.getAuthors().get(i));
+		}
+		newGoal.setAuthors(clonedListP);
 		List<Strategy> clonedList	=	new ArrayList<Strategy>();
 		for(int i=0;i<this.strategyList.size();i++){
 			clonedList.add(strategyList.get(i));
@@ -194,7 +202,9 @@ public class Goal extends GridElement implements Updatable{
 		returnString			=	returnString+prefix+"assumption: "+this.assumption+divider;
 		returnString			=	returnString+prefix+"context: "+this.context+divider;
 		returnString			=	returnString+prefix+"description: "+this.label+divider;
-		returnString			=	returnString+prefix+"measurement goal: "+this.measurementGoal.toString(prefix+prefix, divider)+divider;
+		if(this.measurementGoal!=null){
+			returnString			=	returnString+prefix+"measurement goal: "+this.measurementGoal.toString(prefix+prefix, divider)+divider;
+		}
 		for(int i=0;i<this.strategyList.size();i++){
 			returnString	=	returnString+prefix+"strategy "+i+": "+this.strategyList.get(i).toString(prefix+prefix, divider)+divider;
 		}

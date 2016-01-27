@@ -7,9 +7,6 @@ import org.hibernate.SessionFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Repository;
-
-import grid.entities.Grid;
-import grid.entities.GridElement;
 import grid.entities.Practitioner;
 import grid.interfaces.DAO.PractitionerDAO;
 
@@ -26,6 +23,10 @@ public class PractitionerDAOImpl implements PractitionerDAO {
 	public void setSessionFactory(SessionFactory sessionFactory) {
 		this.sessionFactory = sessionFactory;
 	}
+	
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	public List<Practitioner> getAllPractitioners() {
 		Session session				=	this.sessionFactory.getCurrentSession();
@@ -37,6 +38,10 @@ public class PractitionerDAOImpl implements PractitionerDAO {
 		return practList;
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
+	@SuppressWarnings("unchecked")
 	@Override
 	public List<Practitioner> getPractitionersByName(String name) {
 		Session session				=	this.sessionFactory.getCurrentSession();
@@ -47,6 +52,10 @@ public class PractitionerDAOImpl implements PractitionerDAO {
 		return pElList;
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
+	@SuppressWarnings("unchecked")
 	@Override
 	public Practitioner getPractitionerByEmail(String email) {
 		Session session				=	this.sessionFactory.getCurrentSession();
@@ -58,6 +67,9 @@ public class PractitionerDAOImpl implements PractitionerDAO {
 		return pElList.get(0);
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	public void updatePractitioner(Practitioner p) {
 		Session	session	=	this.sessionFactory.getCurrentSession();
@@ -65,6 +77,9 @@ public class PractitionerDAOImpl implements PractitionerDAO {
 		logger.info("updated a "+p.getClass()+" on persistence layer");
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	public void delete(Practitioner p) {
 		Session session	=	this.sessionFactory.getCurrentSession();
@@ -74,6 +89,9 @@ public class PractitionerDAOImpl implements PractitionerDAO {
 		logger.info(p.getClass().getName()+" deleted successfully");	
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	public void add(Practitioner p) {
 		Session	session	=	this.sessionFactory.getCurrentSession();

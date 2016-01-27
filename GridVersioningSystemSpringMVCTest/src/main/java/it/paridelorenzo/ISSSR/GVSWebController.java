@@ -57,7 +57,7 @@ public class GVSWebController {
 		this.projectService = projectService;
 	}
 
-	private static final Logger logger = LoggerFactory.getLogger(HomeController.class);
+	private static final Logger logger = LoggerFactory.getLogger(GVSWebController.class);
      
 	@RequestMapping(value = "/grids", method = RequestMethod.GET)
     public String listAllGrids(Model model) {
@@ -211,12 +211,14 @@ public class GVSWebController {
 		try {
 			temp = JSONFactory.loadFromJson(jsonData, this.projectService);
 			Grid latest	=	this.gridService.getLatestGrid(temp.getProject().getId());
+			System.out.println("###~~~~VERSIONE GRID CARICATA"+latest.getVersion());
 			if(latest	==	null){
 				return "non esiste grid per questo progetto";
 			}
 			else{
 				//TODO se e' update nel "nostro formato" vai a prendere la grid di riferimento e fai il check per i conflitti
-				List<Modification>	mods	=	GridModificationService.getModification(latest, temp);
+				List<Modification>	mods		=	GridModificationService.getModification(latest, temp);
+				Grid				toBeRemoved	=	null;	//temporary basic grid
 				for(int i=0;i<mods.size();i++){
 					System.out.println("found modification "+mods.get(i).toString());
 				}
@@ -225,6 +227,8 @@ public class GVSWebController {
 				}
 				else{
 					Grid 						newVersion	=	this.gridService.upgradeGrid(latest);
+					newVersion.setVersion(newVersion.getVersion()-1);
+					toBeRemoved								=	newVersion;		//i will delete this temporary version, further change will require an upgrade
 					HashMap<String,GridElement> elements	=	temp.obtainAllEmbeddedElements();
 					for(int i=0;i<mods.size();i++){
 						Modification 	aMod	=	mods.get(i);
@@ -234,12 +238,18 @@ public class GVSWebController {
 								subj	=	elements.get(((ObjectFieldModification) aMod).getSubjectLabel());
 								subj	=	this.gridElementService.upgradeGridElement(subj);
 								((ObjectFieldModification) aMod).apply(subj, newVersion);
-								newVersion.update(subj);
+								newVersion	=	this.gridService.updateGridElement(newVersion, subj);
+								this.gridService.updateGrid(newVersion);
 							}
 							else return "error";
 						}
 					}
-					this.gridService.updateGrid(newVersion);
+					if(toBeRemoved!=null){
+						System.out.println("Removing Grid with ID "+toBeRemoved.getId());
+						toBeRemoved.setMainGoals(null);
+						this.gridService.updateGrid(toBeRemoved);
+						this.gridService.removeGrid(toBeRemoved.getId());
+					}
 					return "modifiche";
 				}
 			}

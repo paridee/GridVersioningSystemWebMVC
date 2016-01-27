@@ -6,8 +6,6 @@ import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import grid.entities.Grid;
 import grid.entities.Project;
 import grid.interfaces.DAO.ProjectDAO;
 
@@ -22,17 +20,23 @@ public class ProjectDAOImpl implements ProjectDAO{
         this.sessionFactory = sf;
     }
  
+	/**
+	 * {@inheritDoc}
+	 */
 	@SuppressWarnings("unchecked")
 	@Override
 	public List<Project> listProjects() {
-        Session session = this.sessionFactory.getCurrentSession();
-        List<Project> projectsList = session.createQuery("from Project").list();
+        Session session 			= 	this.sessionFactory.getCurrentSession();
+        List<Project> projectsList 	=	session.createQuery("from Project").list();
         for(Project p : projectsList){
             logger.info("Project List::"+p);
         }
         return projectsList;
     }
 	
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	public Project getProjectById(int id) {
 		Session currentSession	=	this.sessionFactory.getCurrentSession();
@@ -41,10 +45,13 @@ public class ProjectDAOImpl implements ProjectDAO{
 		return g;
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	@SuppressWarnings("unchecked")
 	@Override
 	public Project getProjectByProjectId(String id) {
-		Session session	=	this.sessionFactory.getCurrentSession();
+		Session session			=	this.sessionFactory.getCurrentSession();
 		List<Project> returnres	=	session.createQuery("from Project P where P.projectId = \'"+id+"\'").list();
 		if(returnres.size()==0){
 			return null;
