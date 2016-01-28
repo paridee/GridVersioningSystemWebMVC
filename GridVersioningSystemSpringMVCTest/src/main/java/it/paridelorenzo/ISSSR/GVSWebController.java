@@ -80,8 +80,8 @@ public class GVSWebController {
 		if(g.getMainGoals().size()!=0){
 			List<Object> stack = new ArrayList<Object>();
 			stack.addAll(g.getMainGoals());
-			String chart="chart_config = {chart: { container: \"#gridChart\", animateOnInit: true,node: {collapsable: true},animation: {nodeAnimation: \"easeOutBounce\",nodeSpeed: 700,connectorsAnimation: \"bounce\",connectorsSpeed: 700}},";		
-			chart=chart+"nodeStructure: {image:\"/ISSSR/resources/Treant/cheryl.png\", text: { name: \""+g.getProject().getProjectId()+"\",desc: \""+g.getProject().getDescription()+"\" },children: [";
+			String chart="chart_config = {chart: { container: \"#gridChart\", siblingSeparation:70, subTeeSeparation:70, animateOnInit: true,node: {collapsable: true},animation: {nodeAnimation: \"easeOutBounce\",nodeSpeed: 700,connectorsAnimation: \"bounce\",connectorsSpeed: 700}},";		
+			chart=chart+"nodeStructure: {innerHTML:\"<div class=\'nodeTxt\'><div class='txtElementTitle'><div class='nodeImg' ></div>"+g.getProject().getProjectId()+"</div><div class='txtElement'>"+g.getProject().getDescription()+"</div></div>\",children: [";
 			chart=chart+updateChart(stack)+"]}};";
 			return chart;
 		}
@@ -141,7 +141,7 @@ public class GVSWebController {
 						//desc=desc+"<div style='float:left;min-width: 200px;'>"+tempField.getName()+": "+fieldValueStr+"</div>";
 						if(fieldValue!=null){
 							String fieldValueStr	=	(String)fieldValue.toString();
-							desc=desc+"<div style='float:left;min-width: 200px;'>"+tempField.getName()+":"+fieldValueStr+"</div>";
+							desc=desc+"<div class='txtElement'>"+tempField.getName()+": "+fieldValueStr+"</div>";
 						}
 					}
 				} catch (IllegalArgumentException e) {
@@ -152,13 +152,14 @@ public class GVSWebController {
 					e.printStackTrace();
 				}
 			}
-			chart=chart+"{innerHTML:\"<div class=\'nodeTxt\'>"+name+"<br>"+desc+"</div>\", collapsed: true";
+			chart=chart+"{ innerHTML:\"<div class=\'nodeTxt\'><div class='txtElementTitle'><div class='nodeImg' ></div>"+name+"</div>"+desc+"</div>\", ";
 			//chart=chart+"{text: { name: \""+name+"\", desc: \""+desc+"\" },innerHTML:\"<div><h1>test</h1></div>\", collapsed: true";
 			if(newStack.size()>0){
-				chart=chart+",children: [";
+				chart=chart+" collapsed: true ,children: [";
 				chart=chart+updateChart(newStack);
 				chart=chart+"]";
 			}
+			else chart=chart+" collapsed: false";
 			chart=chart+"}";
 			if (i<stack.size()-1) chart=chart+",";
 		}
