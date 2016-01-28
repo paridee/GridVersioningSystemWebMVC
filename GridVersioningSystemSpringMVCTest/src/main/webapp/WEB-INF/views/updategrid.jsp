@@ -39,13 +39,9 @@
     	
     	
     function submitForm() {
-    	jQuery.get('http://localhost:8080/ISSSR/resources/grid2.txt', function(data) {
-    		//alert(data);
-    		/*$.post("grids/add",
-    				data,
-    			    function(resp, status){
-    			        alert("Data: " + resp + "\nStatus: " + status);
-    			    });*/
+    	$.ajax({url: "http://localhost:8080/ISSSR/resources/grid2.txt", success: function(data) {
+    		alert(data);
+    		
     		jQuery.ajax({
            		type: "POST",
       	   		url: "grids/update",
@@ -58,7 +54,26 @@
       			{ alert(err.responseText)}
                 
             });
-    	});
+    	}, cache: false});
+    	
+    	
+    	
+    	/*jQuery.get('http://localhost:8080/ISSSR/resources/grid2.txt', function(data) {
+    		//alert(data);
+    		
+    		jQuery.ajax({
+           		type: "POST",
+      	   		url: "grids/update",
+	      	   	contentType: "application/json; charset=utf-8",
+	      	    dataType: "json",
+    	  	   	data: data,
+    	  	  	success: function (msg) 
+              	{ alert(msg) },
+      			error: function (err)
+      			{ alert(err.responseText)}
+                
+            });
+    	});*/
     	
     }
 </script>
