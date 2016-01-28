@@ -138,9 +138,10 @@ public class GVSWebController {
 						}
 					}
 					else{
+						//desc=desc+"<div style='float:left;min-width: 200px;'>"+tempField.getName()+": "+fieldValueStr+"</div>";
 						if(fieldValue!=null){
 							String fieldValueStr	=	(String)fieldValue.toString();
-							desc=desc+tempField.getName()+":"+fieldValueStr;
+							desc=desc+"<div style='float:left;min-width: 200px;'>"+tempField.getName()+":"+fieldValueStr+"</div>";
 						}
 					}
 				} catch (IllegalArgumentException e) {
@@ -151,7 +152,8 @@ public class GVSWebController {
 					e.printStackTrace();
 				}
 			}
-			chart=chart+"{text: { name: \""+name+"\", desc: \""+desc+"\" }, collapsed: true";
+			chart=chart+"{innerHTML:\"<div class=\'nodeTxt\'>"+name+"<br>"+desc+"</div>\", collapsed: true";
+			//chart=chart+"{text: { name: \""+name+"\", desc: \""+desc+"\" },innerHTML:\"<div><h1>test</h1></div>\", collapsed: true";
 			if(newStack.size()>0){
 				chart=chart+",children: [";
 				chart=chart+updateChart(newStack);
