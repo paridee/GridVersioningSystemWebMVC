@@ -18,6 +18,7 @@ import org.javers.core.diff.changetype.map.MapChange;
 import grid.entities.Goal;
 import grid.entities.Grid;
 import grid.entities.GridElement;
+import grid.modification.elements.GridElementModification;
 import grid.modification.elements.Modification;
 import grid.modification.elements.ObjectModificationService;
 
@@ -90,7 +91,9 @@ public class GridModificationService {
 		while(anIterator.hasNext()){
 			String key	=	anIterator.next();
 			if(newElementsMap.containsKey(key)){
-				allMods.addAll(ObjectModificationService.getModification(oldElementsMap.get(key), newElementsMap.get(key)));
+				ArrayList<GridElementModification> someMods	=	(ObjectModificationService.getModification(oldElementsMap.get(key), newElementsMap.get(key)));
+				System.out.println("####mods found for item "+key+" "+someMods.size());
+				allMods.addAll(someMods);
 			}
 		}
 		//take insertion and delections

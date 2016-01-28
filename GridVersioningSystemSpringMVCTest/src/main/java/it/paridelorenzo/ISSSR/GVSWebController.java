@@ -138,8 +138,10 @@ public class GVSWebController {
 						}
 					}
 					else{
-						String fieldValueStr	=	(String)fieldValue.toString();
-						desc=desc+tempField.getName()+":"+fieldValueStr;
+						if(fieldValue!=null){
+							String fieldValueStr	=	(String)fieldValue.toString();
+							desc=desc+tempField.getName()+":"+fieldValueStr;
+						}
 					}
 				} catch (IllegalArgumentException e) {
 					// TODO Auto-generated catch block
