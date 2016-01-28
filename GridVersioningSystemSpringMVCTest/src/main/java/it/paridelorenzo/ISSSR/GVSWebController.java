@@ -138,8 +138,11 @@ public class GVSWebController {
 						}
 					}
 					else{
-						String fieldValueStr	=	(String)fieldValue.toString();
-						desc=desc+"<div style='float:left;min-width: 200px;'>"+tempField.getName()+": "+fieldValueStr+"</div>";
+						//desc=desc+"<div style='float:left;min-width: 200px;'>"+tempField.getName()+": "+fieldValueStr+"</div>";
+						if(fieldValue!=null){
+							String fieldValueStr	=	(String)fieldValue.toString();
+							desc=desc+"<div style='float:left;min-width: 200px;'>"+tempField.getName()+":"+fieldValueStr+"</div>";
+						}
 					}
 				} catch (IllegalArgumentException e) {
 					// TODO Auto-generated catch block

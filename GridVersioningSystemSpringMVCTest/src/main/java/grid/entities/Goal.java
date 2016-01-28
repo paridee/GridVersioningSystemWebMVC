@@ -141,10 +141,12 @@ public class Goal extends GridElement implements Updatable{
 		Goal updated						=	(Goal) this.clone();
 		updated.setVersion(this.getVersion()+1);
 		System.out.println("updating Goal attribute reference");
-		if(this.measurementGoal.getLabel().equals(ge.getLabel())){
-			System.out.println("is a MeasurementGoal, replacing");
-			updated.setMeasurementGoal((MeasurementGoal)ge);
-			addThis	=	true;
+		if(this.measurementGoal!=null){
+			if(this.measurementGoal.getLabel().equals(ge.getLabel())){
+				System.out.println("is a MeasurementGoal, replacing");
+				updated.setMeasurementGoal((MeasurementGoal)ge);
+				addThis	=	true;
+			}
 		}
 		for(int i=0;i<this.strategyList.size();i++){
 			if(this.strategyList.get(i).getLabel().equals(ge.getLabel())){
@@ -152,7 +154,9 @@ public class Goal extends GridElement implements Updatable{
 				addThis=true;
 			}
 		}
-		Utils.mergeLists(returnList, this.measurementGoal.update(ge));
+		if(this.measurementGoal!=null){
+			Utils.mergeLists(returnList, this.measurementGoal.update(ge));
+		}
 		for(int i=0;i<this.strategyList.size();i++){
 			Utils.mergeLists(returnList, this.strategyList.get(i).update(ge));
 		}

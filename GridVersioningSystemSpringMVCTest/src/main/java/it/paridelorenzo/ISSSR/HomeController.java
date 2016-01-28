@@ -40,7 +40,9 @@ import grid.entities.Grid;
 import grid.entities.GridElement;
 import grid.entities.GridElement.State;
 import grid.entities.MeasurementGoal;
+import grid.entities.Metric;
 import grid.entities.Project;
+import grid.entities.Question;
 import grid.entities.Strategy;
 import grid.interfaces.DAO.ProjectDAO;
 import grid.interfaces.services.GridElementService;
@@ -195,6 +197,156 @@ public class HomeController {
 		}
 		return "home";
 	}
+	
+	//TODO remove test
+	@RequestMapping(value = "/test2Grid", method = RequestMethod.GET)
+	public String home2Grid(Locale locale, Model model) {
+			logger.info("Welcome home! The client locale is {}.", locale);
+			
+			Date date = new Date();
+			DateFormat dateFormat = DateFormat.getDateTimeInstance(DateFormat.LONG, DateFormat.LONG, locale);
+			
+			Project test	=	new Project();
+			test.setDescription("progetto di prova");
+			
+			String everything	=	"";
+			try(BufferedReader br = new BufferedReader(new FileReader(new File("grid.txt")))) {
+			    StringBuilder sb = new StringBuilder();
+			    String line = br.readLine();
+
+			    while (line != null) {
+			        sb.append(line);
+			        sb.append(System.lineSeparator());
+			        line = br.readLine();
+			    }
+			    everything = sb.toString();
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			Grid testGrid = null;
+			try {
+				testGrid = JSONFactory.loadFromJson(everything, projectService);
+				System.out.println("CARICATA GRID DA JSON "+everything);
+			} catch (Exception e) {
+				// TODO Auto-generated catch block
+				System.out.println("HomeController stampo errore json");
+				e.printStackTrace();
+				model.addAttribute("jsonError", e.getMessage());
+			}
+
+			everything	=	"";
+			try(BufferedReader br = new BufferedReader(new FileReader(new File("grid2.txt")))) {
+			    StringBuilder sb = new StringBuilder();
+			    String line = br.readLine();
+
+			    while (line != null) {
+			        sb.append(line);
+			        sb.append(System.lineSeparator());
+			        line = br.readLine();
+			    }
+			    everything = sb.toString();
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			Grid testGrid2 = null;
+			try {
+				testGrid2 = JSONFactory.loadFromJson(everything, projectService);
+				System.out.println("CARICATA GRID DA JSON "+everything);
+			} catch (Exception e) {
+				// TODO Auto-generated catch block
+				System.out.println("HomeController stampo errore json");
+				e.printStackTrace();
+				model.addAttribute("jsonError", e.getMessage());
+			}
+			try {
+				ArrayList<Modification> modifications	=	GridModificationService.getModification(testGrid, testGrid2);
+				this.logger.info("Modifications number: "+modifications.size());
+				for(int i=0;i<modifications.size();i++){
+					this.logger.info(modifications.get(i).toString());
+				}
+			} catch (Exception e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			
+			return "home";
+	}
+	
+	//TODO remove test
+	@RequestMapping(value = "/testGrid", method = RequestMethod.GET)
+	public String homeGrid(Locale locale, Model model) {
+			logger.info("Welcome home! The client locale is {}.", locale);
+			
+			Date date = new Date();
+			DateFormat dateFormat = DateFormat.getDateTimeInstance(DateFormat.LONG, DateFormat.LONG, locale);
+			
+			Project test	=	new Project();
+			test.setDescription("progetto di prova");
+			Grid testGrid	=	new Grid();
+			testGrid.setProject(test);
+			ArrayList<Goal> maingoals	=	new ArrayList<Goal>();
+			testGrid.setMainGoals(maingoals);
+			Goal firstGoal	=	new Goal();
+			firstGoal.setLabel("primo goal");
+			this.gridElementService.addGridElement(firstGoal);
+			maingoals.add(firstGoal);
+			Strategy aStrategy	=	new Strategy();
+			aStrategy.setLabel("str1");
+			aStrategy.setDescription("strategia di test");
+			ArrayList<Strategy> strategies	=	new ArrayList<Strategy>();
+			strategies.add(aStrategy);
+			firstGoal.setStrategyList(strategies);
+			ArrayList<Goal> goals1	=	new ArrayList<Goal>();
+			Goal secondGoal	=	new Goal();
+			secondGoal.setLabel("secGoal");
+			secondGoal.setDescription("pippo");
+			goals1.add(secondGoal);
+			aStrategy.setGoalList(goals1);
+			MeasurementGoal mg	=	new MeasurementGoal();
+			mg.setLabel("measurementGoal pippo");
+			mg.setDescription("test");
+			secondGoal.setMeasurementGoal(mg);
+			Strategy anotherStr	=	new Strategy();
+			anotherStr.setLabel("another");
+			ArrayList<Strategy> strategiesb	=	new ArrayList<Strategy>();
+			strategiesb.add(anotherStr);
+			secondGoal.setStrategyList(strategiesb);
+			Metric metricatest	=	new Metric();
+			metricatest.setLabel("metricatest1");
+			metricatest.setDescription("metrica di test");
+			Question testQuestion	=	new Question();
+			testQuestion.setLabel("aQuestion");
+			testQuestion.setQuestion("Stocazzo???");
+			ArrayList<Question> questionList	=	new ArrayList<Question>();
+			questionList.add(testQuestion);
+			mg.setQuestionList(questionList);
+			ArrayList<Metric> metrics	=	new ArrayList<Metric>();
+			metrics.add(metricatest);
+			testQuestion.setMetricList(metrics);
+			Metric updated	=	(Metric) this.gridElementService.upgradeGridElement(metricatest);
+			updated.setDescription("AGGIORNATAAAAAAAAA");
+			this.gridService.addGrid(testGrid);
+			Grid newGrid	=	this.gridService.updateGridElement(testGrid, updated);
+			Goal anotherGoal	=	new Goal();
+			anotherGoal.setLabel("testttt");
+			Grid newRel	=	this.gridService.upgradeGrid(newGrid);
+			newRel.getMainGoals().add(anotherGoal);
+			this.gridService.updateGrid(newRel);
+			anotherGoal	=	(Goal)this.gridElementService.upgradeGridElement(anotherGoal);
+			anotherGoal.setAssumption("ASSUNZIONEEEEEEEEE");
+			newRel	=	this.gridService.updateGridElement(newRel, anotherGoal);
+			ArrayList<Strategy> strlista	=	new ArrayList<Strategy>();
+			strlista.add(aStrategy);
+			anotherGoal	=	(Goal) this.gridElementService.upgradeGridElement(anotherGoal);
+			anotherGoal.setStrategyList(strlista);
+			newRel	=	this.gridService.updateGridElement(newRel, anotherGoal);
+			return "home";
+	}
+	
+	
+	
 	/**
 	 * Simply selects the home view to render by returning its name.
 	 */
