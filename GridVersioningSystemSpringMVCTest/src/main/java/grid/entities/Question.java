@@ -77,9 +77,15 @@ public class Question extends GridElement implements Updatable{
 	 * {@inheritDoc}
 	 */
 	@Override
-	public ArrayList<GridElement> update(GridElement ge) {
-		Question updated	=	(Question) this.clone();
-		updated.setVersion(this.getVersion()+1);
+	public ArrayList<GridElement> update(GridElement ge,boolean autoupgrade) {
+		Question updated	=	null;
+		if(autoupgrade==true){
+			updated	=	(Question) this.clone();
+			updated.setVersion(this.getVersion()+1);		
+		}
+		else{
+			updated	=	this;
+		}
 		ArrayList<GridElement> returnList	=	new ArrayList<GridElement>();
 		boolean addThis						=	false;	
 		for(int i=0;i<this.metricList.size();i++){
@@ -89,7 +95,7 @@ public class Question extends GridElement implements Updatable{
 			}
 		}
 		for(int i=0;i<this.metricList.size();i++){
-			Utils.mergeLists(returnList, this.metricList.get(i).update(ge));
+			Utils.mergeLists(returnList, this.metricList.get(i).update(ge,autoupgrade));
 		}
 		if(addThis==true){
 			returnList.add(updated);

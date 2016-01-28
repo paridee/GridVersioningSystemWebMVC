@@ -92,9 +92,15 @@ public class MeasurementGoal extends GridElement implements Updatable{
 	 * {@inheritDoc}
 	 */
 	@Override
-	public ArrayList<GridElement> update(GridElement ge) {
-		MeasurementGoal updated	=	(MeasurementGoal) this.clone();
-		updated.setVersion(this.getVersion()+1);
+	public ArrayList<GridElement> update(GridElement ge,boolean autoupgrade) {
+		MeasurementGoal updated	=	null;
+		if(autoupgrade==true){
+			updated	=	(MeasurementGoal) this.clone();
+			updated.setVersion(this.getVersion()+1);
+		}
+		else{
+			updated	=	this;
+		}
 		ArrayList<GridElement> returnList	=	new ArrayList<GridElement>();
 		boolean addThis						=	false;	
 		for(int i=0;i<this.questionList.size();i++){
@@ -104,7 +110,7 @@ public class MeasurementGoal extends GridElement implements Updatable{
 			}
 		}
 		for(int i=0;i<this.questionList.size();i++){
-			Utils.mergeLists(returnList, this.questionList.get(i).update(ge));
+			Utils.mergeLists(returnList, this.questionList.get(i).update(ge,autoupgrade));
 		}
 		if(addThis==true){
 			returnList.add(updated);

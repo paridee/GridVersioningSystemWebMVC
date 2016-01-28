@@ -328,7 +328,7 @@ public class HomeController {
 			Metric updated	=	(Metric) this.gridElementService.upgradeGridElement(metricatest);
 			updated.setDescription("AGGIORNATAAAAAAAAA");
 			this.gridService.addGrid(testGrid);
-			Grid newGrid	=	this.gridService.updateGridElement(testGrid, updated);
+			Grid newGrid	=	this.gridService.updateGridElement(testGrid, updated,true);
 			Goal anotherGoal	=	new Goal();
 			anotherGoal.setLabel("testttt");
 			Grid newRel	=	this.gridService.upgradeGrid(newGrid);
@@ -336,12 +336,12 @@ public class HomeController {
 			this.gridService.updateGrid(newRel);
 			anotherGoal	=	(Goal)this.gridElementService.upgradeGridElement(anotherGoal);
 			anotherGoal.setAssumption("ASSUNZIONEEEEEEEEE");
-			newRel	=	this.gridService.updateGridElement(newRel, anotherGoal);
+			newRel	=	this.gridService.updateGridElement(newRel, anotherGoal,true);
 			ArrayList<Strategy> strlista	=	new ArrayList<Strategy>();
 			strlista.add(aStrategy);
 			anotherGoal	=	(Goal) this.gridElementService.upgradeGridElement(anotherGoal);
 			anotherGoal.setStrategyList(strlista);
-			newRel	=	this.gridService.updateGridElement(newRel, anotherGoal);
+			newRel	=	this.gridService.updateGridElement(newRel, anotherGoal,true);
 			return "home";
 	}
 	
@@ -392,7 +392,7 @@ public class HomeController {
 								clone.setVersion(clone.getVersion()+1);
 								clone.setDescription(clone.getDescription()+"*");//+clone.getVersion());
 								System.out.println("Aggiorno");
-								Grid newGrid	=	gridService.updateGridElement(testupdate, clone);
+								Grid newGrid	=	gridService.updateGridElement(testupdate, clone,true);
 								//strategies.get(j).setDescription("non deve salvare questo");
 								System.out.println("Aggiornato");
 								model.addAttribute("gridString",newGrid.toString("&nbsp&nbsp&nbsp&nbsp", "<br>") );
