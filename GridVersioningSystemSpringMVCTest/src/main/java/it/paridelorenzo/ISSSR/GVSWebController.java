@@ -100,21 +100,7 @@ public class GVSWebController {
 			String image="";
 			String name="";
 			String desc="";
-			//
 			List<Object> newStack=new ArrayList<Object>();
-			/*if(stack.get(i).getClass().getSimpleName().equals("Goal")){
-				Goal tempGoal=(Goal)stack.get(i);
-				name=tempGoal.getLabel();
-				newStack.addAll(tempGoal.getStrategyList());
-			}
-			else if(stack.get(i).getClass().getSimpleName().equals("Strategy")){
-				Strategy tempStrategy=(Strategy)stack.get(i);
-				name=tempStrategy.getLabel();
-				newStack.addAll(tempStrategy.getGoalList());
-			}
-			else {
-				name=stack.get(i).getClass().getSimpleName();
-			}*/
 			GridElement ge=(GridElement)stack.get(i);
 			name=ge.getLabel()+"-v"+ge.getVersion();
 			desc="";
@@ -141,7 +127,7 @@ public class GVSWebController {
 						//desc=desc+"<div style='float:left;min-width: 200px;'>"+tempField.getName()+": "+fieldValueStr+"</div>";
 						if(fieldValue!=null){
 							String fieldValueStr	=	(String)fieldValue.toString();
-							desc=desc+"<div class='txtElement'>"+tempField.getName()+": "+fieldValueStr+"</div>";
+							desc=desc+"<div class='txtElement'><i>"+tempField.getName()+": </i> "+fieldValueStr+"</div>";
 						}
 					}
 				} catch (IllegalArgumentException e) {
