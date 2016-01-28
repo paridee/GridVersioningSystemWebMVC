@@ -39,19 +39,10 @@
     	
     	
     function submitForm() {
-<<<<<<< HEAD
-    	$.ajax({url: "http://localhost:8080/ISSSR/resources/grid2.txt", success: function(data) {
+
+    	$.ajax({url: "http://localhost:8080/ISSSR/resources/grid3.txt", success: function(data) {
     		alert(data);
-    		
-=======
-    	jQuery.get('http://localhost:8080/ISSSR/resources/grid3.txt', function(data) {
-    		//alert(data);
-    		/*$.post("grids/add",
-    				data,
-    			    function(resp, status){
-    			        alert("Data: " + resp + "\nStatus: " + status);
-    			    });*/
->>>>>>> refs/remotes/origin/master
+
     		jQuery.ajax({
            		type: "POST",
       	   		url: "grids/update",

@@ -3,7 +3,7 @@
     {
       "assumption": "assumption1",
       "context": "context1",
-      "descrizione": "goal1modificato",
+      "descrizione": "goal1modificato2",
       "goalId": "g1",
       "measurementGoal": "mg1",
       "strategyList": [
