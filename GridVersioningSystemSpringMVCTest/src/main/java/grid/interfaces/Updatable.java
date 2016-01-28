@@ -15,7 +15,8 @@ public interface Updatable {
 	/**
 	 * Updates all the reference for an object linked
 	 * @param ge updated object replacing an older one
+	 * @param autoupgrade set if autoupgrade needed
 	 * @return list of all GridEntity updated
 	 */
-	public ArrayList<GridElement> update(GridElement ge);
+	public ArrayList<GridElement> update(GridElement ge,boolean autoupgrade);
 }

@@ -85,9 +85,15 @@ public class Strategy extends GridElement implements Updatable{
 	 * {@inheritDoc}
 	 */
 	@Override
-	public ArrayList<GridElement> update(GridElement ge) {
-		Strategy updated	=	(Strategy)this.clone();
-		updated.setVersion(this.getVersion()+1);
+	public ArrayList<GridElement> update(GridElement ge,boolean autoupgrade) {
+		Strategy updated	=	null;
+		if(autoupgrade	== true){
+			updated	=	(Strategy)this.clone();
+			updated.setVersion(this.getVersion()+1);	
+		}
+		else{
+			updated	=	this;
+		}
 		ArrayList<GridElement> returnList	=	new ArrayList<GridElement>();
 		boolean addThis						=	false;	
 		for(int i=0;i<this.goalList.size();i++){
@@ -97,7 +103,7 @@ public class Strategy extends GridElement implements Updatable{
 			}
 		}
 		for(int i=0;i<this.goalList.size();i++){
-			Utils.mergeLists(returnList, this.goalList.get(i).update(ge));
+			Utils.mergeLists(returnList, this.goalList.get(i).update(ge,autoupgrade));
 		}
 		if(addThis==true){
 			returnList.add(updated);

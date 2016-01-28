@@ -135,11 +135,17 @@ public class Goal extends GridElement implements Updatable{
 	 * {@inheritDoc}
 	 */
 	@Override
-	public ArrayList<GridElement> update(GridElement ge) {
+	public ArrayList<GridElement> update(GridElement ge,boolean autoupgrade) {
 		ArrayList<GridElement> returnList	=	new ArrayList<GridElement>();
 		boolean addThis						=	false;	
-		Goal updated						=	(Goal) this.clone();
-		updated.setVersion(this.getVersion()+1);
+		Goal updated	=	null;
+		if(autoupgrade	==	true){
+			updated						=	(Goal) this.clone();
+			updated.setVersion(this.getVersion()+1);
+		}
+		else{
+			updated		=	this;
+		}
 		System.out.println("updating Goal attribute reference");
 		if(this.measurementGoal!=null){
 			if(this.measurementGoal.getLabel().equals(ge.getLabel())){
@@ -155,10 +161,10 @@ public class Goal extends GridElement implements Updatable{
 			}
 		}
 		if(this.measurementGoal!=null){
-			Utils.mergeLists(returnList, this.measurementGoal.update(ge));
+			Utils.mergeLists(returnList, this.measurementGoal.update(ge,autoupgrade));
 		}
 		for(int i=0;i<this.strategyList.size();i++){
-			Utils.mergeLists(returnList, this.strategyList.get(i).update(ge));
+			Utils.mergeLists(returnList, this.strategyList.get(i).update(ge,autoupgrade));
 		}
 		if(addThis==true){
 			returnList.add(updated);

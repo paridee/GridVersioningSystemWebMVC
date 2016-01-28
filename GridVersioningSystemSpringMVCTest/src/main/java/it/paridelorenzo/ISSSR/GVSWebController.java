@@ -262,28 +262,20 @@ public class GVSWebController {
 				}
 				else{
 					Grid 						newVersion	=	this.gridService.upgradeGrid(latest);
-					newVersion.setVersion(newVersion.getVersion()-1);
-					toBeRemoved								=	newVersion;		//i will delete this temporary version, further change will require an upgrade
 					HashMap<String,GridElement> elements	=	temp.obtainAllEmbeddedElements();
+					Grid intermediate	=	null;
 					for(int i=0;i<mods.size();i++){
 						Modification 	aMod	=	mods.get(i);
 						if(aMod instanceof ObjectFieldModification){
 							GridElement 	subj;
 							if(elements.containsKey(((ObjectFieldModification) aMod).getSubjectLabel())){
 								subj	=	elements.get(((ObjectFieldModification) aMod).getSubjectLabel());
-								subj	=	this.gridElementService.upgradeGridElement(subj);
 								((ObjectFieldModification) aMod).apply(subj, newVersion);
-								newVersion	=	this.gridService.updateGridElement(newVersion, subj);
+								newVersion	=	this.gridService.updateGridElement(newVersion, subj,true);
 								this.gridService.updateGrid(newVersion);
 							}
 							else return "error";
 						}
-					}
-					if(toBeRemoved!=null){
-						System.out.println("Removing Grid with ID "+toBeRemoved.getId());
-						toBeRemoved.setMainGoals(null);
-						this.gridService.updateGrid(toBeRemoved);
-						this.gridService.removeGrid(toBeRemoved.getId());
 					}
 					return "modifiche";
 				}

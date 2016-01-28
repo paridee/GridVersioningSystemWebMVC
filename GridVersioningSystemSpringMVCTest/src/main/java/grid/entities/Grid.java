@@ -120,7 +120,7 @@ public class Grid implements Updatable{
 	 * {@inheritDoc}
 	 */
 	@Override
-	public ArrayList<GridElement> update(GridElement ge) {
+	public ArrayList<GridElement> update(GridElement ge,boolean autoupgrade) {
 		// TODO Auto-generated method stub
 		return null;
 	}

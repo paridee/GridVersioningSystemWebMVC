@@ -140,7 +140,7 @@ public class Metric extends GridElement implements Updatable{
 	 * {@inheritDoc}
 	 */
 	@Override
-	public ArrayList<GridElement> update(GridElement ge) {
+	public ArrayList<GridElement> update(GridElement ge,boolean autoupgrade) {
 		return new ArrayList<GridElement>();
 	}
 
