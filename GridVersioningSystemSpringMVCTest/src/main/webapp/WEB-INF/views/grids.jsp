@@ -64,6 +64,7 @@
     </nav>
 
     <div class="container">
+    	
     	<c:if test="${(gridAdded!= null)&&(grid==null)}">
 		<div class="starter-template">
 			${gridAdded} test
