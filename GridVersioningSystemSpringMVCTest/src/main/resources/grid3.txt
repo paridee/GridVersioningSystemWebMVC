@@ -3,7 +3,7 @@
     {
       "assumption": "assumption1",
       "context": "context1",
-      "descrizione": "goal1 mod",
+      "descrizione": "goal1",
       "goalId": "g1",
       "measurementGoal": "mg1",
       "strategyList": [
@@ -18,7 +18,7 @@
               "measurementGoal": "mg2",
               "strategyList": [
                 {
-                  "descrizione": "strat3 mod",
+                  "descrizione": "strat3",
                   "goalList": [
                   ],
                   "strategicProjectId": 0,

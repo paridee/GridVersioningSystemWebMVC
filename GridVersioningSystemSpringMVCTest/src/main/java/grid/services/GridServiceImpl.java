@@ -146,7 +146,7 @@ public class GridServiceImpl implements GridService {
 					checked.put(subj.getLabel(), subj);
 					List<Goal> mainGoals	=	g.getMainGoals();
 					for(int j=0;j<mainGoals.size();j++){
-						Utils.mergeLists(nextCheck, mainGoals.get(j).update(subj,autoupgrade));
+						Utils.mergeLists(nextCheck, mainGoals.get(j).update(subj,true));
 					}
 				}
 			}
@@ -154,7 +154,7 @@ public class GridServiceImpl implements GridService {
 		}
 		Grid updated	=	null;
 		if(autoupgrade	==	false){
-			updated	=	g;	//if false not upgrade
+			updated	=	g;	
 		}
 		else{
 			updated	=	this.upgradeGrid(g);

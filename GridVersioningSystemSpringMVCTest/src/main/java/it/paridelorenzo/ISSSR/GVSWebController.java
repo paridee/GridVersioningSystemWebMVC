@@ -11,6 +11,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Controller;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -19,6 +20,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import grid.JSONFactory;
+import grid.entities.Goal;
 import grid.entities.Grid;
 import grid.entities.GridElement;
 import grid.entities.Project;
@@ -28,6 +30,7 @@ import grid.interfaces.services.ProjectService;
 import grid.modification.elements.Modification;
 import grid.modification.elements.ObjectFieldModification;
 import grid.modification.grid.GridModificationService;
+import javassist.bytecode.Descriptor.Iterator;
  
  
 @Controller
@@ -80,8 +83,8 @@ public class GVSWebController {
 		if(g.getMainGoals().size()!=0){
 			List<Object> stack = new ArrayList<Object>();
 			stack.addAll(g.getMainGoals());
-			String chart="chart_config = {chart: { container: \"#gridChart\", siblingSeparation:70, subTeeSeparation:70, animateOnInit: true,node: {collapsable: true},animation: {nodeAnimation: \"easeOutBounce\",nodeSpeed: 700,connectorsAnimation: \"bounce\",connectorsSpeed: 700}},";		
-			chart=chart+"nodeStructure: {innerHTML:\"<div class=\'nodeTxt\'><div class='txtElementTitle'><div class='nodeImg' ></div>"+g.getProject().getProjectId()+"</div><div class='txtElement'>"+g.getProject().getDescription()+"</div></div>\",children: [";
+			String chart="chart_config = {chart: { container: \"#gridChart\", animateOnInit: true,node: {collapsable: true},animation: {nodeAnimation: \"easeOutBounce\",nodeSpeed: 700,connectorsAnimation: \"bounce\",connectorsSpeed: 700}},";		
+			chart=chart+"nodeStructure: {image:\"/ISSSR/resources/Treant/cheryl.png\", text: { name: \""+g.getProject().getProjectId()+"\",desc: \""+g.getProject().getDescription()+"\" },children: [";
 			chart=chart+updateChart(stack)+"]}};";
 			return chart;
 		}
@@ -100,7 +103,21 @@ public class GVSWebController {
 			String image="";
 			String name="";
 			String desc="";
+			//
 			List<Object> newStack=new ArrayList<Object>();
+			/*if(stack.get(i).getClass().getSimpleName().equals("Goal")){
+				Goal tempGoal=(Goal)stack.get(i);
+				name=tempGoal.getLabel();
+				newStack.addAll(tempGoal.getStrategyList());
+			}
+			else if(stack.get(i).getClass().getSimpleName().equals("Strategy")){
+				Strategy tempStrategy=(Strategy)stack.get(i);
+				name=tempStrategy.getLabel();
+				newStack.addAll(tempStrategy.getGoalList());
+			}
+			else {
+				name=stack.get(i).getClass().getSimpleName();
+			}*/
 			GridElement ge=(GridElement)stack.get(i);
 			name=ge.getLabel()+"-v"+ge.getVersion();
 			desc="";
@@ -124,10 +141,9 @@ public class GVSWebController {
 						}
 					}
 					else{
-						//desc=desc+"<div style='float:left;min-width: 200px;'>"+tempField.getName()+": "+fieldValueStr+"</div>";
 						if(fieldValue!=null){
 							String fieldValueStr	=	(String)fieldValue.toString();
-							desc=desc+"<div class='txtElement'><i>"+tempField.getName()+": </i> "+fieldValueStr+"</div>";
+							desc=desc+tempField.getName()+":"+fieldValueStr;
 						}
 					}
 				} catch (IllegalArgumentException e) {
@@ -138,14 +154,12 @@ public class GVSWebController {
 					e.printStackTrace();
 				}
 			}
-			chart=chart+"{ innerHTML:\"<div class=\'nodeTxt\'><div class='txtElementTitle'><div class='nodeImg' ></div>"+name+"</div>"+desc+"</div>\", ";
-			//chart=chart+"{text: { name: \""+name+"\", desc: \""+desc+"\" },innerHTML:\"<div><h1>test</h1></div>\", collapsed: true";
+			chart=chart+"{text: { name: \""+name+"\", desc: \""+desc+"\" }, collapsed: true";
 			if(newStack.size()>0){
-				chart=chart+" collapsed: true ,children: [";
+				chart=chart+",children: [";
 				chart=chart+updateChart(newStack);
 				chart=chart+"]";
 			}
-			else chart=chart+" collapsed: false";
 			chart=chart+"}";
 			if (i<stack.size()-1) chart=chart+",";
 		}
@@ -225,6 +239,7 @@ public class GVSWebController {
 		return "addgrid";
     }
 	
+	
 	@RequestMapping(value = "/grids/update", method=RequestMethod.POST)
     public @ResponseBody String updateGrid(@RequestBody String jsonData) {
 		//Grid temp=JSONFactory.loadFromJson(jsonData, this.projectService);
@@ -250,9 +265,17 @@ public class GVSWebController {
 					return "non ci sono modifiche";
 				}
 				else{
-					Grid 						newVersion	=	this.gridService.upgradeGrid(latest);
+					Grid 						newVersion	=	new Grid();
+					newVersion.setMainGoals(latest.getMainGoals());
+					ArrayList<Goal> mainGoalsCopy	=	new ArrayList<Goal>();
+					List<Goal> gridMainGoals	=	latest.getMainGoals(); //a direct reference creates errors in hibernate (shared reference to a collection)	
+					for(int i=0;i<gridMainGoals.size();i++){
+						mainGoalsCopy.add(gridMainGoals.get(i));
+					}
+					newVersion.setMainGoals(mainGoalsCopy);
+					newVersion.setProject(latest.getProject());
+					newVersion.setVersion(latest.getVersion()+1);
 					HashMap<String,GridElement> elements	=	temp.obtainAllEmbeddedElements();
-					Grid intermediate	=	null;
 					for(int i=0;i<mods.size();i++){
 						Modification 	aMod	=	mods.get(i);
 						if(aMod instanceof ObjectFieldModification){
@@ -260,12 +283,25 @@ public class GVSWebController {
 							if(elements.containsKey(((ObjectFieldModification) aMod).getSubjectLabel())){
 								subj	=	elements.get(((ObjectFieldModification) aMod).getSubjectLabel());
 								((ObjectFieldModification) aMod).apply(subj, newVersion);
-								newVersion	=	this.gridService.updateGridElement(newVersion, subj,true);
-								this.gridService.updateGrid(newVersion);
+								newVersion	=	this.gridService.updateGridElement(newVersion, subj,false);
 							}
 							else return "error";
 						}
 					}
+					HashMap<String,GridElement> oldElements	=	latest.obtainAllEmbeddedElements();
+					HashMap<String,GridElement> newElements	=	newVersion.obtainAllEmbeddedElements();
+					java.util.Iterator<String> anIt	=	oldElements.keySet().iterator();
+					while(anIt.hasNext()){
+						if(newElements.containsKey(anIt)){
+							GridElement oldElement 	=	oldElements.get(anIt);
+							GridElement newElement 	=	newElements.get(anIt);
+							if(newElement.getVersion()>oldElement.getVersion()){
+								newElement.setVersion(oldElement.getVersion()+1);
+							}
+						}
+						anIt.next();
+					}
+					this.gridService.addGrid(newVersion);
 					return "modifiche";
 				}
 			}
