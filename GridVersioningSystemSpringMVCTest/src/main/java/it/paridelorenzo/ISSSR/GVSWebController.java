@@ -248,8 +248,38 @@ public class GVSWebController {
 		JSONObject response	=	new JSONObject();
 		Grid temp;
 		try {
+			JSONObject anObject	=	new JSONObject(jsonData);
+			int refVersion		=	-1;
+			String authorEmail	=	null;
+			if(anObject.has("refVersion")){
+				refVersion	=	anObject.getInt("refVersion");
+			}
+			if(anObject.has("changeAuthor")){
+				authorEmail	=	anObject.getString("changeAuthor");
+			}
+			if(anObject.has("newGrid")){
+				jsonData	=	anObject.getString("newGrid");
+			}
 			temp = JSONFactory.loadFromJson(jsonData, this.projectService);
-			Grid latest	=	this.gridService.getLatestGrid(temp.getProject().getId());
+			Grid latest	=	null;
+			latest	=	this.gridService.getLatestGrid(temp.getProject().getId());
+			//TODO carciofo nota bene:
+			/*
+			 * se l'update e' rispetto l'ultima grid disponibile ovviamente non ci sara' nessun tipo di conflitto possibile
+			 * in quanto la versione di riferimento e' l'ultima disponibile di default, se invece c'e' una versione di riferimento
+			 * va tirata fuori una lista di gridelement modificati dalla versione di riferimento rispetto all'ultima disponibile
+			 * e va verificato se l'oggetto che vado a modificare sta li dentro, in caso affermativo DEVO far partire il processo di 
+			 * gestione del conflitto //TODO implementare controllo e gestione
+			 */
+			if(refVersion>-1){
+				List<Grid> grids	=	this.gridService.getGridLog(temp.getProject().getId());
+				for(int i=0;i<grids.size();i++){
+					Grid current	=	grids.get(i);
+					if(current.getVersion()==refVersion){
+						latest	=	current;
+					}
+				}
+			}
 			System.out.println("###~~~~VERSIONE GRID CARICATA"+latest.getVersion());
 			if(latest	==	null){
 				return "non esiste grid per questo progetto";
@@ -278,14 +308,20 @@ public class GVSWebController {
 					HashMap<String,GridElement> elements	=	latest.obtainAllEmbeddedElements();
 					for(int i=0;i<mods.size();i++){
 						Modification 	aMod	=	mods.get(i);
+						GridElement 	subj;
+						subj	=	elements.get(((ObjectFieldModification) aMod).getSubjectLabel());
+						if(Modification.minorUpdateClass.contains(subj.getClass())){
+							aMod.setModificationType(Modification.Type.Minor);
+						}
+						else{
+							aMod.setModificationType(Modification.Type.Major);
+						}
 						if(aMod instanceof ObjectFieldModification){
-							GridElement 	subj;
 							if(elements.containsKey(((ObjectFieldModification) aMod).getSubjectLabel())){
-								subj	=	elements.get(((ObjectFieldModification) aMod).getSubjectLabel());
-								subj	=	subj.clone();
-								subj.setVersion(subj.getVersion()+1);
-								((ObjectFieldModification) aMod).apply(subj, newVersion);
-								newVersion	=	this.gridService.updateGridElement(newVersion, subj,false);
+								GridElement cloned	=	subj.clone();
+								cloned.setVersion(subj.getVersion()+1);
+								((ObjectFieldModification) aMod).apply(cloned, newVersion);
+								newVersion	=	this.gridService.updateGridElement(newVersion, cloned,false);
 							}
 							else return "error";
 						}
