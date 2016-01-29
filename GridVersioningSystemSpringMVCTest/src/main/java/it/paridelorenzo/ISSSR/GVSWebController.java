@@ -275,13 +275,15 @@ public class GVSWebController {
 					newVersion.setMainGoals(mainGoalsCopy);
 					newVersion.setProject(latest.getProject());
 					newVersion.setVersion(latest.getVersion()+1);
-					HashMap<String,GridElement> elements	=	temp.obtainAllEmbeddedElements();
+					HashMap<String,GridElement> elements	=	latest.obtainAllEmbeddedElements();
 					for(int i=0;i<mods.size();i++){
 						Modification 	aMod	=	mods.get(i);
 						if(aMod instanceof ObjectFieldModification){
 							GridElement 	subj;
 							if(elements.containsKey(((ObjectFieldModification) aMod).getSubjectLabel())){
 								subj	=	elements.get(((ObjectFieldModification) aMod).getSubjectLabel());
+								subj	=	subj.clone();
+								subj.setVersion(subj.getVersion()+1);
 								((ObjectFieldModification) aMod).apply(subj, newVersion);
 								newVersion	=	this.gridService.updateGridElement(newVersion, subj,false);
 							}
@@ -292,14 +294,14 @@ public class GVSWebController {
 					HashMap<String,GridElement> newElements	=	newVersion.obtainAllEmbeddedElements();
 					java.util.Iterator<String> anIt	=	oldElements.keySet().iterator();
 					while(anIt.hasNext()){
-						if(newElements.containsKey(anIt)){
-							GridElement oldElement 	=	oldElements.get(anIt);
-							GridElement newElement 	=	newElements.get(anIt);
+						String key	=	anIt.next();
+						if(newElements.containsKey(key)){
+							GridElement oldElement 	=	oldElements.get(key);
+							GridElement newElement 	=	newElements.get(key);
 							if(newElement.getVersion()>oldElement.getVersion()){
 								newElement.setVersion(oldElement.getVersion()+1);
 							}
 						}
-						anIt.next();
 					}
 					this.gridService.addGrid(newVersion);
 					return "modifiche";
