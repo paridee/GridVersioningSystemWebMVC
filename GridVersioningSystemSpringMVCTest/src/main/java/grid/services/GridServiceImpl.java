@@ -8,6 +8,7 @@ import java.util.List;
 import org.json.JSONObject;
 import org.springframework.transaction.annotation.Transactional;
 
+import grid.JSONFactory.JSONType;
 import grid.Utils;
 import grid.entities.Goal;
 import grid.entities.Grid;
@@ -15,7 +16,6 @@ import grid.entities.GridElement;
 import grid.interfaces.DAO.GridDAO;
 import grid.interfaces.services.GridElementService;
 import grid.interfaces.services.GridService;
-import grid.services.GridElementServiceImpl.JSONType;
 
 
 /**

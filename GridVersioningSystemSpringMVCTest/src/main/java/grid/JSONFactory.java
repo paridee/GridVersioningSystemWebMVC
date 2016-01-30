@@ -12,19 +12,25 @@ import org.json.JSONException;
 import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+
 import grid.entities.Goal;
 import grid.entities.Grid;
 import grid.entities.GridElement;
 import grid.entities.MeasurementGoal;
 import grid.entities.Metric;
+import grid.entities.Practitioner;
 import grid.entities.Project;
 import grid.entities.Question;
 import grid.entities.Strategy;
+import grid.interfaces.DAO.PractitionerDAO;
 import grid.interfaces.services.ProjectService;
 import grid.modification.elements.Modification;
 import grid.modification.elements.ObjectFieldModification;
 import grid.modification.elements.ObjectModificationService;
 import grid.modification.grid.GridElementAdd;
+import grid.services.PractitionerServiceImpl;
 
 /**
  * This class provides a method for parsing a Grid from JSON Representation 
@@ -33,18 +39,31 @@ import grid.modification.grid.GridElementAdd;
  *
  */
 public class JSONFactory {
+	
 	/**
-	 * Struct returned if a modification json is submitted, contains all the changes and new elements to be added
+	 * Enumeration with all the JSON format supported by this project
 	 * @author Paride Casulli
 	 * @author Lorenzo La Banca
 	 *
 	 */
+	public enum JSONType{
+		FIRST,SECOND
+	}
 	
+
+	private static PractitionerServiceImpl practitionerService;
 	private static final Logger logger	=	LoggerFactory.getLogger(JSONFactory.class);
 	@SuppressWarnings("rawtypes")
-	HashMap<Class,HashMap<String,String>> attributesMap	=	new HashMap<Class,HashMap<String,String>>();
+	public HashMap<Class,HashMap<String,String>> attributesMap	=	new HashMap<Class,HashMap<String,String>>();
 	
 	
+	@Autowired(required=true)
+	@Qualifier(value="practitionerService")
+	public static void setPractitionerService(PractitionerServiceImpl practitionerService) {
+		JSONFactory.practitionerService = practitionerService;
+	}
+
+
 	/**
 	 * Default constructor, needed to initialize some dictionaries
 	 */
@@ -55,7 +74,7 @@ public class JSONFactory {
 		attributesMap.put(Goal.class, goalMap);
 		HashMap<String,String> measurementGoalMap	=	new HashMap<String,String>();
 		measurementGoalMap.put("mgId", "label");
-		measurementGoalMap.put("decrizione3", "description");
+		measurementGoalMap.put("decrizione", "description");
 		attributesMap.put(MeasurementGoal.class, measurementGoalMap);
 		HashMap<String,String> metricMap	=	new HashMap<String,String>();
 		metricMap.put("metricId", "label");
@@ -303,22 +322,47 @@ public class JSONFactory {
 	 */
 	private static GridElement loadGridObj(String objectStr,HashMap<String,Object> loaded) {
 		JSONObject object	=	new JSONObject(objectStr);
+		GridElement loadedGE	=	null;
 		if(object.has("goalId")){
-			return JSONFactory.loadGoalFromJson(objectStr, loaded);
+			loadedGE	=	 JSONFactory.loadGoalFromJson(objectStr, loaded);
 		}
 		else if(object.has("mgId")){
-			return JSONFactory.loadMeasurementGoalFromJson(objectStr, loaded);
+			loadedGE	=	 JSONFactory.loadMeasurementGoalFromJson(objectStr, loaded);
 		}
 		else if(object.has("strategyId")){
-			return JSONFactory.loadStrategyFromJson(objectStr, loaded);
+			loadedGE	=	 JSONFactory.loadStrategyFromJson(objectStr, loaded);
 		}
 		else if(object.has("metricId")){
-			return JSONFactory.loadMetricFromJson(objectStr, loaded);
+			loadedGE	=	 JSONFactory.loadMetricFromJson(objectStr, loaded);
 		}
 		else if(object.has("questionId")){
-			return JSONFactory.loadMetricFromJson(objectStr, loaded);
+			loadedGE	=	 JSONFactory.loadMetricFromJson(objectStr, loaded);
 		}
-		return null;
+		if(object.has("authors")){
+			loadedGE.setAuthors(loadAuthors((JSONArray)(object.get("authors"))));
+		}
+		return loadedGE;
+	}
+
+	/**
+	 * loads authors
+	 * @param object with authors
+	 * @return authors
+	 */
+	private static ArrayList<Practitioner> loadAuthors(JSONArray authors) {
+		ArrayList<Practitioner> practitioners	=	new ArrayList<Practitioner>();
+		for(int i=0;i<authors.length();i++){
+			String email	=	((JSONObject)authors.get(i)).getString("email");
+			Practitioner aPract	=	practitionerService.getPractitionerByEmail(email);
+			if(aPract==null){
+				aPract	=	new Practitioner();
+				aPract.setEmail(((JSONObject)authors.get(i)).getString("email"));
+				aPract.setEmail(((JSONObject)authors.get(i)).getString("name"));
+				practitionerService.add(aPract);
+			}
+			practitioners.add(aPract);
+		}
+		return practitioners;
 	}
 
 	/**
@@ -518,6 +562,174 @@ public class JSONFactory {
 		aMetric.setScaleType(obj.getString("scaleType"));
 		loaded.put(aMetric.getLabel(), aMetric);
 		return aMetric;
-		
 	}
+	
+	/**
+	 * Obtain a JSON from an element
+	 * @param element element to be serialized
+	 * @param type type of JSON
+	 * @return JSON
+	 */
+	@SuppressWarnings("rawtypes")
+	public JSONObject obtainJson(GridElement element,JSONType type){
+		JSONObject	returnObject	=	new JSONObject();
+		String		id				=	element.getLabel();
+		String		typeC			=	element.getClass().getSimpleName().toString();
+		typeC						=	typeC.toLowerCase();
+		HashMap<Class,HashMap<String,String>> reverseMap	=	new HashMap<Class, HashMap<String, String>>();
+		Iterator<Class> anIterator			=	this.attributesMap.keySet().iterator();
+		while(anIterator.hasNext()){
+			Class aClass							=	anIterator.next();
+			HashMap<String,String> innerMap			=	this.attributesMap.get(aClass);
+			HashMap<String,String> reverseInnerMap	=	new HashMap<String,String>();
+			Iterator<String> innerIterator			=	innerMap.keySet().iterator();
+			while(innerIterator.hasNext()){
+				String value	=	innerIterator.next();
+				String key		=	innerMap.get(value);
+				reverseInnerMap.put(key, value);
+				logger.info("map of class "+aClass.getCanonicalName()+" original "+value+" value "+key+" reverse "+key+" value "+value);
+			}
+			reverseMap.put(aClass, reverseInnerMap);
+		}
+		//id label of measurement goal has a different format
+		if(typeC.equals("measurementgoal")){
+			typeC	=	"mg";
+		}
+		typeC						=	typeC+"Id";
+		returnObject.put(typeC, id);
+		//gets the fields list of the elemen
+		Field[]	fields	=	element.getClass().getDeclaredFields();
+		for(int i=0;i<fields.length;i++){
+			System.out.println("FIELD "+fields[i].getName());
+			String 	fieldName	=	fields[i].getName();
+			fields[i].setAccessible(true);
+			Object fieldValue	=	null;
+			try {
+				if(fields[i].get(element)!=null){
+					fieldValue = fields[i].get(element);	
+					if(reverseMap.containsKey(fields[i].getDeclaringClass())){
+						HashMap <String,String> fieldMap	=	reverseMap.get(fields[i].getDeclaringClass());
+						if(fieldMap.containsKey(fieldName)){
+							fieldName	=	fieldMap.get(fieldName);
+						}
+					}
+					//if the attrubute is a list select a behaviour for creating a JSON
+					if(fieldValue instanceof List){
+						@SuppressWarnings("rawtypes")
+						List list	=	(List) fieldValue;
+						JSONArray	array	=	new JSONArray();
+						for(int j=0;j<list.size();j++){
+							Object listElement	=	list.get(j);
+							if(listElement instanceof Metric){
+								if(type	==	JSONType.FIRST){
+									array.put(this.obtainJson((GridElement)list.get(j), type));
+								}
+								else if(type	==	JSONType.SECOND){
+									array.put(((GridElement)list.get(j)).getIdElement());
+								}
+							}
+							else if(listElement instanceof GridElement){
+								array.put(this.obtainJson((GridElement)list.get(j), type));
+							}
+							else{
+								array.put(list.get(j));
+							}
+							returnObject.put(fieldName, array);
+						}
+					}
+					else{
+						Object innerObj	=	null;
+						if(fieldValue instanceof MeasurementGoal){
+							if(type	==	JSONType.FIRST){
+								innerObj	=	((MeasurementGoal)fieldValue).getLabel();	
+							}
+							else if(type	==	JSONType.SECOND){
+								innerObj	=	this.obtainJson(((MeasurementGoal)fieldValue),type);
+							}
+						}
+						else if(fieldValue instanceof GridElement){
+							innerObj	=	this.obtainJson((GridElement)fieldValue, type);
+						}
+						else{
+							innerObj	=	fieldValue;
+						}
+						returnObject.put(fieldName, innerObj);
+					}
+				}
+			} catch (IllegalArgumentException e) {
+				e.printStackTrace();
+			} catch (IllegalAccessException e) {
+				e.printStackTrace();
+			}
+		}
+		List<Practitioner> authors	=	element.getAuthors();
+		JSONArray auth				=	new JSONArray();
+		for(int i=0;i<authors.size();i++){
+			JSONObject author		=	new JSONObject();
+			author.put("email", authors.get(i).getEmail());
+			author.put("name", authors.get(i).getName());
+			auth.put(author);
+		}
+		if(auth.length()>0){
+			returnObject.put("authors", auth);
+		}
+		return returnObject;
+	}
+	
+	/**
+	 * Obtain a JSON from a grid
+	 * @param aGrid grid to be serialized
+	 * @param type type of JSON
+	 * @return JSON
+	 */
+	@SuppressWarnings("rawtypes")
+	public JSONObject obtainJson(Grid aGrid,JSONType type){
+		JSONObject 	returnObject	=	new JSONObject();
+		List<Goal> 	mainGoal		=	aGrid.getMainGoals();
+		JSONArray	mainGoalArray	=	new JSONArray();
+		for(int i=0;i<mainGoal.size();i++){
+			mainGoalArray.put(this.obtainJson(mainGoal.get(i), type));
+		}
+		returnObject.put("goalList", mainGoalArray);
+		HashMap<String,GridElement> elements	=	aGrid.obtainAllEmbeddedElements();
+		JSONArray	measGoalList				=	new JSONArray();
+		JSONArray	metricList					=	new JSONArray();
+		JSONArray	questionList				=	new JSONArray();
+		JSONArray	strategyList				=	new JSONArray();
+		JSONObject	project						=	new JSONObject();
+		//project JSON creation
+		project.put("creationDate", aGrid.getProject().getCreationDate());
+		project.put("description", aGrid.getProject().getDescription());
+		project.put("projectId", aGrid.getProject().getProjectId());
+		//end of creation
+		Iterator<String> anIterator				=	elements.keySet().iterator();
+		while(anIterator.hasNext()){
+			String key					=	anIterator.next();
+			GridElement	anEl			=	elements.get(key);
+			JSONArray destinationArray	=	null;
+			if(anEl instanceof MeasurementGoal){
+				destinationArray	=	measGoalList;
+			}
+			else if(anEl instanceof Metric){
+				destinationArray	=	metricList;
+			}
+			else if(anEl instanceof Question){
+				destinationArray	=	questionList;
+			}
+			else if(anEl instanceof Strategy){
+				destinationArray	=	strategyList;
+			}
+			if(destinationArray!=null){//may have goals, with null array
+				JSONObject anObj	=	this.obtainJson(anEl, type);
+				destinationArray.put(anObj);
+			}
+		}
+		returnObject.put("measGoalList", measGoalList);
+		returnObject.put("metricList", metricList);
+		returnObject.put("project", project);
+		returnObject.put("questionList", questionList);
+		returnObject.put("strategyList", strategyList);
+		return returnObject;
+	}
+
 }

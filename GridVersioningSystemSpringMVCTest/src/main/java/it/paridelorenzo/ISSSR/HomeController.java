@@ -34,6 +34,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 
 import grid.JSONFactory;
+import grid.JSONFactory.JSONType;
 import grid.DAOImpl.ProjectDAOImpl;
 import grid.entities.Goal;
 import grid.entities.Grid;
@@ -41,6 +42,7 @@ import grid.entities.GridElement;
 import grid.entities.GridElement.State;
 import grid.entities.MeasurementGoal;
 import grid.entities.Metric;
+import grid.entities.Practitioner;
 import grid.entities.Project;
 import grid.entities.Question;
 import grid.entities.Strategy;
@@ -124,7 +126,7 @@ public class HomeController {
 		mg2.add(pippo2);
 		mg2.add(testMG);
 		test2.setMainGoals(mg2);
-		String jsonV	=	this.gridElementService.obtainJson(pippo2, GridElementServiceImpl.JSONType.FIRST).toString();
+		String jsonV	=	new JSONFactory().obtainJson(pippo2, JSONType.FIRST).toString();
 		System.out.println("JSON Ottenuto "+jsonV);
 		List<Modification> mod;
 		try {
@@ -281,14 +283,18 @@ public class HomeController {
 			
 			Date date = new Date();
 			DateFormat dateFormat = DateFormat.getDateTimeInstance(DateFormat.LONG, DateFormat.LONG, locale);
-			
+			JSONFactory testFactory	=	new JSONFactory();
 			Project test	=	new Project();
 			test.setDescription("progetto di prova");
 			Grid testGrid	=	new Grid();
 			testGrid.setProject(test);
 			ArrayList<Goal> maingoals	=	new ArrayList<Goal>();
 			testGrid.setMainGoals(maingoals);
+			MeasurementGoal turboFregna	=	new MeasurementGoal();
+			turboFregna.setLabel("porco dio");
+			turboFregna.setDescription("e mannaggia la madonna");
 			Goal firstGoal	=	new Goal();
+			firstGoal.setMeasurementGoal(turboFregna);
 			firstGoal.setLabel("primo goal");
 			this.gridElementService.addGridElement(firstGoal);
 			maingoals.add(firstGoal);
@@ -331,6 +337,13 @@ public class HomeController {
 			Grid newGrid	=	this.gridService.updateGridElement(testGrid, updated,true);
 			Goal anotherGoal	=	new Goal();
 			anotherGoal.setLabel("testttt");
+			Practitioner zio	=	new Practitioner();
+			zio.setEmail("porcodio@porcamadonna.com");
+			zio.setName("Dio Cane");
+			ArrayList<Practitioner> auths	=	new ArrayList<Practitioner>();
+			auths.add(zio);
+			anotherGoal.setAuthors(auths);
+			anotherGoal.setMeasurementGoal(turboFregna);
 			Grid newRel	=	this.gridService.upgradeGrid(newGrid);
 			newRel.getMainGoals().add(anotherGoal);
 			this.gridService.updateGrid(newRel);
@@ -342,6 +355,10 @@ public class HomeController {
 			anotherGoal	=	(Goal) this.gridElementService.upgradeGridElement(anotherGoal);
 			anotherGoal.setStrategyList(strlista);
 			newRel	=	this.gridService.updateGridElement(newRel, anotherGoal,true);
+			System.out.println("TEST JSON");
+			System.out.println(testFactory.obtainJson(firstGoal, JSONType.FIRST));
+			System.out.println("TEST JSON GRID");
+			System.out.println(testFactory.obtainJson(newRel, JSONType.FIRST));
 			return "home";
 	}
 	

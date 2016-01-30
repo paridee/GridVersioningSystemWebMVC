@@ -254,15 +254,12 @@ public class GVSWebController {
 			if(anObject.has("refVersion")){
 				refVersion	=	anObject.getInt("refVersion");
 			}
-			if(anObject.has("changeAuthor")){
-				authorEmail	=	anObject.getString("changeAuthor");
-			}
-			if(anObject.has("newGrid")){
+			if(anObject.has("grid")){
 				jsonData	=	anObject.getString("newGrid");
 			}
 			temp = JSONFactory.loadFromJson(jsonData, this.projectService);
-			Grid latest	=	null;
-			latest	=	this.gridService.getLatestGrid(temp.getProject().getId());
+			Grid referenceGrid	=	null;
+			referenceGrid	=	this.gridService.getLatestGrid(temp.getProject().getId());
 			//TODO carciofo nota bene:
 			/*
 			 * se l'update e' rispetto l'ultima grid disponibile ovviamente non ci sara' nessun tipo di conflitto possibile
@@ -276,17 +273,17 @@ public class GVSWebController {
 				for(int i=0;i<grids.size();i++){
 					Grid current	=	grids.get(i);
 					if(current.getVersion()==refVersion){
-						latest	=	current;
+						referenceGrid	=	current;
 					}
 				}
 			}
-			System.out.println("###~~~~VERSIONE GRID CARICATA"+latest.getVersion());
-			if(latest	==	null){
+			System.out.println("###~~~~VERSIONE GRID CARICATA"+referenceGrid.getVersion());
+			if(referenceGrid	==	null){
 				return "non esiste grid per questo progetto";
 			}
 			else{
 				//TODO se e' update nel "nostro formato" vai a prendere la grid di riferimento e fai il check per i conflitti
-				List<Modification>	mods		=	GridModificationService.getModification(latest, temp);
+				List<Modification>	mods		=	GridModificationService.getModification(referenceGrid, temp);
 				Grid				toBeRemoved	=	null;	//temporary basic grid
 				for(int i=0;i<mods.size();i++){
 					System.out.println("found modification "+mods.get(i).toString());
@@ -296,16 +293,16 @@ public class GVSWebController {
 				}
 				else{
 					Grid 						newVersion	=	new Grid();
-					newVersion.setMainGoals(latest.getMainGoals());
+					newVersion.setMainGoals(referenceGrid.getMainGoals());
 					ArrayList<Goal> mainGoalsCopy	=	new ArrayList<Goal>();
-					List<Goal> gridMainGoals	=	latest.getMainGoals(); //a direct reference creates errors in hibernate (shared reference to a collection)	
+					List<Goal> gridMainGoals	=	referenceGrid.getMainGoals(); //a direct reference creates errors in hibernate (shared reference to a collection)	
 					for(int i=0;i<gridMainGoals.size();i++){
 						mainGoalsCopy.add(gridMainGoals.get(i));
 					}
 					newVersion.setMainGoals(mainGoalsCopy);
-					newVersion.setProject(latest.getProject());
-					newVersion.setVersion(latest.getVersion()+1);
-					HashMap<String,GridElement> elements	=	latest.obtainAllEmbeddedElements();
+					newVersion.setProject(referenceGrid.getProject());
+					newVersion.setVersion(referenceGrid.getVersion()+1);
+					HashMap<String,GridElement> elements	=	referenceGrid.obtainAllEmbeddedElements();
 					for(int i=0;i<mods.size();i++){
 						Modification 	aMod	=	mods.get(i);
 						GridElement 	subj;
@@ -326,7 +323,7 @@ public class GVSWebController {
 							else return "error";
 						}
 					}
-					HashMap<String,GridElement> oldElements	=	latest.obtainAllEmbeddedElements();
+					HashMap<String,GridElement> oldElements	=	referenceGrid.obtainAllEmbeddedElements();
 					HashMap<String,GridElement> newElements	=	newVersion.obtainAllEmbeddedElements();
 					java.util.Iterator<String> anIt	=	oldElements.keySet().iterator();
 					while(anIt.hasNext()){

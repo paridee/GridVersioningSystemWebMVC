@@ -2,7 +2,9 @@ package grid.entities;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Set;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Entity;
@@ -15,6 +17,8 @@ import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
+
+import grid.entities.GridElement.State;
 import grid.interfaces.Updatable;
 
 /**
@@ -26,9 +30,9 @@ import grid.interfaces.Updatable;
 @Entity
 @Table(name="Grid")
 public class Grid implements Updatable{
-	//public enum GridState{
-	//	WORKING,UPDATING,FINAL_KO
-	//}
+	public enum GridState{
+		WORKING,UPDATING,FINAL_KO
+	}
 	private int 		id;
 	private	int 		version=1; //TODO make String Version
 	private List<Goal> 	mainGoals				=	null;
@@ -137,8 +141,11 @@ public class Grid implements Updatable{
 		return returnMap;
 	}
 
-	
-	/*public GridState obtainGridState(){
+	/**
+	 * Obtain the current state for this grid
+	 * @return state
+	 */
+	public GridState obtainGridState(){
 		HashMap<String,GridElement>	allElements	=	new HashMap<String,GridElement>();
 		for(int i=0;i<this.mainGoals.size();i++){
 			allElements.putAll(this.mainGoals.get(i).obtainEmbeddedElements());
@@ -157,7 +164,7 @@ public class Grid implements Updatable{
 			}
 		}
 		return returnState;
-	}*/
+	}
 	
 	/**
 	 * Calls Grid Element custom toString
