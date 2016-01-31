@@ -77,9 +77,9 @@ public class GridElementDAOImpl implements GridElementDao {
 	@Override
 	public List<GridElement> getElementLog(String label, Class c) {
 		Session session				=	this.sessionFactory.getCurrentSession();
-		List<GridElement> gElList	=	session.createQuery("from "+c.getName()+" G where G.label = "+label).list();
+		List<GridElement> gElList	=	session.createQuery("from "+c.getSimpleName()+" G where G.label = "+label).list();
 		for(GridElement g : gElList){
-			logger.info("Goal List::"+g);
+			logger.info("GridElement List:"+g);
 		}
 		return gElList;
 	}

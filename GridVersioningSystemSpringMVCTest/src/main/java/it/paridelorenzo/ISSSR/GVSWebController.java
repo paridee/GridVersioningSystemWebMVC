@@ -191,20 +191,29 @@ public class GVSWebController {
         return "projects";
     }
 	
-/*
-	@RequestMapping(value = "/grids/add")
-    public String addGrid(@RequestParam("jsonData") String jsonData, Model model) {
-		model.addAttribute("addedGrid", "true");
-		System.out.println(jsonData);
-		return "addgrid";
+	
+	
+	@RequestMapping(value = "/element/{type}/{id}")
+    public String getElementHistory(@PathVariable("id") String id, @PathVariable("type") String type, Model model) {
+		try {
+			List <GridElement> temp=this.gridElementService.getElementLog(id, Class.forName(type));
+		} catch (ClassNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return "element";
     }
-	*/
+	/*@RequestMapping(value = "/element/{type}/{id}/{vers}")
+    public String getElementVers(@PathVariable("id") String id,@PathVariable("vers") int vers, @PathVariable("type") String type,Model model) {
+		GridElement  temp=this.gridElementService.getElementById(id, getClass());
+		return "element";
+    }*/
+	
+	
 	
 	@RequestMapping(value = "/grids/add", method=RequestMethod.POST)
     public @ResponseBody String addGrid(@RequestBody String jsonData) {
-		//Grid temp=JSONFactory.loadFromJson(jsonData, this.projectService);
 		System.out.println(jsonData.toString());
-		//this.gridService.addGrid(temp);
 		Grid temp;
 		try {
 			temp = JSONFactory.loadFromJson(jsonData, this.projectService);
@@ -220,7 +229,6 @@ public class GVSWebController {
 				
 			}
 		} catch (Exception e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 			JSONObject jsonObject = new JSONObject();
 			jsonObject.put("msg", "error");
