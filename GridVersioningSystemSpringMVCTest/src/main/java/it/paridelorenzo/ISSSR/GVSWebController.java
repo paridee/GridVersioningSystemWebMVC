@@ -80,8 +80,8 @@ public class GVSWebController {
 		if(g.getMainGoals().size()!=0){
 			List<Object> stack = new ArrayList<Object>();
 			stack.addAll(g.getMainGoals());
-			String chart="chart_config = {chart: { container: \"#gridChart\", siblingSeparation:70, subTeeSeparation:70, animateOnInit: true,node: {collapsable: true},animation: {nodeAnimation: \"easeOutBounce\",nodeSpeed: 700,connectorsAnimation: \"bounce\",connectorsSpeed: 700}},";		
-			chart=chart+"nodeStructure: {innerHTML:\"<div class=\'nodeTxt\'><div class='txtElementTitle'><div class='nodeImg' ></div>"+g.getProject().getProjectId()+"</div><div class='txtElement'>"+g.getProject().getDescription()+"</div></div>\",children: [";
+			String chart="chart_config = {chart: { connectors: {type: \"bCurve\",style: {\"stroke-width\": 2}}, container: \"#gridChart\", siblingSeparation:70, rootOrientation:'WEST',  subTeeSeparation:70, animateOnInit: true,node: {collapsable: true},animation: {nodeAnimation: \"easeOutBounce\",nodeSpeed: 700,connectorsAnimation: \"bounce\",connectorsSpeed: 700}},";		
+			chart=chart+"nodeStructure: {innerHTML:\"<div class=\'nodeTxt\'><div class='txtProjectTitle'>"+g.getProject().getProjectId()+"</div><div class='txtElement'>"+g.getProject().getDescription()+"</div></div>\",children: [";
 			chart=chart+updateChart(stack)+"]}};";
 			return chart;
 		}
@@ -102,7 +102,7 @@ public class GVSWebController {
 			String desc="";
 			List<Object> newStack=new ArrayList<Object>();
 			GridElement ge=(GridElement)stack.get(i);
-			name=ge.getLabel()+"-v"+ge.getVersion();
+			name=stack.get(i).getClass().getSimpleName()+" "+ge.getLabel()+" - <i>v"+ge.getVersion()+"</i>";
 			desc="";
 			Field[] fields=ge.getClass().getDeclaredFields();
 			for(int j=0; j<fields.length;j++){
@@ -127,7 +127,10 @@ public class GVSWebController {
 						//desc=desc+"<div style='float:left;min-width: 200px;'>"+tempField.getName()+": "+fieldValueStr+"</div>";
 						if(fieldValue!=null){
 							String fieldValueStr	=	(String)fieldValue.toString();
-							desc=desc+"<div class='txtElement'><i>"+tempField.getName()+": </i> "+fieldValueStr+"</div>";
+							String txt=tempField.getName()+": </i> "+fieldValueStr;
+							int maxLength=60;
+							if(txt.length()>maxLength) txt=txt.substring(0, maxLength)+"...";
+							desc=desc+"<div class='txtElement'><i>"+txt+"</div>";
 						}
 					}
 				} catch (IllegalArgumentException e) {
