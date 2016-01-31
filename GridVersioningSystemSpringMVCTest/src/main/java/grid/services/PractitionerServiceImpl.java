@@ -21,39 +21,33 @@ public class PractitionerServiceImpl implements PractitionerService {
 
 	@Override
 	public List<Practitioner> getAllPractitioners() {
-		// TODO Auto-generated method stub
-		return null;
+		return this.practitionerDAO.getAllPractitioners();
 	}
 
 	@Override
 	public List<Practitioner> getPractitionersByName(String name) {
-		// TODO Auto-generated method stub
-		return null;
+		return this.practitionerDAO.getPractitionersByName(name);
 	}
 
 	@Override
 	public Practitioner getPractitionerByEmail(String email) {
-		// TODO Auto-generated method stub
-		return null;
+		return this.practitionerDAO.getPractitionerByEmail(email);
 	}
 	
 	@Transactional
 	@Override
 	public void updatePractitioner(Practitioner p) {
-		// TODO Auto-generated method stub
-		
+		this.practitionerDAO.updatePractitioner(p);		
 	}
 	@Transactional
 	@Override
 	public void delete(Practitioner p) {
-		// TODO Auto-generated method stub
-		
+		this.practitionerDAO.delete(p);
 	}
 	@Transactional
 	@Override
 	public void add(Practitioner p) {
-		// TODO Auto-generated method stub
-		
+		this.practitionerDAO.add(p);
 	}
 
 }

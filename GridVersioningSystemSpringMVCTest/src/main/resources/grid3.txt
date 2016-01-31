@@ -70,7 +70,7 @@
   ],
   "measGoalList": [
     {
-      "descrizione": "meas goal 1 paride",
+      "descrizione": "meas goal 1",
       "interpretationModel": "interpr1",
       "mgId": "mg1",
       "questionList": [
@@ -78,7 +78,7 @@
           "metricList": [
             {
               "count": 0,
-              "description": "m3 descr awsefasdf asdfasdf asdfasdf asdfasdf asdfasdf asdfasdf asdfasdf asdfasdf awsefasdf asdfasdf asdfasdf asdfasdf asdfasdf asdfasdf asdfasdf asdfasdf awsefasdf asdfasdf asdfasdf asdfasdf asdfasdf asdfasdf asdfasdf asdfasdf",
+              "description": "m3 descr",
               "measUnits": [
               ],
               "measurementProcess": "m3 mProcess",
@@ -119,7 +119,7 @@
       ]
     },
     {
-      "descrizione": "meas goal 2 pippo",
+      "descrizione": "meas goal 2",
       "interpretationModel": "interpr2",
       "mgId": "mg2",
       "questionList": [
@@ -165,7 +165,7 @@
     },
     {
       "count": 0,
-      "description": "m3 descr awsefasdf asdfasdf asdfasdf asdfasdf asdfasdf asdfasdf asdfasdf asdfasdf awsefasdf asdfasdf asdfasdf asdfasdf asdfasdf asdfasdf asdfasdf asdfasdf awsefasdf asdfasdf asdfasdf asdfasdf asdfasdf asdfasdf asdfasdf asdfasdf",
+      "description": "m3 descr",
       "measUnits": [
       ],
       "measurementProcess": "m3 mProcess",
@@ -222,7 +222,7 @@
       "metricList": [
         {
           "count": 0,
-          "description": "m3 descr awsefasdf asdfasdf asdfasdf asdfasdf asdfasdf asdfasdf asdfasdf asdfasdf awsefasdf asdfasdf asdfasdf asdfasdf asdfasdf asdfasdf asdfasdf asdfasdf",
+          "description": "m3 descr",
           "measUnits": [
           ],
           "measurementProcess": "m3 mProcess",

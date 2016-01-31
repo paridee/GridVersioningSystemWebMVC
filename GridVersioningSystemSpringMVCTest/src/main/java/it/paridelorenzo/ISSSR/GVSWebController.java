@@ -11,6 +11,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Controller;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -19,6 +20,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import grid.JSONFactory;
+import grid.entities.Goal;
 import grid.entities.Grid;
 import grid.entities.GridElement;
 import grid.entities.Project;
@@ -28,6 +30,7 @@ import grid.interfaces.services.ProjectService;
 import grid.modification.elements.Modification;
 import grid.modification.elements.ObjectFieldModification;
 import grid.modification.grid.GridModificationService;
+import javassist.bytecode.Descriptor.Iterator;
  
  
 @Controller
@@ -236,15 +239,42 @@ public class GVSWebController {
 		JSONObject response	=	new JSONObject();
 		Grid temp;
 		try {
+			JSONObject anObject	=	new JSONObject(jsonData);
+			int refVersion		=	-1;
+			String authorEmail	=	null;
+			if(anObject.has("refVersion")){
+				refVersion	=	anObject.getInt("refVersion");
+			}
+			if(anObject.has("grid")){
+				jsonData	=	anObject.getString("newGrid");
+			}
 			temp = JSONFactory.loadFromJson(jsonData, this.projectService);
-			Grid latest	=	this.gridService.getLatestGrid(temp.getProject().getId());
-			System.out.println("###~~~~VERSIONE GRID CARICATA"+latest.getVersion());
-			if(latest	==	null){
+			Grid referenceGrid	=	null;
+			referenceGrid	=	this.gridService.getLatestGrid(temp.getProject().getId());
+			//TODO carciofo nota bene:
+			/*
+			 * se l'update e' rispetto l'ultima grid disponibile ovviamente non ci sara' nessun tipo di conflitto possibile
+			 * in quanto la versione di riferimento e' l'ultima disponibile di default, se invece c'e' una versione di riferimento
+			 * va tirata fuori una lista di gridelement modificati dalla versione di riferimento rispetto all'ultima disponibile
+			 * e va verificato se l'oggetto che vado a modificare sta li dentro, in caso affermativo DEVO far partire il processo di 
+			 * gestione del conflitto //TODO implementare controllo e gestione
+			 */
+			if(refVersion>-1){
+				List<Grid> grids	=	this.gridService.getGridLog(temp.getProject().getId());
+				for(int i=0;i<grids.size();i++){
+					Grid current	=	grids.get(i);
+					if(current.getVersion()==refVersion){
+						referenceGrid	=	current;
+					}
+				}
+			}
+			System.out.println("###~~~~VERSIONE GRID CARICATA"+referenceGrid.getVersion());
+			if(referenceGrid	==	null){
 				return "non esiste grid per questo progetto";
 			}
 			else{
 				//TODO se e' update nel "nostro formato" vai a prendere la grid di riferimento e fai il check per i conflitti
-				List<Modification>	mods		=	GridModificationService.getModification(latest, temp);
+				List<Modification>	mods		=	GridModificationService.getModification(referenceGrid, temp);
 				Grid				toBeRemoved	=	null;	//temporary basic grid
 				for(int i=0;i<mods.size();i++){
 					System.out.println("found modification "+mods.get(i).toString());
@@ -253,22 +283,51 @@ public class GVSWebController {
 					return "non ci sono modifiche";
 				}
 				else{
-					Grid 						newVersion	=	this.gridService.upgradeGrid(latest);
-					HashMap<String,GridElement> elements	=	temp.obtainAllEmbeddedElements();
-					Grid intermediate	=	null;
+					Grid 						newVersion	=	new Grid();
+					newVersion.setMainGoals(referenceGrid.getMainGoals());
+					ArrayList<Goal> mainGoalsCopy	=	new ArrayList<Goal>();
+					List<Goal> gridMainGoals	=	referenceGrid.getMainGoals(); //a direct reference creates errors in hibernate (shared reference to a collection)	
+					for(int i=0;i<gridMainGoals.size();i++){
+						mainGoalsCopy.add(gridMainGoals.get(i));
+					}
+					newVersion.setMainGoals(mainGoalsCopy);
+					newVersion.setProject(referenceGrid.getProject());
+					newVersion.setVersion(referenceGrid.getVersion()+1);
+					HashMap<String,GridElement> elements	=	referenceGrid.obtainAllEmbeddedElements();
 					for(int i=0;i<mods.size();i++){
 						Modification 	aMod	=	mods.get(i);
+						GridElement 	subj;
+						subj	=	elements.get(((ObjectFieldModification) aMod).getSubjectLabel());
+						if(Modification.minorUpdateClass.contains(subj.getClass())){
+							aMod.setModificationType(Modification.Type.Minor);
+						}
+						else{
+							aMod.setModificationType(Modification.Type.Major);
+						}
 						if(aMod instanceof ObjectFieldModification){
-							GridElement 	subj;
 							if(elements.containsKey(((ObjectFieldModification) aMod).getSubjectLabel())){
-								subj	=	elements.get(((ObjectFieldModification) aMod).getSubjectLabel());
-								((ObjectFieldModification) aMod).apply(subj, newVersion);
-								newVersion	=	this.gridService.updateGridElement(newVersion, subj,true);
-								this.gridService.updateGrid(newVersion);
+								GridElement cloned	=	subj.clone();
+								cloned.setVersion(subj.getVersion()+1);
+								((ObjectFieldModification) aMod).apply(cloned, newVersion);
+								newVersion	=	this.gridService.updateGridElement(newVersion, cloned,false);
 							}
 							else return "error";
 						}
 					}
+					HashMap<String,GridElement> oldElements	=	referenceGrid.obtainAllEmbeddedElements();
+					HashMap<String,GridElement> newElements	=	newVersion.obtainAllEmbeddedElements();
+					java.util.Iterator<String> anIt	=	oldElements.keySet().iterator();
+					while(anIt.hasNext()){
+						String key	=	anIt.next();
+						if(newElements.containsKey(key)){
+							GridElement oldElement 	=	oldElements.get(key);
+							GridElement newElement 	=	newElements.get(key);
+							if(newElement.getVersion()>oldElement.getVersion()){
+								newElement.setVersion(oldElement.getVersion()+1);
+							}
+						}
+					}
+					this.gridService.addGrid(newVersion);
 					return "modifiche";
 				}
 			}

@@ -8,6 +8,7 @@ import java.util.List;
 import org.json.JSONObject;
 import org.springframework.transaction.annotation.Transactional;
 
+import grid.JSONFactory.JSONType;
 import grid.Utils;
 import grid.entities.Goal;
 import grid.entities.Grid;
@@ -15,7 +16,6 @@ import grid.entities.GridElement;
 import grid.interfaces.DAO.GridDAO;
 import grid.interfaces.services.GridElementService;
 import grid.interfaces.services.GridService;
-import grid.services.GridElementServiceImpl.JSONType;
 
 
 /**
@@ -146,7 +146,7 @@ public class GridServiceImpl implements GridService {
 					checked.put(subj.getLabel(), subj);
 					List<Goal> mainGoals	=	g.getMainGoals();
 					for(int j=0;j<mainGoals.size();j++){
-						Utils.mergeLists(nextCheck, mainGoals.get(j).update(subj,autoupgrade));
+						Utils.mergeLists(nextCheck, mainGoals.get(j).update(subj,true));
 					}
 				}
 			}
@@ -154,7 +154,7 @@ public class GridServiceImpl implements GridService {
 		}
 		Grid updated	=	null;
 		if(autoupgrade	==	false){
-			updated	=	g;	//if false not upgrade
+			updated	=	g;	
 		}
 		else{
 			updated	=	this.upgradeGrid(g);

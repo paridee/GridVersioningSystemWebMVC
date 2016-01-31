@@ -31,15 +31,7 @@ import grid.interfaces.services.GridElementService;
 @Service
 @Transactional
 public class GridElementServiceImpl implements GridElementService {
-	/**
-	 * Enumeration with all the JSON format supported by this project
-	 * @author Paride Casulli
-	 * @author Lorenzo La Banca
-	 *
-	 */
-	public enum JSONType{
-		FIRST,SECOND
-	}
+
 	private GridElementDao gridElementDao;
 	
 	/**
@@ -181,76 +173,4 @@ public class GridElementServiceImpl implements GridElementService {
 		return true;
 	}
 	
-	/**
-	 * {@inheritDoc}
-	 */
-	@SuppressWarnings("rawtypes")
-	public JSONObject obtainJson(GridElement element,JSONType type){
-		JSONObject	returnObject	=	new JSONObject();
-		String		id				=	element.getLabel();
-		String		typeC			=	element.getClass().getSimpleName().toString();
-		typeC						=	typeC.toLowerCase();
-		//id label of measurement goal has a different format
-		if(typeC.equals("measurementgoal")){
-			typeC	=	"mg";
-		}
-		List authors		=	element.getAuthors();
-		JSONArray autEmail	=	new JSONArray();
-		for(int i=0;i<authors.size();i++){
-			Practitioner aPract	=	(Practitioner)authors.get(i);
-			autEmail.put(aPract.getEmail());
-		}
-		JSONObject	auth	=	new JSONObject();
-		auth.put("authors", autEmail);
-		typeC						=	typeC+"Id";
-		returnObject.put(typeC, id);
-		//gets the fields list of the elemen
-		Field[]	fields	=	element.getClass().getDeclaredFields();
-		for(int i=0;i<fields.length;i++){
-			System.out.println("FIELD "+fields[i].getName());
-			String 	fieldName	=	fields[i].getName();
-			fields[i].setAccessible(true);
-			Object fieldValue	=	null;
-			try {
-				if(fields[i].get(element)!=null){
-					fieldValue = fields[i].get(element).toString();	
-					//if the attrubute is a list select a behaviour for creating a JSON
-					if(fields[i].get(element) instanceof List){
-						@SuppressWarnings("rawtypes")
-						List list	=	(List) fields[i].get(element);
-						JSONArray	array	=	new JSONArray();
-						if(type	==	JSONType.FIRST){
-							for(int j=0;j<list.size();j++){
-								array.put(this.obtainJson((GridElement)list.get(j), type));
-							}
-						}
-						else if(type	==	JSONType.SECOND){
-							for(int j=0;j<list.size();j++){
-								array.put(((GridElement)list.get(j)).getLabel());
-							}
-						}
-						fieldValue	=	array.toString(0);	
-					}
-				}
-			} catch (IllegalArgumentException e) {
-				e.printStackTrace();
-			} catch (IllegalAccessException e) {
-				e.printStackTrace();
-			}
-			if(fieldValue!=null){
-				//measurement goal element has a non-standard behaviour
-				if(fieldValue instanceof MeasurementGoal){
-					if(type	==	JSONType.FIRST){
-						fieldValue	=	((MeasurementGoal)fieldValue).getLabel();	
-					}
-					else if(type	==	JSONType.SECOND){
-						fieldValue	=	this.obtainJson(((MeasurementGoal)fieldValue),type);
-					}
-				}
-				returnObject.put(fieldName, fieldValue);
-			}
-		}
-		return returnObject;
-	}
-
 }

@@ -4,9 +4,9 @@ import java.util.List;
 
 import org.json.JSONObject;
 
+import grid.JSONFactory.JSONType;
 import grid.entities.Grid;
 import grid.entities.GridElement;
-import grid.services.GridElementServiceImpl.JSONType;
 
 /**
  * Interface defining methods for a Grid service, following CRUD operations and more

@@ -5,7 +5,6 @@ import java.util.List;
 import org.json.JSONObject;
 
 import grid.entities.GridElement;
-import grid.services.GridElementServiceImpl.JSONType;
 /**
  * Interface defining methods for a Grid element service, following CRUD operations and more
  * @author Paride Casulli
@@ -65,11 +64,4 @@ public interface GridElementService {
 	 */
 	public boolean isAddUpdate(GridElement oldElement,GridElement newElement);
 	
-	/**
-	 * Obtain a json representation for this object
-	 * @param element object to be represented
-	 * @param type json format (there are more than a format)
-	 * @return string json
-	 */
-	public JSONObject obtainJson(GridElement element,JSONType type); 
 }
