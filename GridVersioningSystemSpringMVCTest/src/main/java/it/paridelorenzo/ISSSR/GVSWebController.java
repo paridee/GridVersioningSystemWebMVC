@@ -365,7 +365,7 @@ public class GVSWebController {
 											elementList.add(latestGrid.obtainAllEmbeddedElements().get(newElement.getLabel()));
 											elementList.add(newElement);
 											aConflict.setConflicting(elementList);
-											this.conflictService
+											//TODO this.conflictService
 										}
 									}	
 								}
