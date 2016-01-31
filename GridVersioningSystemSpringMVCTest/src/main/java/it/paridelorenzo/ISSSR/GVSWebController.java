@@ -24,11 +24,14 @@ import grid.entities.Goal;
 import grid.entities.Grid;
 import grid.entities.GridElement;
 import grid.entities.Project;
+import grid.interfaces.services.ConflictService;
 import grid.interfaces.services.GridElementService;
 import grid.interfaces.services.GridService;
 import grid.interfaces.services.ProjectService;
+import grid.modification.elements.GridElementModification;
 import grid.modification.elements.Modification;
 import grid.modification.elements.ObjectFieldModification;
+import grid.modification.grid.Conflict;
 import grid.modification.grid.GridModificationService;
 import javassist.bytecode.Descriptor.Iterator;
  
@@ -40,6 +43,13 @@ public class GVSWebController {
 	private GridService			gridService;
 	private ProjectService		projectService;
 	private JSONFactory 		jFact;
+	private ConflictService		conflictService;
+	
+	@Autowired(required=true)
+	@Qualifier(value="conflictService")
+	public void setConflictService(ConflictService	conflictService) {
+		this.conflictService = conflictService;
+	}
 	
 	@Autowired(required=true)
 	@Qualifier(value="gridElementService")
@@ -258,7 +268,10 @@ public class GVSWebController {
 			}
 			temp = JSONFactory.loadFromJson(jsonData, this.projectService);
 			Grid referenceGrid	=	null;
+			Grid latestGrid;	
 			referenceGrid	=	this.gridService.getLatestGrid(temp.getProject().getId());
+			latestGrid		=	referenceGrid;
+			ArrayList<String> modifiedObjectLabels	=	new ArrayList<String>();
 			//TODO carciofo nota bene:
 			/*
 			 * se l'update e' rispetto l'ultima grid disponibile ovviamente non ci sara' nessun tipo di conflitto possibile
@@ -273,6 +286,17 @@ public class GVSWebController {
 					Grid current	=	grids.get(i);
 					if(current.getVersion()==refVersion){
 						referenceGrid	=	current;
+					}
+				}
+			}
+			if(referenceGrid!=latestGrid){
+				List<Modification>	mods		=	GridModificationService.getModification(referenceGrid, latestGrid);
+				for(Modification m:mods){
+					if(m instanceof GridElementModification){
+						String modObjLabel	=	((GridElementModification) m).getSubjectLabel();
+						if(!mods.contains(modObjLabel)){
+							modifiedObjectLabels.add(modObjLabel);	
+						}
 					}
 				}
 			}
@@ -321,6 +345,10 @@ public class GVSWebController {
 							}
 							else return "error";
 						}
+						else{
+							//TODO manage!!!!
+							System.out.println("case to be manageD!!!!");
+						}
 					}
 					HashMap<String,GridElement> oldElements	=	referenceGrid.obtainAllEmbeddedElements();
 					HashMap<String,GridElement> newElements	=	newVersion.obtainAllEmbeddedElements();
@@ -332,6 +360,38 @@ public class GVSWebController {
 							GridElement newElement 	=	newElements.get(key);
 							if(newElement.getVersion()>oldElement.getVersion()){
 								newElement.setVersion(oldElement.getVersion()+1);
+								//if is minorupdate...
+								if(Modification.minorUpdateClass.contains(newElement.getClass())){
+									if(!this.gridElementService.isAddUpdate(oldElement, newElement)){
+										if(modifiedObjectLabels.contains(newElement.getLabel())){
+											//is a conflict
+											Conflict aConflict	=	new Conflict();
+											aConflict.setConflictState(Conflict.State.PENDING);
+											aConflict.setConflictType(Conflict.Type.MINOR);
+											newElement.setState(GridElement.State.MINOR_UPDATING);
+											ArrayList<GridElement> elementList	=	new ArrayList<GridElement>();
+											elementList.add(latestGrid.obtainAllEmbeddedElements().get(newElement.getLabel()));
+											elementList.add(newElement);
+											aConflict.setConflicting(elementList);
+											//TODO this.conflictService
+										}
+									}	
+								}
+								else{//is major update
+									if(!this.gridElementService.isAddUpdate(oldElement, newElement)){
+										if(modifiedObjectLabels.contains(newElement.getLabel())){
+											//is a conflict
+											Conflict aConflict	=	new Conflict();
+											aConflict.setConflictState(Conflict.State.PENDING);
+											aConflict.setConflictType(Conflict.Type.MINOR);
+											newElement.setState(GridElement.State.MINOR_UPDATING);
+											ArrayList<GridElement> elementList	=	new ArrayList<GridElement>();
+											elementList.add(latestGrid.obtainAllEmbeddedElements().get(newElement.getLabel()));
+											elementList.add(newElement);
+											aConflict.setConflicting(elementList);
+										}
+									}
+								}
 							}
 						}
 					}
