@@ -93,8 +93,8 @@ public class GVSWebController {
 		if(g.getMainGoals().size()!=0){
 			List<Object> stack = new ArrayList<Object>();
 			stack.addAll(g.getMainGoals());
-			String chart="chart_config = {chart: { container: \"#gridChart\", animateOnInit: true,node: {collapsable: true},animation: {nodeAnimation: \"easeOutBounce\",nodeSpeed: 700,connectorsAnimation: \"bounce\",connectorsSpeed: 700}},";		
-			chart=chart+"nodeStructure: {image:\"/ISSSR/resources/Treant/cheryl.png\", text: { name: \""+g.getProject().getProjectId()+"\",desc: \""+g.getProject().getDescription()+"\" },children: [";
+			String chart="chart_config = {chart: { connectors: {type: \"bCurve\",style: {\"stroke-width\": 2}}, container: \"#gridChart\", siblingSeparation:70, rootOrientation:'WEST',  subTeeSeparation:70, animateOnInit: true,node: {collapsable: true},animation: {nodeAnimation: \"easeOutBounce\",nodeSpeed: 700,connectorsAnimation: \"bounce\",connectorsSpeed: 700}},";		
+			chart=chart+"nodeStructure: {innerHTML:\"<div class=\'nodeTxt\'><div class='txtProjectTitle'>"+g.getProject().getProjectId()+"</div><div class='txtElement'>"+g.getProject().getDescription()+"</div></div>\",children: [";
 			chart=chart+updateChart(stack)+"]}};";
 			return chart;
 		}
@@ -113,23 +113,9 @@ public class GVSWebController {
 			String image="";
 			String name="";
 			String desc="";
-			//
 			List<Object> newStack=new ArrayList<Object>();
-			/*if(stack.get(i).getClass().getSimpleName().equals("Goal")){
-				Goal tempGoal=(Goal)stack.get(i);
-				name=tempGoal.getLabel();
-				newStack.addAll(tempGoal.getStrategyList());
-			}
-			else if(stack.get(i).getClass().getSimpleName().equals("Strategy")){
-				Strategy tempStrategy=(Strategy)stack.get(i);
-				name=tempStrategy.getLabel();
-				newStack.addAll(tempStrategy.getGoalList());
-			}
-			else {
-				name=stack.get(i).getClass().getSimpleName();
-			}*/
 			GridElement ge=(GridElement)stack.get(i);
-			name=ge.getLabel()+"-v"+ge.getVersion();
+			name=stack.get(i).getClass().getSimpleName()+" "+ge.getLabel()+" - <i>v"+ge.getVersion()+"</i>";
 			desc="";
 			Field[] fields=ge.getClass().getDeclaredFields();
 			for(int j=0; j<fields.length;j++){
@@ -151,9 +137,13 @@ public class GVSWebController {
 						}
 					}
 					else{
+						//desc=desc+"<div style='float:left;min-width: 200px;'>"+tempField.getName()+": "+fieldValueStr+"</div>";
 						if(fieldValue!=null){
 							String fieldValueStr	=	(String)fieldValue.toString();
-							desc=desc+tempField.getName()+":"+fieldValueStr;
+							String txt=tempField.getName()+": </i> "+fieldValueStr;
+							int maxLength=60;
+							if(txt.length()>maxLength) txt=txt.substring(0, maxLength)+"...";
+							desc=desc+"<div class='txtElement'><i>"+txt+"</div>";
 						}
 					}
 				} catch (IllegalArgumentException e) {
@@ -164,12 +154,14 @@ public class GVSWebController {
 					e.printStackTrace();
 				}
 			}
-			chart=chart+"{text: { name: \""+name+"\", desc: \""+desc+"\" }, collapsed: true";
+			chart=chart+"{ innerHTML:\"<div class=\'nodeTxt\'><div class='txtElementTitle'><div class='nodeImg' ></div>"+name+"</div>"+desc+"</div>\", ";
+			//chart=chart+"{text: { name: \""+name+"\", desc: \""+desc+"\" },innerHTML:\"<div><h1>test</h1></div>\", collapsed: true";
 			if(newStack.size()>0){
-				chart=chart+",children: [";
+				chart=chart+" collapsed: true ,children: [";
 				chart=chart+updateChart(newStack);
 				chart=chart+"]";
 			}
+			else chart=chart+" collapsed: false";
 			chart=chart+"}";
 			if (i<stack.size()-1) chart=chart+",";
 		}
@@ -248,7 +240,6 @@ public class GVSWebController {
     public String addGridPage(Model model) {
 		return "addgrid";
     }
-	
 	
 	@RequestMapping(value = "/grids/update", method=RequestMethod.POST)
     public @ResponseBody String updateGrid(@RequestBody String jsonData) {
