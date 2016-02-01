@@ -15,6 +15,8 @@ import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
 
+import grid.interfaces.Updatable;
+
 /**
  * This abstract class contains all the common elements among all elements belonging to every element of the Grid
  * @author Paride Casulli
@@ -23,7 +25,7 @@ import javax.persistence.ManyToMany;
 
 @Entity
 @Inheritance(strategy=InheritanceType.TABLE_PER_CLASS)
-public abstract class GridElement {
+public abstract class GridElement implements Updatable{
 	public enum State{
 		WORKING, MAJOR_UPDATING, MINOR_UPDATING, FINAL_KO
 	}

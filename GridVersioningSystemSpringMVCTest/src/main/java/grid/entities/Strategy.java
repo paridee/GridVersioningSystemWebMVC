@@ -24,7 +24,7 @@ import grid.interfaces.Updatable;
 
 @Entity
 @Table(name="Strategy")
-public class Strategy extends GridElement implements Updatable{
+public class Strategy extends GridElement{
 	
 	private String 			description		=	"";
 	private String			strategyType	=	"TERMINAL";
@@ -85,7 +85,7 @@ public class Strategy extends GridElement implements Updatable{
 	 * {@inheritDoc}
 	 */
 	@Override
-	public ArrayList<GridElement> update(GridElement ge,boolean autoupgrade) {
+	public ArrayList<GridElement> updateReferences(GridElement ge,boolean autoupgrade) {
 		Strategy updated	=	null;
 		if(autoupgrade	== true){
 			updated	=	(Strategy)this.clone();
@@ -103,7 +103,7 @@ public class Strategy extends GridElement implements Updatable{
 			}
 		}
 		for(int i=0;i<this.goalList.size();i++){
-			Utils.mergeLists(returnList, this.goalList.get(i).update(ge,autoupgrade));
+			Utils.mergeLists(returnList, this.goalList.get(i).updateReferences(ge,autoupgrade));
 		}
 		if(addThis==true){
 			returnList.add(updated);

@@ -111,6 +111,7 @@ public class GridModificationService {
 						EntryAdded 		thisAdd	=	(EntryAdded)entryChange;
 						GridElementAdd 	append	=	new GridElementAdd();
 						append.setAppendedObjectLabel(thisAdd.getKey().toString());
+						append.setGridElementAdded((GridElement) thisAdd.getValue());
 						allMods.add(append);
 					}
 					else if(entryChange.getClass().equals(EntryRemoved.class)){
