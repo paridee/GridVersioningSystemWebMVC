@@ -140,33 +140,43 @@ public class ModificationController {
 					for(int i=0;i<mods.size();i++){
 						Modification 	aMod	=	mods.get(i);
 						GridElement 	subj;
-						subj	=	elements.get(((ObjectFieldModification) aMod).getSubjectLabel());
-						if(Modification.minorUpdateClass.contains(subj.getClass())){
-							aMod.setModificationType(Modification.Type.Minor);
-						}
-						else{
-							aMod.setModificationType(Modification.Type.Major);
-						}
-						if(aMod instanceof ObjectFieldModification){
-							if(elements.containsKey(((ObjectFieldModification) aMod).getSubjectLabel())){
-								GridElement cloned	=	subj.clone();
-								cloned.setVersion(subj.getVersion()+1);
-								((ObjectFieldModification) aMod).apply(cloned, newVersion);
-								newVersion	=	this.gridService.updateGridElement(newVersion, cloned,false,false);
+						this.logger.info(aMod.toString());
+						if(aMod instanceof GridElementModification){
+							subj	=	elements.get(((GridElementModification) aMod).getSubjectLabel());
+							if(Modification.minorUpdateClass.contains(subj.getClass())){
+								aMod.setModificationType(Modification.Type.Minor);
 							}
-							else return "error";
+							else{
+								aMod.setModificationType(Modification.Type.Major);
+							}
+							if(aMod instanceof GridElementModification){
+								//if is already in new grid use this one...
+								if(newVersion.obtainAllEmbeddedElements().containsKey(((GridElementModification) aMod).getSubjectLabel())){
+									subj	=	newVersion.obtainAllEmbeddedElements().get(((GridElementModification) aMod).getSubjectLabel());
+								}
+								if(elements.containsKey(((GridElementModification) aMod).getSubjectLabel())){
+									GridElement cloned	=	subj.clone();
+									cloned.setVersion(subj.getVersion()+1);
+									((GridElementModification) aMod).apply(cloned, newVersion);
+									newVersion	=	this.gridService.updateGridElement(newVersion, cloned,false,false);
+								}
+								else return "error";
+							}
+							else{
+								//TODO manage!!!!
+								System.out.println("case to be manageD!!!!");
+							}
 						}
 						else{
-							//TODO manage!!!!
-							System.out.println("case to be manageD!!!!");
+							this.logger.info("manage this case "+aMod.toString());
 						}
 					}
 					HashMap<String,GridElement> oldElements	=	referenceGrid.obtainAllEmbeddedElements();
 					HashMap<String,GridElement> newElements	=	newVersion.obtainAllEmbeddedElements();
-					java.util.Iterator<String> anIt	=	oldElements.keySet().iterator();
+					java.util.Iterator<String> anIt	=	newElements.keySet().iterator();
 					while(anIt.hasNext()){
 						String key	=	anIt.next();
-						if(newElements.containsKey(key)){
+						if(oldElements.containsKey(key)){
 							GridElement oldElement 	=	oldElements.get(key);
 							GridElement newElement 	=	newElements.get(key);
 							if(newElement.getVersion()>oldElement.getVersion()){
@@ -204,6 +214,9 @@ public class ModificationController {
 										}
 									}
 								}
+							}
+							else{
+								newElement.setVersion(1);
 							}
 						}
 					}

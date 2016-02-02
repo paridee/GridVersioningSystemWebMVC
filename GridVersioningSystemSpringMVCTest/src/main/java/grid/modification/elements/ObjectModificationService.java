@@ -16,7 +16,9 @@ import org.javers.core.diff.changetype.map.EntryChange;
 import org.javers.core.diff.changetype.map.EntryRemoved;
 import org.javers.core.diff.changetype.map.MapChange;
 
+import grid.entities.Goal;
 import grid.entities.GridElement;
+import grid.entities.MeasurementGoal;
 
 public class ObjectModificationService {
 	
@@ -46,13 +48,34 @@ public class ObjectModificationService {
 			if(current.getClass().equals(ValueChange.class)){
 				ValueChange 		thisChange	=	(ValueChange)current;
 				GridElement 		changed		=	(GridElement)thisChange.getAffectedObject().get();
-				if(!(thisChange.getPropertyName().equals("idElement")||(thisChange.getPropertyName().equals("version")))){
+				if((!(thisChange.getPropertyName().equals("idElement")||(thisChange.getPropertyName().equals("version"))))&&(!thisChange.getAffectedGlobalId().value().contains("#"))){
 					System.out.println("Adding modification on "+changed.getLabel()+" field "+thisChange.getPropertyName()+" old value "+thisChange.getLeft()+" new value "+thisChange.getRight());
 					ObjectFieldModification 	thisMod		=	new ObjectFieldModification();
 					thisMod.setSubjectLabel(changed.getLabel());
 					thisMod.setFieldToBeChanged(thisChange.getPropertyName());
 					thisMod.setNewValue(thisChange.getRight());
 					modifications.add(thisMod);
+				}
+				if(thisChange.getAffectedGlobalId().value().contains("grid.entities.Goal/#measurementGoal")){//ad hoc solution for measurement goal
+					System.out.println("cambio measurement goal");
+					MeasurementGoal newMeasGoal	=	((Goal)newElement).getMeasurementGoal();
+					MeasurementGoal oldMeasGoal	=	((Goal)oldElement).getMeasurementGoal();
+					ObjectFieldModification 	thisMod		=	new ObjectFieldModification();
+					thisMod.setSubjectLabel(oldElement.getLabel());
+					thisMod.setFieldToBeChanged("measurementGoal");
+					if(oldMeasGoal!=null){
+						if(newMeasGoal!=null){
+							if(!oldMeasGoal.getLabel().equals(newMeasGoal.getLabel())){
+								thisMod.setNewValue(newMeasGoal);
+								System.out.println("cambio measurement goal aggiunto in lista");
+								modifications.add(thisMod);
+							}
+						}
+						else{
+							thisMod.setNewValue(null);
+							modifications.add(thisMod);
+						}
+					}
 				}
 			}
 			else if(current.getClass().equals(ListChange.class)){
