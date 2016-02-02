@@ -203,11 +203,12 @@ public class GVSWebController {
 		}
 		return "element";
     }
-	/*@RequestMapping(value = "/element/{type}/{id}/{vers}")
+	
+	@RequestMapping(value = "/element/{type}/{id}/{vers}")
     public String getElementVers(@PathVariable("id") String id,@PathVariable("vers") int vers, @PathVariable("type") String type,Model model) {
-		GridElement  temp=this.gridElementService.getElementById(id, getClass());
+		//GridElement  temp=this.gridElementService.getElementById(id, getClass());
 		return "element";
-    }*/
+    }
 	
 	
 	
