@@ -152,7 +152,7 @@ public class ModificationController {
 								GridElement cloned	=	subj.clone();
 								cloned.setVersion(subj.getVersion()+1);
 								((ObjectFieldModification) aMod).apply(cloned, newVersion);
-								newVersion	=	this.gridService.updateGridElement(newVersion, cloned,false);
+								newVersion	=	this.gridService.updateGridElement(newVersion, cloned,false,false);
 							}
 							else return "error";
 						}
@@ -242,6 +242,7 @@ public class ModificationController {
 		}
 		//TODO check "a 3"
 		ArrayList<String> modifiedObjectLabels	=	null;
+		HashMap<String,Object> loadedObjs		=	new HashMap<String,Object>();	
 		try {
 			modifiedObjectLabels	=	modifiedObjects(referenceGrid,latestGrid);
 			JSONObject 	mods		=	(JSONObject) modification.get("modifiche");
@@ -249,31 +250,31 @@ public class ModificationController {
 			if(mods.has("goals")){
 				JSONArray goalsArray	=	(JSONArray) mods.get("goals");
 				for(int i=0;i<goalsArray.length();i++){
-					modifiedElementsArray.add(JSONFactory.loadGoalFromJson(goalsArray.getString(i), new HashMap<String,Object>()));
+					modifiedElementsArray.add(JSONFactory.loadGoalFromJson(goalsArray.getString(i), loadedObjs));
 				}
 			}
 			if(mods.has("metrics")){
 				JSONArray goalsArray	=	(JSONArray) mods.get("metrics");
 				for(int i=0;i<goalsArray.length();i++){
-					modifiedElementsArray.add(JSONFactory.loadGoalFromJson(goalsArray.getString(i), new HashMap<String,Object>()));
+					modifiedElementsArray.add(JSONFactory.loadGoalFromJson(goalsArray.getString(i), loadedObjs));
 				}
 			}
 			if(mods.has("questions")){
 				JSONArray goalsArray	=	(JSONArray) mods.get("questions");
 				for(int i=0;i<goalsArray.length();i++){
-					modifiedElementsArray.add(JSONFactory.loadGoalFromJson(goalsArray.getString(i), new HashMap<String,Object>()));
+					modifiedElementsArray.add(JSONFactory.loadGoalFromJson(goalsArray.getString(i), loadedObjs));
 				}
 			}
 			if(mods.has("strategies")){
 				JSONArray goalsArray	=	(JSONArray) mods.get("strategies");
 				for(int i=0;i<goalsArray.length();i++){
-					modifiedElementsArray.add(JSONFactory.loadGoalFromJson(goalsArray.getString(i), new HashMap<String,Object>()));
+					modifiedElementsArray.add(JSONFactory.loadGoalFromJson(goalsArray.getString(i), loadedObjs));
 				}
 			}
 			if(mods.has("measurementgoals")){
 				JSONArray goalsArray	=	(JSONArray) mods.get("measurementgoals");
 				for(int i=0;i<goalsArray.length();i++){
-					modifiedElementsArray.add(JSONFactory.loadGoalFromJson(goalsArray.getString(i), new HashMap<String,Object>()));
+					modifiedElementsArray.add(JSONFactory.loadGoalFromJson(goalsArray.getString(i), loadedObjs));
 				}
 			}
 			//actualize links to other objects
