@@ -26,7 +26,7 @@ import grid.interfaces.Updatable;
 
 @Entity
 @Table(name="Goal")
-public class Goal extends GridElement implements Updatable{
+public class Goal extends GridElement{
 	@Column(name="assumption")
 	private String 				assumption		=	"";
 	@Column(name="context")
@@ -135,7 +135,7 @@ public class Goal extends GridElement implements Updatable{
 	 * {@inheritDoc}
 	 */
 	@Override
-	public ArrayList<GridElement> update(GridElement ge,boolean autoupgrade) {
+	public ArrayList<GridElement> updateReferences(GridElement ge,boolean autoupgrade) {
 		ArrayList<GridElement> returnList	=	new ArrayList<GridElement>();
 		boolean addThis						=	false;	
 		Goal updated	=	null;
@@ -161,10 +161,10 @@ public class Goal extends GridElement implements Updatable{
 			}
 		}
 		if(this.measurementGoal!=null){
-			Utils.mergeLists(returnList, this.measurementGoal.update(ge,autoupgrade));
+			Utils.mergeLists(returnList, this.measurementGoal.updateReferences(ge,autoupgrade));
 		}
 		for(int i=0;i<this.strategyList.size();i++){
-			Utils.mergeLists(returnList, this.strategyList.get(i).update(ge,autoupgrade));
+			Utils.mergeLists(returnList, this.strategyList.get(i).updateReferences(ge,autoupgrade));
 		}
 		if(addThis==true){
 			returnList.add(updated);

@@ -146,7 +146,7 @@ public class GridServiceImpl implements GridService {
 					checked.put(subj.getLabel(), subj);
 					List<Goal> mainGoals	=	g.getMainGoals();
 					for(int j=0;j<mainGoals.size();j++){
-						Utils.mergeLists(nextCheck, mainGoals.get(j).update(subj,true));
+						Utils.mergeLists(nextCheck, mainGoals.get(j).updateReferences(subj,true));
 					}
 				}
 			}

@@ -23,7 +23,7 @@ import grid.interfaces.Updatable;
 
 @Entity
 @Table(name="Metric")
-public class Metric extends GridElement implements Updatable{
+public class Metric extends GridElement{
 	@Column(name="count")
 	public int 					count				=	0;
 	@Column(name="description")
@@ -140,7 +140,7 @@ public class Metric extends GridElement implements Updatable{
 	 * {@inheritDoc}
 	 */
 	@Override
-	public ArrayList<GridElement> update(GridElement ge,boolean autoupgrade) {
+	public ArrayList<GridElement> updateReferences(GridElement ge,boolean autoupgrade) {
 		return new ArrayList<GridElement>();
 	}
 

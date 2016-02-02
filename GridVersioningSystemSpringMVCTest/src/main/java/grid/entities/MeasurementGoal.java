@@ -22,7 +22,7 @@ import grid.interfaces.Updatable;
  */
 @Entity
 @Table(name="MeasurementGoal")
-public class MeasurementGoal extends GridElement implements Updatable{
+public class MeasurementGoal extends GridElement{
 	private	String description			=	"";
 	private	String interpretationModel	=	"";
 	private	List<Question> questionList	=	new ArrayList<Question>();
@@ -92,7 +92,7 @@ public class MeasurementGoal extends GridElement implements Updatable{
 	 * {@inheritDoc}
 	 */
 	@Override
-	public ArrayList<GridElement> update(GridElement ge,boolean autoupgrade) {
+	public ArrayList<GridElement> updateReferences(GridElement ge,boolean autoupgrade) {
 		MeasurementGoal updated	=	null;
 		if(autoupgrade==true){
 			updated	=	(MeasurementGoal) this.clone();
@@ -110,7 +110,7 @@ public class MeasurementGoal extends GridElement implements Updatable{
 			}
 		}
 		for(int i=0;i<this.questionList.size();i++){
-			Utils.mergeLists(returnList, this.questionList.get(i).update(ge,autoupgrade));
+			Utils.mergeLists(returnList, this.questionList.get(i).updateReferences(ge,autoupgrade));
 		}
 		if(addThis==true){
 			returnList.add(updated);

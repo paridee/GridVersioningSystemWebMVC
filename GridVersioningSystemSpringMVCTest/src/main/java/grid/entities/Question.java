@@ -24,7 +24,7 @@ import grid.interfaces.Updatable;
 
 @Entity
 @Table(name="Question")
-public class Question extends GridElement implements Updatable{
+public class Question extends GridElement{
 
 	private List<Metric> 	metricList	=	new ArrayList<Metric>();
 	private String 			question	=	"";
@@ -77,7 +77,7 @@ public class Question extends GridElement implements Updatable{
 	 * {@inheritDoc}
 	 */
 	@Override
-	public ArrayList<GridElement> update(GridElement ge,boolean autoupgrade) {
+	public ArrayList<GridElement> updateReferences(GridElement ge,boolean autoupgrade) {
 		Question updated	=	null;
 		if(autoupgrade==true){
 			updated	=	(Question) this.clone();
@@ -95,7 +95,7 @@ public class Question extends GridElement implements Updatable{
 			}
 		}
 		for(int i=0;i<this.metricList.size();i++){
-			Utils.mergeLists(returnList, this.metricList.get(i).update(ge,autoupgrade));
+			Utils.mergeLists(returnList, this.metricList.get(i).updateReferences(ge,autoupgrade));
 		}
 		if(addThis==true){
 			returnList.add(updated);
