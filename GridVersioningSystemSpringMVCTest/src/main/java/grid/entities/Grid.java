@@ -193,4 +193,9 @@ public class Grid implements Updatable{
 		cloned.setMainGoals(clonedMainGoals);
 		return cloned;
 	}
+
+	@Override
+	public ArrayList<GridElement> updateReferences(GridElement ge, boolean autoupgrade, boolean recursive) {
+		return this.updateReferences(ge, autoupgrade);
+	}
 }

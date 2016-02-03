@@ -97,11 +97,13 @@ public class JSONFactory {
 	public static Grid loadFromJson(String json,ProjectService projService) throws Exception{
 		Grid returnGrid					=	new Grid();	//new Grid to be loaded
 		HashMap<String, Object> objects	=	new HashMap<String, Object>();
-		JSONArray 	metricList	=	null;
+		JSONArray 	metricList	=	new JSONArray();
 		JSONObject 	obj			=	null;
 		try{
 			obj					=	new JSONObject(json);
-			metricList			=	(JSONArray)obj.get("metricList");
+			if(obj.has("metricList")){
+				metricList			=	(JSONArray)obj.get("metricList");
+			}
 		}
 		catch(Exception e){
 			e.printStackTrace();
@@ -118,16 +120,20 @@ public class JSONFactory {
 		}
 		logger.info("Number of loaded metrics "+metrics.size());
 		ArrayList<MeasurementGoal> measGoals	=	new ArrayList<MeasurementGoal>();	//loads measurement goals
-		JSONArray measGoalList					=	(JSONArray)obj.get("measGoalList");
-		for(int i=0;i<measGoalList.length();i++){
-			MeasurementGoal aMG					=	JSONFactory.loadMeasurementGoalFromJson(measGoalList.get(i).toString(), objects);
-			measGoals.add(aMG);
+		if(obj.has("measGoalList")){
+			JSONArray measGoalList					=	(JSONArray)obj.get("measGoalList");
+			for(int i=0;i<measGoalList.length();i++){
+				MeasurementGoal aMG					=	JSONFactory.loadMeasurementGoalFromJson(measGoalList.get(i).toString(), objects);
+				measGoals.add(aMG);
+			}
 		}
 		logger.info("Number of Measurement Goal loaded "+measGoals.size());
-		JSONArray goalList						=	(JSONArray)obj.get("goalList");
 		ArrayList<Goal> goals					=	new ArrayList<Goal>();
-		for(int i=0;i<goalList.length();i++){
-			goals.add(JSONFactory.loadGoalFromJson(goalList.get(i).toString(),objects));
+		if(obj.has("goalList")){
+			JSONArray goalList						=	(JSONArray)obj.get("goalList");
+			for(int i=0;i<goalList.length();i++){
+				goals.add(JSONFactory.loadGoalFromJson(goalList.get(i).toString(),objects));
+			}
 		}
 		logger.info("MainClass.java goals loaded "+goals.size());
 		JSONObject projectj						=	(JSONObject) obj.get("project");	//loads project
@@ -144,18 +150,22 @@ public class JSONFactory {
 				throw new Exception(errObject.toString());
 			}	
 		}
-		JSONArray qList							=	(JSONArray) obj.get("questionList");//loads questions
 		ArrayList<Question> questionList		=	new ArrayList<Question>();
-		for(int i=0;i<qList.length();i++){
-			Question aQ							=	JSONFactory.loadQuestionFromJson(qList.get(i).toString(),objects);
-			questionList.add(aQ);
+		if(obj.has("questionList")){
+			JSONArray qList							=	(JSONArray) obj.get("questionList");//loads questions
+			for(int i=0;i<qList.length();i++){
+				Question aQ							=	JSONFactory.loadQuestionFromJson(qList.get(i).toString(),objects);
+				questionList.add(aQ);
+			}
 		}
-		logger.info("MainClass.java questions loaded "+questionList.size());
-		JSONArray strategies					=	(JSONArray) obj.get("strategyList");//loads strategies
 		ArrayList<Strategy> strategyList		=	new ArrayList<Strategy>();
-		for(int i=0;i<strategies.length();i++){
-			Strategy aStr						=	JSONFactory.loadStrategyFromJson(strategies.get(i).toString(), objects);
-			strategyList.add(aStr);
+		logger.info("MainClass.java questions loaded "+questionList.size());
+		if(obj.has("strategyList")){
+			JSONArray strategies					=	(JSONArray) obj.get("strategyList");//loads strategies
+			for(int i=0;i<strategies.length();i++){
+				Strategy aStr						=	JSONFactory.loadStrategyFromJson(strategies.get(i).toString(), objects);
+				strategyList.add(aStr);
+			}	
 		}
 		logger.info("MainClass.java strategy loaded "+strategyList.size());
 		//sets loaded objects to grid
@@ -728,10 +738,11 @@ public class JSONFactory {
 	 * Obtain a JSON from a grid
 	 * @param aGrid grid to be serialized
 	 * @param type type of JSON
+	 * @param refGrid (optional)
 	 * @return JSON
 	 */
 	@SuppressWarnings("rawtypes")
-	public JSONObject obtainJson(Grid aGrid,JSONType type){
+	public JSONObject obtainJson(Grid aGrid,JSONType type,Grid refGrid){
 		JSONObject 	returnObject	=	new JSONObject();
 		List<Goal> 	mainGoal		=	aGrid.getMainGoals();
 		JSONArray	mainGoalArray	=	new JSONArray();
@@ -777,6 +788,14 @@ public class JSONFactory {
 		returnObject.put("project", project);
 		returnObject.put("questionList", questionList);
 		returnObject.put("strategyList", strategyList);
+		this.logger.info("reference grid "+refGrid);
+		if (refGrid!=null){
+			this.logger.info("exists reference grid "+refGrid);
+			JSONObject shell	=	new JSONObject();
+			shell.put("refVersion", refGrid.getVersion());
+			shell.put("newGrid", returnObject);
+			returnObject	=	shell;
+		}
 		return returnObject;
 	}
 

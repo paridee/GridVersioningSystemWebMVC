@@ -48,7 +48,7 @@ public class ObjectModificationService {
 			if(current.getClass().equals(ValueChange.class)){
 				ValueChange 		thisChange	=	(ValueChange)current;
 				GridElement 		changed		=	(GridElement)thisChange.getAffectedObject().get();
-				if((!(thisChange.getPropertyName().equals("idElement")||(thisChange.getPropertyName().equals("version"))))&&(!thisChange.getAffectedGlobalId().value().contains("#"))){
+				if((!(thisChange.getPropertyName().equals("idElement")||(thisChange.getPropertyName().equals("version")||(thisChange.getPropertyName().equals("state")))))&&(!thisChange.getAffectedGlobalId().value().contains("#"))){
 					System.out.println("Adding modification on "+changed.getLabel()+" field "+thisChange.getPropertyName()+" old value "+thisChange.getLeft()+" new value "+thisChange.getRight());
 					ObjectFieldModification 	thisMod		=	new ObjectFieldModification();
 					thisMod.setSubjectLabel(changed.getLabel());
@@ -85,11 +85,14 @@ public class ObjectModificationService {
 				Object subject	=	thisChange.getAffectedObject().get();
 				field = subject.getClass().getDeclaredField(thisChange.getPropertyName());
 				field.setAccessible(true);
-				@SuppressWarnings("rawtypes")
-				List 	oldList 	= 	(List)field.get(oldElement);
-				@SuppressWarnings("rawtypes")
-				List 	newList 	= 	(List)field.get(newElement);
-				modifications.addAll(getListModification(oldList,newList,listname,oldElement.getLabel()));
+				if(!thisChange.getAffectedGlobalId().value().contains("#")){//excludes inner changes
+					System.out.println(oldElement+" new "+newElement+" field "+field.getName()+" change "+current.toString());
+					@SuppressWarnings("rawtypes")
+					List 	oldList 	= 	(List)field.get(oldElement);
+					@SuppressWarnings("rawtypes")
+					List 	newList 	= 	(List)field.get(newElement);
+					modifications.addAll(getListModification(oldList,newList,listname,oldElement.getLabel()));
+					}
 			}
 		}
 		//TODO remove: testing purpose

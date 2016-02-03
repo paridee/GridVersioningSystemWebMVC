@@ -135,7 +135,7 @@ public class Goal extends GridElement{
 	 * {@inheritDoc}
 	 */
 	@Override
-	public ArrayList<GridElement> updateReferences(GridElement ge,boolean autoupgrade) {
+	public ArrayList<GridElement> updateReferences(GridElement ge,boolean autoupgrade,boolean recursive) {
 		ArrayList<GridElement> returnList	=	new ArrayList<GridElement>();
 		boolean addThis						=	false;	
 		Goal updated	=	null;
@@ -160,11 +160,13 @@ public class Goal extends GridElement{
 				addThis=true;
 			}
 		}
-		if(this.measurementGoal!=null){
-			Utils.mergeLists(returnList, this.measurementGoal.updateReferences(ge,autoupgrade));
-		}
-		for(int i=0;i<this.strategyList.size();i++){
-			Utils.mergeLists(returnList, this.strategyList.get(i).updateReferences(ge,autoupgrade));
+		if(recursive	==	true){
+			if(this.measurementGoal!=null){
+				Utils.mergeLists(returnList, this.measurementGoal.updateReferences(ge,autoupgrade));
+			}
+			for(int i=0;i<this.strategyList.size();i++){
+				Utils.mergeLists(returnList, this.strategyList.get(i).updateReferences(ge,autoupgrade));
+			}
 		}
 		if(addThis==true){
 			returnList.add(updated);
@@ -288,7 +290,6 @@ public class Goal extends GridElement{
 	 */
 	@Override
 	public HashMap<String, GridElement> obtainEmbeddedElements() {
-		// TODO Auto-generated method stub
 		HashMap<String, GridElement> returnMap	=	new HashMap<String, GridElement>();
 		returnMap.put(this.label, this);
 		if(this.measurementGoal!=null){
@@ -298,6 +299,14 @@ public class Goal extends GridElement{
 			returnMap.putAll(this.strategyList.get(i).obtainEmbeddedElements());
 		}
 		return returnMap;
+	}
+	
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public ArrayList<GridElement> updateReferences(GridElement ge, boolean autoupgrade) {
+		return this.updateReferences(ge, autoupgrade, true);
 	}
 
 }

@@ -3,6 +3,7 @@ package it.paridelorenzo.ISSSR;
 import java.text.DateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 import java.util.Locale;
 
 import org.slf4j.Logger;
@@ -88,7 +89,10 @@ public class TestController {
 		Grid newGrid	=	new Grid();
 		newGrid.setMainGoals(goals);
 		newGrid.setProject(first);
+		Grid refVer	=	newGrid;
 		this.gridService.addGrid(newGrid);
+		newGrid	= newGrid.clone();//this.gridService.upgradeGrid(newGrid);
+		newGrid.setVersion(newGrid.getVersion()+1);
 		Strategy s1	=	new Strategy();
 		s1.setLabel("s1");
 		s1.setDescription("a strategy");
@@ -98,13 +102,35 @@ public class TestController {
 		ArrayList<Strategy> strs= new ArrayList<Strategy>();
 		strs.add(s1);
 		strs.add(s2);
+		aGoal2	=	(Goal)this.gridElementService.upgradeGridElement(aGoal2);
+		this.gridService.updateGridElement(newGrid, aGoal2, false, false);
 		aGoal2.setStrategyList(strs);
 		MeasurementGoal another	=	new MeasurementGoal();
 		another.setLabel("mg4");
 		another.setDescription("CAMBIATO bubu");
 		aGoal2.setMeasurementGoal(another);
 		JSONFactory aFactory	=	new JSONFactory();
-		System.out.print(aFactory.obtainJson(newGrid, JSONType.FIRST));
+		this.logger.info("current grid version "+newGrid.getVersion()+" id "+newGrid.getId());
+		//this.gridService.addGrid(newGrid);
+		Goal terzo	=	new Goal();
+		terzo.setLabel("g4556");
+		terzo.setDescription("terzo incomodo");
+		List <Goal> maingoals	=	newGrid.getMainGoals();
+		maingoals.add(terzo);
+		newGrid.setMainGoals(maingoals);
+		this.gridService.addGrid(newGrid);
+		newGrid	=	newGrid.clone();
+		newGrid.setVersion(newGrid.getVersion()+1);
+		Goal quarto	=	new Goal();
+		quarto.setLabel("g093");
+		quarto.setDescription("ancora un altro");
+		newGrid.getMainGoals().add(quarto);
+		s2	=	(Strategy)this.gridElementService.upgradeGridElement(s2);
+		newGrid	=	this.gridService.updateGridElement(newGrid, s2, false, false);
+		ArrayList<Goal> s2goals	=	new ArrayList<Goal>();
+		s2goals.add(quarto);
+		s2.setGoalList(s2goals);
+		System.out.print(aFactory.obtainJson(newGrid, JSONType.FIRST,refVer));
 		
 		
 		return "home";
@@ -194,7 +220,8 @@ public class TestController {
 			System.out.println("TEST JSON");
 			System.out.println(testFactory.obtainJson(firstGoal, JSONType.FIRST));
 			System.out.println("TEST JSON GRID");
-			System.out.println(testFactory.obtainJson(newRel, JSONType.FIRST));
+			System.out.println(testFactory.obtainJson(newRel, JSONType.FIRST,testGrid));
+			System.out.println("TEST JSON GRID ref "+testGrid);
 			return "home";
 	}
 	

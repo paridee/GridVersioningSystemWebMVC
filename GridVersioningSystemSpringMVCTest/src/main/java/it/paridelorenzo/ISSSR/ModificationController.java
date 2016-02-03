@@ -37,6 +37,9 @@ import grid.modification.elements.Modification;
 import grid.modification.elements.ObjectFieldModification;
 import grid.modification.elements.ObjectModificationService;
 import grid.modification.grid.Conflict;
+import grid.modification.grid.GridElementAdd;
+import grid.modification.grid.GridElementRemove;
+import grid.modification.grid.GridModification;
 import grid.modification.grid.GridModificationService;
 
 @Controller
@@ -85,8 +88,8 @@ public class ModificationController {
 			if(anObject.has("refVersion")){
 				refVersion	=	anObject.getInt("refVersion");
 			}
-			if(anObject.has("grid")){
-				jsonData	=	anObject.getString("newGrid");
+			if(anObject.has("newGrid")){
+				jsonData	=	anObject.get("newGrid").toString();
 			}
 			temp = JSONFactory.loadFromJson(jsonData, this.projectService);
 			Grid referenceGrid	=	null;
@@ -111,14 +114,17 @@ public class ModificationController {
 				}
 			}
 			ArrayList<String> modifiedObjectLabels	=	modifiedObjects(referenceGrid,latestGrid);
+			System.out.println("MODIFIED ELEMENTS -> "+modifiedObjectLabels.size());
+			for(int t=0;t<modifiedObjectLabels.size();t++){
+				System.out.println("MODIFIED ELEMENT -> "+modifiedObjectLabels.get(t));
+			}
 			System.out.println("###~~~~VERSIONE GRID CARICATA"+referenceGrid.getVersion());
 			if(referenceGrid	==	null){
 				return "non esiste grid per questo progetto";
 			}
 			else{
 				//TODO se e' update nel "nostro formato" vai a prendere la grid di riferimento e fai il check per i conflitti
-				List<Modification>	mods		=	GridModificationService.getModification(referenceGrid, temp);
-				Grid				toBeRemoved	=	null;	//temporary basic grid
+				List<Modification>	mods		=	GridModificationService.getModification(latestGrid, temp);
 				for(int i=0;i<mods.size();i++){
 					System.out.println("found modification "+mods.get(i).toString());
 				}
@@ -127,45 +133,51 @@ public class ModificationController {
 				}
 				else{
 					Grid 						newVersion	=	new Grid();
-					newVersion.setMainGoals(referenceGrid.getMainGoals());
 					ArrayList<Goal> mainGoalsCopy	=	new ArrayList<Goal>();
-					List<Goal> gridMainGoals	=	referenceGrid.getMainGoals(); //a direct reference creates errors in hibernate (shared reference to a collection)	
+					List<Goal> gridMainGoals	=	latestGrid.getMainGoals(); //a direct reference creates errors in hibernate (shared reference to a collection)	
 					for(int i=0;i<gridMainGoals.size();i++){
 						mainGoalsCopy.add(gridMainGoals.get(i));
 					}
 					newVersion.setMainGoals(mainGoalsCopy);
-					newVersion.setProject(referenceGrid.getProject());
-					newVersion.setVersion(referenceGrid.getVersion()+1);
-					HashMap<String,GridElement> elements	=	referenceGrid.obtainAllEmbeddedElements();
+					newVersion.setProject(latestGrid.getProject());
+					newVersion.setVersion(latestGrid.getVersion()+1);
+					HashMap<String,GridElement> addedElements	=	new HashMap<String,GridElement>();
+					//saves all new items
 					for(int i=0;i<mods.size();i++){
+						if(mods.get(i) instanceof GridElementAdd){
+							GridElement insertion	=	((GridElementAdd)mods.get(i)).getGridElementAdded();
+							addedElements.put(insertion.getLabel(), insertion);
+						}
+					}
+					for(int i=0;i<mods.size();i++){
+						HashMap<String,GridElement> elements	=	newVersion.obtainAllEmbeddedElements();
 						Modification 	aMod	=	mods.get(i);
 						GridElement 	subj;
 						this.logger.info(aMod.toString());
 						if(aMod instanceof GridElementModification){
 							subj	=	elements.get(((GridElementModification) aMod).getSubjectLabel());
+							logger.info("involved class "+subj.getClass());
 							if(Modification.minorUpdateClass.contains(subj.getClass())){
 								aMod.setModificationType(Modification.Type.Minor);
 							}
 							else{
 								aMod.setModificationType(Modification.Type.Major);
 							}
-							if(aMod instanceof GridElementModification){
-								//if is already in new grid use this one...
-								if(newVersion.obtainAllEmbeddedElements().containsKey(((GridElementModification) aMod).getSubjectLabel())){
-									subj	=	newVersion.obtainAllEmbeddedElements().get(((GridElementModification) aMod).getSubjectLabel());
-								}
-								if(elements.containsKey(((GridElementModification) aMod).getSubjectLabel())){
-									GridElement cloned	=	subj.clone();
-									cloned.setVersion(subj.getVersion()+1);
-									((GridElementModification) aMod).apply(cloned, newVersion);
-									newVersion	=	this.gridService.updateGridElement(newVersion, cloned,false,false);
-								}
-								else return "error";
+							//if is already in new grid use this one...
+							if(newVersion.obtainAllEmbeddedElements().containsKey(((GridElementModification) aMod).getSubjectLabel())){
+								subj	=	newVersion.obtainAllEmbeddedElements().get(((GridElementModification) aMod).getSubjectLabel());
 							}
-							else{
-								//TODO manage!!!!
-								System.out.println("case to be manageD!!!!");
+							if(elements.containsKey(((GridElementModification) aMod).getSubjectLabel())){
+								GridElement cloned	=	subj.clone();
+								cloned.setVersion(subj.getVersion()+1);
+								((GridElementModification) aMod).apply(cloned, newVersion);
+								newVersion	=	this.gridService.updateGridElement(newVersion, cloned,false,false);
 							}
+							else return "error";
+						}
+						else if(aMod instanceof GridModification){
+							GridModification aGridModification	=	(GridModification)aMod;
+							aGridModification.apply(newVersion);
 						}
 						else{
 							this.logger.info("manage this case "+aMod.toString());
@@ -194,7 +206,7 @@ public class ModificationController {
 											elementList.add(latestGrid.obtainAllEmbeddedElements().get(newElement.getLabel()));
 											elementList.add(newElement);
 											aConflict.setConflicting(elementList);
-											this.conflictService.addConflict(aConflict);
+											//this.conflictService.addConflict(aConflict);
 										}
 									}	
 								}
@@ -210,7 +222,7 @@ public class ModificationController {
 											elementList.add(latestGrid.obtainAllEmbeddedElements().get(newElement.getLabel()));
 											elementList.add(newElement);
 											aConflict.setConflicting(elementList);
-											this.conflictService.addConflict(aConflict);
+											//this.conflictService.addConflict(aConflict);
 										}
 									}
 								}
@@ -221,6 +233,10 @@ public class ModificationController {
 						}
 					}
 					this.gridService.addGrid(newVersion);
+					logger.info("mods summary");
+					for(int i=0;i<mods.size();i++){
+						logger.info(mods.get(i).toString());
+					}
 					return "modifiche";
 				}
 			}
@@ -319,16 +335,37 @@ public class ModificationController {
 		return "home";
 	}
 	
-	public static ArrayList<String> modifiedObjects(Grid referenceGrid, Grid latestGrid) throws Exception{
+	public static ArrayList<String> modifiedObjects(Grid olderGrid, Grid newerGrid) throws Exception{
 		ArrayList<String>	modifiedObjectLabels	=	new ArrayList<String>();
-		if(referenceGrid!=latestGrid){
-			List<Modification>	mods		=	GridModificationService.getModification(referenceGrid, latestGrid);
+		logger.info("checking modified elements label");
+		if(olderGrid!=newerGrid){
+			logger.info("from different grids v"+olderGrid.getVersion()+" v"+newerGrid.getVersion());
+			List<Modification>	mods		=	GridModificationService.getModification(olderGrid, newerGrid);
+			logger.info("mods size: "+mods.size());
 			for(Modification m:mods){
 				if(m instanceof GridElementModification){
 					String modObjLabel	=	((GridElementModification) m).getSubjectLabel();
-					if(!mods.contains(modObjLabel)){
+					if(!modifiedObjectLabels.contains(modObjLabel)){
+						logger.info("adding label "+modObjLabel);
 						modifiedObjectLabels.add(modObjLabel);	
 					}
+				}
+				else if(m instanceof GridElementAdd){
+					String modObjLabel	=	((GridElementAdd) m).getGridElementAdded().getLabel();
+					if(!mods.contains(modObjLabel)){
+						logger.info("adding label "+modObjLabel);
+						modifiedObjectLabels.add(modObjLabel);	
+					}
+				}
+				else if(m instanceof GridElementRemove){
+					String modObjLabel	=	((GridElementRemove) m).getRemovedObjectLabel();
+					if(!mods.contains(modObjLabel)){
+						logger.info("adding label "+modObjLabel);
+						modifiedObjectLabels.add(modObjLabel);	
+					}
+				}
+				else{
+					logger.info("not managed");
 				}
 			}
 		}
