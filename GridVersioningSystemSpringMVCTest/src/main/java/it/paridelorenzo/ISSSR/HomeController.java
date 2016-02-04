@@ -155,51 +155,6 @@ public class HomeController {
 		return "home";
 	}
 	
-	@RequestMapping(value = "/modifiche", method = RequestMethod.GET)
-	public String hometestmod(Locale locale, Model model) {
-		logger.info("Welcome home! The client locale is {}.", locale);
-		
-		Date date = new Date();
-		DateFormat dateFormat = DateFormat.getDateTimeInstance(DateFormat.LONG, DateFormat.LONG, locale);
-		
-		String formattedDate = dateFormat.format(date);
-		
-		model.addAttribute("serverTime", formattedDate );	
-		try {
-			logger.info("loadfile");
-			BufferedReader reader	=	new BufferedReader(new FileReader("modifiche.txt"));
-			String text	=	"";
-			String line	=	reader.readLine();
-			while(line!=null){
-				text	=	text+line;
-				line	=	reader.readLine();
-			}
-			ArrayList<Modification> mods;
-			Grid refGrid	=	this.gridService.getLatestGrid(1);
-			
-			//test
-			HashMap<String,GridElement> elements	=	refGrid.obtainAllEmbeddedElements();
-			System.out.println("###elementi su grid "+elements.keySet());
-			
-			JSONFactory testFactory	=	new JSONFactory();
-			logger.info("JSON loaded "+text);
-			mods	=	testFactory.loadModificationJson(text, refGrid);
-			for(int i=0;i<mods.size();i++){
-				System.out.println(mods.get(i).toString());
-			}
-			
-		} catch (FileNotFoundException e) {
-			logger.info("file not found");
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (IOException e) {
-			logger.info("io exception");
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		return "home";
-	}
-	
 	//TODO remove test
 	@RequestMapping(value = "/test2Grid", method = RequestMethod.GET)
 	public String home2Grid(Locale locale, Model model) {

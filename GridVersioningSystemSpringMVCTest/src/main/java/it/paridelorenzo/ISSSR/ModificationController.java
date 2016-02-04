@@ -2,9 +2,12 @@ package it.paridelorenzo.ISSSR;
 
 import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
+import java.text.DateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -44,11 +47,12 @@ import grid.modification.grid.GridModificationService;
 
 @Controller
 public class ModificationController {
-	private GridElementService 	gridElementService;
-	private GridService			gridService;
-	private ProjectService		projectService;
+	private GridElementService 		gridElementService;
+	private GridService				gridService;
+	private ProjectService			projectService;
+	private GridModificationService gridModificationService;
 	private static final Logger logger = LoggerFactory.getLogger(ModificationController.class);
-	private ConflictService		conflictService;
+	private ConflictService			conflictService;
 	
 	@Autowired(required=true)
 	@Qualifier(value="conflictService")
@@ -74,6 +78,12 @@ public class ModificationController {
 		this.projectService = projectService;
 	}
 	
+	@Autowired(required=true)
+	@Qualifier(value="gridModificationService")
+	public void setGridModificationService(GridModificationService gridModificationService) {
+		this.gridModificationService = gridModificationService;
+	}
+
 	@RequestMapping(value = "/grids/update", method=RequestMethod.POST)
     public @ResponseBody String updateGrid(@RequestBody String jsonData) {
 		//Grid temp=JSONFactory.loadFromJson(jsonData, this.projectService);
@@ -132,111 +142,8 @@ public class ModificationController {
 					return "non ci sono modifiche";
 				}
 				else{
-					Grid 						newVersion	=	new Grid();
-					ArrayList<Goal> mainGoalsCopy	=	new ArrayList<Goal>();
-					List<Goal> gridMainGoals	=	latestGrid.getMainGoals(); //a direct reference creates errors in hibernate (shared reference to a collection)	
-					for(int i=0;i<gridMainGoals.size();i++){
-						mainGoalsCopy.add(gridMainGoals.get(i));
-					}
-					newVersion.setMainGoals(mainGoalsCopy);
-					newVersion.setProject(latestGrid.getProject());
-					newVersion.setVersion(latestGrid.getVersion()+1);
-					HashMap<String,GridElement> addedElements	=	new HashMap<String,GridElement>();
-					//saves all new items
-					for(int i=0;i<mods.size();i++){
-						if(mods.get(i) instanceof GridElementAdd){
-							GridElement insertion	=	((GridElementAdd)mods.get(i)).getGridElementAdded();
-							addedElements.put(insertion.getLabel(), insertion);
-						}
-					}
-					for(int i=0;i<mods.size();i++){
-						HashMap<String,GridElement> elements	=	newVersion.obtainAllEmbeddedElements();
-						Modification 	aMod	=	mods.get(i);
-						GridElement 	subj;
-						this.logger.info(aMod.toString());
-						if(aMod instanceof GridElementModification){
-							subj	=	elements.get(((GridElementModification) aMod).getSubjectLabel());
-							logger.info("involved class "+subj.getClass());
-							if(Modification.minorUpdateClass.contains(subj.getClass())){
-								aMod.setModificationType(Modification.Type.Minor);
-							}
-							else{
-								aMod.setModificationType(Modification.Type.Major);
-							}
-							//if is already in new grid use this one...
-							if(newVersion.obtainAllEmbeddedElements().containsKey(((GridElementModification) aMod).getSubjectLabel())){
-								subj	=	newVersion.obtainAllEmbeddedElements().get(((GridElementModification) aMod).getSubjectLabel());
-							}
-							if(elements.containsKey(((GridElementModification) aMod).getSubjectLabel())){
-								GridElement cloned	=	subj.clone();
-								cloned.setVersion(subj.getVersion()+1);
-								((GridElementModification) aMod).apply(cloned, newVersion);
-								newVersion	=	this.gridService.updateGridElement(newVersion, cloned,false,false);
-							}
-							else return "error";
-						}
-						else if(aMod instanceof GridModification){
-							GridModification aGridModification	=	(GridModification)aMod;
-							aGridModification.apply(newVersion);
-						}
-						else{
-							this.logger.info("manage this case "+aMod.toString());
-						}
-					}
-					HashMap<String,GridElement> oldElements	=	referenceGrid.obtainAllEmbeddedElements();
-					HashMap<String,GridElement> newElements	=	newVersion.obtainAllEmbeddedElements();
-					java.util.Iterator<String> anIt	=	newElements.keySet().iterator();
-					while(anIt.hasNext()){
-						String key	=	anIt.next();
-						if(oldElements.containsKey(key)){
-							GridElement oldElement 	=	oldElements.get(key);
-							GridElement newElement 	=	newElements.get(key);
-							if(newElement.getVersion()>oldElement.getVersion()){
-								newElement.setVersion(oldElement.getVersion()+1);
-								//if is minorupdate...
-								if(Modification.minorUpdateClass.contains(newElement.getClass())){
-									if(!this.gridElementService.isAddUpdate(oldElement, newElement)){
-										if(modifiedObjectLabels.contains(newElement.getLabel())){
-											//is a conflict
-											Conflict aConflict	=	new Conflict();
-											aConflict.setConflictState(Conflict.State.PENDING);
-											aConflict.setConflictType(Conflict.Type.MINOR);
-											newElement.setState(GridElement.State.MINOR_UPDATING);
-											ArrayList<GridElement> elementList	=	new ArrayList<GridElement>();
-											elementList.add(latestGrid.obtainAllEmbeddedElements().get(newElement.getLabel()));
-											elementList.add(newElement);
-											aConflict.setConflicting(elementList);
-											//this.conflictService.addConflict(aConflict);
-										}
-									}	
-								}
-								else{//is major update
-									if(!this.gridElementService.isAddUpdate(oldElement, newElement)){
-										if(modifiedObjectLabels.contains(newElement.getLabel())){
-											//is a conflict
-											Conflict aConflict	=	new Conflict();
-											aConflict.setConflictState(Conflict.State.PENDING);
-											aConflict.setConflictType(Conflict.Type.MINOR);
-											newElement.setState(GridElement.State.MINOR_UPDATING);
-											ArrayList<GridElement> elementList	=	new ArrayList<GridElement>();
-											elementList.add(latestGrid.obtainAllEmbeddedElements().get(newElement.getLabel()));
-											elementList.add(newElement);
-											aConflict.setConflicting(elementList);
-											//this.conflictService.addConflict(aConflict);
-										}
-									}
-								}
-							}
-							else{
-								newElement.setVersion(1);
-							}
-						}
-					}
+					Grid newVersion	=	this.gridModificationService.applyModifications(mods, latestGrid, modifiedObjectLabels);
 					this.gridService.addGrid(newVersion);
-					logger.info("mods summary");
-					for(int i=0;i<mods.size();i++){
-						logger.info(mods.get(i).toString());
-					}
 					return "modifiche";
 				}
 			}
@@ -372,4 +279,53 @@ public class ModificationController {
 		return modifiedObjectLabels;
 	}
 
+	@RequestMapping(value = "/modifiche", method = RequestMethod.GET)
+	public String hometestmod(Locale locale, Model model) {
+		logger.info("Welcome home! The client locale is {}.", locale);
+		
+		Date date = new Date();
+		DateFormat dateFormat = DateFormat.getDateTimeInstance(DateFormat.LONG, DateFormat.LONG, locale);
+		
+		String formattedDate = dateFormat.format(date);
+		
+		model.addAttribute("serverTime", formattedDate );	
+		try {
+			logger.info("loadfile");
+			BufferedReader reader	=	new BufferedReader(new FileReader("modifiche.txt"));
+			String text	=	"";
+			String line	=	reader.readLine();
+			while(line!=null){
+				text	=	text+line;
+				line	=	reader.readLine();
+			}
+			ArrayList<Modification> mods;
+			Grid refGrid	=	this.gridService.getLatestGrid(1);
+			
+			//test
+			HashMap<String,GridElement> elements	=	refGrid.obtainAllEmbeddedElements();
+			System.out.println("###elementi su grid "+elements.keySet());
+			
+			JSONFactory testFactory	=	new JSONFactory();
+			logger.info("JSON loaded "+text);
+			logger.info("loaded grid version "+refGrid.getVersion()+" for project "+refGrid.getProject().getProjectId());
+			mods	=	testFactory.loadModificationJson(text, refGrid);
+			for(int i=0;i<mods.size();i++){
+				System.out.println(mods.get(i).toString());
+			}
+			Grid newVersion	=	this.gridModificationService.applyModifications(mods, refGrid, modifiedObjectLabels);
+			this.gridService.addGrid(newVersion);
+			
+		} catch (FileNotFoundException e) {
+			logger.info("file not found");
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (IOException e) {
+			logger.info("io exception");
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return "home";
+	}
+	
+	
 }
