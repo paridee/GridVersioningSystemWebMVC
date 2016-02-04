@@ -42,7 +42,7 @@ public interface GridElementService {
 	 * @param c class of the object
 	 * @return object instance
 	 */
-	public GridElement getElementById(int id,Class<?> c);
+	public GridElement getElementById(int id, String type);
 	
 	/**
 	 * Returns the history of an element of a grid
@@ -50,7 +50,7 @@ public interface GridElementService {
 	 * @param c class of the element
 	 * @return list of the objects representing the state
 	 */
-	public List<GridElement> getElementLog(String label,Class<?> c);
+	public List<GridElement> getElementLog(String label, String table);
 	
 	/**
 	 * Removes a grid element from persistence layer

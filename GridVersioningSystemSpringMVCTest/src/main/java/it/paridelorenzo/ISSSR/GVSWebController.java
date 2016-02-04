@@ -2,7 +2,6 @@ package it.paridelorenzo.ISSSR;
 
 import java.lang.reflect.Field;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 
 import org.json.JSONObject;
@@ -11,7 +10,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Controller;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -20,7 +18,6 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import grid.JSONFactory;
-import grid.entities.Goal;
 import grid.entities.Grid;
 import grid.entities.GridElement;
 import grid.entities.Project;
@@ -28,12 +25,6 @@ import grid.interfaces.services.ConflictService;
 import grid.interfaces.services.GridElementService;
 import grid.interfaces.services.GridService;
 import grid.interfaces.services.ProjectService;
-import grid.modification.elements.GridElementModification;
-import grid.modification.elements.Modification;
-import grid.modification.elements.ObjectFieldModification;
-import grid.modification.grid.Conflict;
-import grid.modification.grid.GridModificationService;
-import javassist.bytecode.Descriptor.Iterator;
  
  
 @Controller
@@ -44,6 +35,7 @@ public class GVSWebController {
 	private ProjectService		projectService;
 	private JSONFactory 		jFact;
 	private ConflictService		conflictService;
+	private int nMenuButtons=3;
 	
 	@Autowired(required=true)
 	@Qualifier(value="conflictService")
@@ -71,16 +63,34 @@ public class GVSWebController {
 
 	private static final Logger logger = LoggerFactory.getLogger(GVSWebController.class);
      
+	@RequestMapping(value = "/GVShome", method = RequestMethod.GET)
+    public String GVShome(Model model) {
+		model.addAttribute("pageTitle", "Grids Versioning System");
+		return "GVShome";
+    }
+	
 	@RequestMapping(value = "/grids", method = RequestMethod.GET)
     public String listAllGrids(Model model) {
+		model.addAttribute("pageTitle", "Lista Grids");
+		this.setActiveButton(1, model);
 		List<Grid> temp= this.gridService.listAllGrids();
 		model.addAttribute("nGrids", temp.size());
         model.addAttribute("listGrids", temp);
         return "grids";
     }
 	
+	private void setActiveButton(int i, Model model) {
+		for (int j=0;j<this.nMenuButtons; j++){
+			if(j==i) model.addAttribute("navClass"+j, "class=\"active\"");
+			else model.addAttribute("navClass"+j, "");
+		}
+		
+	}
+
 	@RequestMapping(value = "/grids/{id}")
     public String getGrid(@PathVariable("id") int id, Model model) {
+		model.addAttribute("pageTitle", "Lista Grids");
+		this.setActiveButton(1, model);
 		Grid tempGrid= this.gridService.getGridById(id);
 		model.addAttribute("grid", tempGrid);
 		String chart=createChart(tempGrid);
@@ -174,10 +184,12 @@ public class GVSWebController {
 	
 	@RequestMapping(value = "/projects", method = RequestMethod.GET)
     public String listAllProjects(Model model) {
+		model.addAttribute("pageTitle", "Lista Progetti");
+		this.setActiveButton(0, model);
 		List<Project> temp = this.projectService.listProjects();
-			model.addAttribute("nProjects", temp.size());
-			model.addAttribute("listProjects", temp);
-			return "projects";
+		model.addAttribute("nProjects", temp.size());
+		model.addAttribute("listProjects", temp);
+		return "projects";
 		
 		
     }
@@ -193,20 +205,20 @@ public class GVSWebController {
 	
 	
 	
-	@RequestMapping(value = "/element/{type}/{id}")
-    public String getElementHistory(@PathVariable("id") String id, @PathVariable("type") String type, Model model) {
-		try {
-			List <GridElement> temp=this.gridElementService.getElementLog(id, Class.forName(type));
-		} catch (ClassNotFoundException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+	@RequestMapping(value = "/elementhistory/{type}/{label}")
+    public String getElementHistory(@PathVariable("label") String label, @PathVariable("type") String type, Model model) {
+		List <GridElement> tempList=this.gridElementService.getElementLog(label, type);
+		model.addAttribute("nGridElements", tempList.size());
+        model.addAttribute("listGridElements", tempList);
+        //System.out.println(tempList.toString());
 		return "element";
     }
 	
-	@RequestMapping(value = "/element/{type}/{id}/{vers}")
-    public String getElementVers(@PathVariable("id") String id,@PathVariable("vers") int vers, @PathVariable("type") String type,Model model) {
-		//GridElement  temp=this.gridElementService.getElementById(id, getClass());
+	@RequestMapping(value = "/element/{type}/{id}")
+    public String getElementVers(@PathVariable("id") int id, @PathVariable("type") String type,Model model) {
+		GridElement  ge=this.gridElementService.getElementById(id, type);
+		model.addAttribute("element", ge);
+		//System.out.println(this.gridElementToFormattedString(ge));
 		return "element";
     }
 	
@@ -255,5 +267,65 @@ public class GVSWebController {
     public String updateGridPage(Model model) {
 		return "updategrid";
     }
+	
+	public String gridElementToFormattedString(GridElement ge){
+		String name=ge.getClass().getSimpleName()+" "+ge.getLabel()+" - <i>v"+ge.getVersion()+"</i><br>";
+		String desc="";
+		String references="";
+		Field[] fields=ge.getClass().getDeclaredFields();
+		for(int j=0; j<fields.length;j++){
+			Field tempField=fields[j];
+			tempField.setAccessible(true);
+			try {
+				Object fieldValue=tempField.get(ge);
+				if(fieldValue instanceof GridElement){
+					GridElement currentGE=(GridElement) fieldValue;
+					if (references.length()==0){
+						references=references+"riferimenti: "+currentGE.getLabel()+" v"+currentGE.getVersion();
+					}
+					else{
+						references=references+", "+currentGE.getLabel()+" v"+currentGE.getVersion();
+					}
+				}
+				else if(fieldValue instanceof List){
+					List myList 	=	(List)fieldValue;
+					if(myList.size()>0){
+						Object	first	=	 myList.get(0);
+						if(first instanceof GridElement){
+							GridElement currentGE=(GridElement) first;
+							if (references.length()==0){
+								references=references+"riferimenti: "+currentGE.getLabel()+" v"+currentGE.getVersion();
+							}
+							else{
+								references=references+", "+currentGE.getLabel()+" v"+currentGE.getVersion();
+							}
+							
+							
+						}
+						//TODO gestire array stringhe
+					}
+				}
+				else{
+					//desc=desc+"<div style='float:left;min-width: 200px;'>"+tempField.getName()+": "+fieldValueStr+"</div>";
+					if(fieldValue!=null){
+						String fieldValueStr	=	(String)fieldValue.toString();
+						String txt=tempField.getName()+": </i> "+fieldValueStr;
+						int maxLength=60;
+						if(txt.length()>maxLength) txt=txt.substring(0, maxLength)+"...";
+						desc=desc+"<div class='txtElement'><i>"+txt+"</div>";
+					}
+				}
+			} catch (IllegalArgumentException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} catch (IllegalAccessException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
+		return name+"\n\t"+desc+"\n\t"+references;
+	}
+	
+	
      
 }

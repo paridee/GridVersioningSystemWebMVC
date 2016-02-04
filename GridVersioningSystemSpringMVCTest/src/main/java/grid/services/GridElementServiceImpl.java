@@ -84,16 +84,16 @@ public class GridElementServiceImpl implements GridElementService {
 	 * {@inheritDoc}
 	 */
 	@Override
-	public GridElement getElementById(int id, Class<?> c) {
-		return this.gridElementDao.getElementById(id, c);
+	public GridElement getElementById(int id, String type) {
+		return this.gridElementDao.getElementById(id, type);
 	}
 
 	/**
 	 * {@inheritDoc}
 	 */
 	@Override
-	public List<GridElement> getElementLog(String label, Class<?> c) {
-		return this.gridElementDao.getElementLog(label, c);
+	public List<GridElement> getElementLog(String label, String table) {
+		return this.gridElementDao.getElementLog(label, table);
 	}
 
 	/**

@@ -39,7 +39,7 @@ public interface GridElementDao {
 	 * @param c class of the element
 	 * @return element found
 	 */
-	public GridElement getElementById(int id,Class<?> c);
+	public GridElement getElementById(int id, String type);
 	
 	/**
 	 * Returns the history for an element
@@ -47,7 +47,7 @@ public interface GridElementDao {
 	 * @param c class of the element
 	 * @return list of objects representing the item history
 	 */
-	public List<GridElement> getElementLog(String label,Class<?> c);
+	public List<GridElement> getElementLog(String label, String table);
 	
 	/**
 	 * Removes a grid element from persistence
