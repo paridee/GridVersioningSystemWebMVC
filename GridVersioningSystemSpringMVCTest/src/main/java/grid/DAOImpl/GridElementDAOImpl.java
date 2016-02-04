@@ -7,6 +7,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Repository;
 import grid.entities.GridElement;
+import grid.entities.Project;
 import grid.interfaces.DAO.GridElementDao;
 
 @Repository
@@ -61,13 +62,18 @@ public class GridElementDAOImpl implements GridElementDao {
 	/**
 	 * {@inheritDoc}
 	 */
-	@SuppressWarnings("rawtypes")
+	@SuppressWarnings({ "rawtypes", "unchecked" })
 	@Override
-	public GridElement getElementById(int id, Class c) {
-		Session currentSession	=	this.sessionFactory.getCurrentSession();
-		GridElement	g			=	(GridElement) currentSession.load(c,new Integer(id));
-		logger.info(c.getName()+" loaded::"+g);
+	public GridElement getElementById(int id, String type) {
+		Session session	=	this.sessionFactory.getCurrentSession();
+		List<GridElement> returnres	=session.createQuery("from "+type+" P where P.id = \'"+id+"\'").list();
+		if(returnres.size()==0){
+			return null;
+		}
+		GridElement g	=	(GridElement) returnres.get(0) ;
 		return g;
+		
+		
 	}
 
 	/**
@@ -75,9 +81,9 @@ public class GridElementDAOImpl implements GridElementDao {
 	 */
 	@SuppressWarnings({ "rawtypes", "unchecked" })
 	@Override
-	public List<GridElement> getElementLog(String label, Class c) {
+	public List<GridElement> getElementLog(String id, String table) {
 		Session session				=	this.sessionFactory.getCurrentSession();
-		List<GridElement> gElList	=	session.createQuery("from "+c.getSimpleName()+" G where G.label = "+label).list();
+		List<GridElement> gElList	=	session.createQuery("from "+table+" where label = '"+id+"'").list();
 		for(GridElement g : gElList){
 			logger.info("GridElement List:"+g);
 		}
