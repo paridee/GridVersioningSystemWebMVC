@@ -2,6 +2,7 @@ package grid.modification.elements;
 
 import java.lang.reflect.Field;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 
 import grid.entities.Grid;
@@ -57,7 +58,13 @@ public class ListAppend extends GridElementModification {
 				aList.add(element);
 			}
 			else if(this.newLoadedObject!=null){	//i have to append a new object
-				aList.add(this.newLoadedObject);
+				newLoadedObject	=	((GridElement) newLoadedObject).clone();
+				HashMap<String, GridElement> elements	=	grid.obtainAllEmbeddedElements();
+				Iterator<String> it	=	elements.keySet().iterator();
+				while(it.hasNext()){
+					((GridElement) newLoadedObject).updateReferences(elements.get(it.next()), false, false);
+				}
+				aList.add(newLoadedObject);
 			}
 			else{
 				throw new Exception("Object to be added not found in current Grid");	

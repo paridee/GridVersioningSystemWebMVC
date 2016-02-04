@@ -92,7 +92,7 @@ public class MeasurementGoal extends GridElement{
 	 * {@inheritDoc}
 	 */
 	@Override
-	public ArrayList<GridElement> updateReferences(GridElement ge,boolean autoupgrade) {
+	public ArrayList<GridElement> updateReferences(GridElement ge,boolean autoupgrade,boolean recursive) {
 		MeasurementGoal updated	=	null;
 		if(autoupgrade==true){
 			updated	=	(MeasurementGoal) this.clone();
@@ -109,8 +109,10 @@ public class MeasurementGoal extends GridElement{
 				addThis	=	true;
 			}
 		}
-		for(int i=0;i<this.questionList.size();i++){
-			Utils.mergeLists(returnList, this.questionList.get(i).updateReferences(ge,autoupgrade));
+		if(recursive == true){
+			for(int i=0;i<this.questionList.size();i++){
+				Utils.mergeLists(returnList, this.questionList.get(i).updateReferences(ge,autoupgrade));
+			}
 		}
 		if(addThis==true){
 			returnList.add(updated);
@@ -228,6 +230,11 @@ public class MeasurementGoal extends GridElement{
 			returnMap.putAll(this.questionList.get(i).obtainEmbeddedElements());
 		}
 		return returnMap;
+	}
+
+	@Override
+	public ArrayList<GridElement> updateReferences(GridElement ge, boolean autoupgrade) {
+		return this.updateReferences(ge, autoupgrade,true);
 	}
 	
 	/*

@@ -276,93 +276,6 @@ public class HomeController {
 			return "home";
 	}
 	
-	//TODO remove test
-	@RequestMapping(value = "/testGrid", method = RequestMethod.GET)
-	public String homeGrid(Locale locale, Model model) {
-			logger.info("Welcome home! The client locale is {}.", locale);
-			
-			Date date = new Date();
-			DateFormat dateFormat = DateFormat.getDateTimeInstance(DateFormat.LONG, DateFormat.LONG, locale);
-			JSONFactory testFactory	=	new JSONFactory();
-			Project test	=	new Project();
-			test.setDescription("progetto di prova");
-			Grid testGrid	=	new Grid();
-			testGrid.setProject(test);
-			ArrayList<Goal> maingoals	=	new ArrayList<Goal>();
-			testGrid.setMainGoals(maingoals);
-			MeasurementGoal turboFregna	=	new MeasurementGoal();
-			turboFregna.setLabel("porco dio");
-			turboFregna.setDescription("e mannaggia la madonna");
-			Goal firstGoal	=	new Goal();
-			firstGoal.setMeasurementGoal(turboFregna);
-			firstGoal.setLabel("primo goal");
-			this.gridElementService.addGridElement(firstGoal);
-			maingoals.add(firstGoal);
-			Strategy aStrategy	=	new Strategy();
-			aStrategy.setLabel("str1");
-			aStrategy.setDescription("strategia di test");
-			ArrayList<Strategy> strategies	=	new ArrayList<Strategy>();
-			strategies.add(aStrategy);
-			firstGoal.setStrategyList(strategies);
-			ArrayList<Goal> goals1	=	new ArrayList<Goal>();
-			Goal secondGoal	=	new Goal();
-			secondGoal.setLabel("secGoal");
-			secondGoal.setDescription("pippo");
-			goals1.add(secondGoal);
-			aStrategy.setGoalList(goals1);
-			MeasurementGoal mg	=	new MeasurementGoal();
-			mg.setLabel("measurementGoal pippo");
-			mg.setDescription("test");
-			secondGoal.setMeasurementGoal(mg);
-			Strategy anotherStr	=	new Strategy();
-			anotherStr.setLabel("another");
-			ArrayList<Strategy> strategiesb	=	new ArrayList<Strategy>();
-			strategiesb.add(anotherStr);
-			secondGoal.setStrategyList(strategiesb);
-			Metric metricatest	=	new Metric();
-			metricatest.setLabel("metricatest1");
-			metricatest.setDescription("metrica di test");
-			Question testQuestion	=	new Question();
-			testQuestion.setLabel("aQuestion");
-			testQuestion.setQuestion("Stocazzo???");
-			ArrayList<Question> questionList	=	new ArrayList<Question>();
-			questionList.add(testQuestion);
-			mg.setQuestionList(questionList);
-			ArrayList<Metric> metrics	=	new ArrayList<Metric>();
-			metrics.add(metricatest);
-			testQuestion.setMetricList(metrics);
-			Metric updated	=	(Metric) this.gridElementService.upgradeGridElement(metricatest);
-			updated.setDescription("AGGIORNATAAAAAAAAA");
-			this.gridService.addGrid(testGrid);
-			Grid newGrid	=	this.gridService.updateGridElement(testGrid, updated,true);
-			Goal anotherGoal	=	new Goal();
-			anotherGoal.setLabel("testttt");
-			Practitioner zio	=	new Practitioner();
-			zio.setEmail("porcodio@porcamadonna.com");
-			zio.setName("Dio Cane");
-			ArrayList<Practitioner> auths	=	new ArrayList<Practitioner>();
-			auths.add(zio);
-			anotherGoal.setAuthors(auths);
-			anotherGoal.setMeasurementGoal(turboFregna);
-			Grid newRel	=	this.gridService.upgradeGrid(newGrid);
-			newRel.getMainGoals().add(anotherGoal);
-			this.gridService.updateGrid(newRel);
-			anotherGoal	=	(Goal)this.gridElementService.upgradeGridElement(anotherGoal);
-			anotherGoal.setAssumption("ASSUNZIONEEEEEEEEE");
-			newRel	=	this.gridService.updateGridElement(newRel, anotherGoal,true);
-			ArrayList<Strategy> strlista	=	new ArrayList<Strategy>();
-			strlista.add(aStrategy);
-			anotherGoal	=	(Goal) this.gridElementService.upgradeGridElement(anotherGoal);
-			anotherGoal.setStrategyList(strlista);
-			newRel	=	this.gridService.updateGridElement(newRel, anotherGoal,true);
-			System.out.println("TEST JSON");
-			System.out.println(testFactory.obtainJson(firstGoal, JSONType.FIRST));
-			System.out.println("TEST JSON GRID");
-			System.out.println(testFactory.obtainJson(newRel, JSONType.FIRST));
-			return "home";
-	}
-	
-	
 	
 	/**
 	 * Simply selects the home view to render by returning its name.
@@ -395,6 +308,7 @@ public class HomeController {
 		}
 		List<Goal> goals	=	testupdate.getMainGoals();
 		System.out.println("CARICATO "+goals.size()+" GOALS");
+		Grid newGrid	=	null;
 		for(int i=0;i<goals.size();i++){
 			System.out.println(goals.get(i).getLabel());
 			if(goals.get(i).getLabel().equals("g1")){
@@ -409,7 +323,7 @@ public class HomeController {
 								clone.setVersion(clone.getVersion()+1);
 								clone.setDescription(clone.getDescription()+"*");//+clone.getVersion());
 								System.out.println("Aggiorno");
-								Grid newGrid	=	gridService.updateGridElement(testupdate, clone,true);
+								newGrid	=	gridService.updateGridElement(testupdate, clone,true,false);
 								//strategies.get(j).setDescription("non deve salvare questo");
 								System.out.println("Aggiornato");
 								model.addAttribute("gridString",newGrid.toString("&nbsp&nbsp&nbsp&nbsp", "<br>") );
@@ -423,6 +337,7 @@ public class HomeController {
 				}
 			}
 		}
+		this.gridService.addGrid(newGrid);
 		HashMap<String,GridElement> map			=	iesima.obtainAllEmbeddedElements();
 		Set<String> keys						=	iesima.obtainAllEmbeddedElements().keySet();
 		ArrayList<GridElement> elements1		=	new ArrayList<GridElement>();

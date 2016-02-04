@@ -72,10 +72,10 @@ public interface GridService {
 	 * Updates an element on the Grid
 	 * @param g Grid of the element to be updated
 	 * @param ge Element of the Grid to be updated
-	 * @param autoupgrade set if autoupgrade is enabled
+	 * @param autoupgradeElement set if autoupgrade is enabled
 	 * @return updated Grid
 	 */
-	public Grid updateGridElement(Grid g,GridElement ge,boolean autoupgrade);
+	public Grid updateGridElement(Grid g,GridElement ge,boolean autoupgradeElement,boolean autoupgradeGrid);
 	
 	/**
 	 * Removes a Grid from persistence layer

@@ -68,7 +68,7 @@ public class GridModificationService {
 					if(entryChange.getClass().equals(EntryAdded.class)){
 						EntryAdded thisAdd	=	(EntryAdded)entryChange;
 						MainGoalAdd append	=	new MainGoalAdd();
-						append.setAppendedObjectLabel(thisAdd.getKey().toString());
+						append.setAppendedObject((Goal)thisAdd.getValue());
 						allMods.add(append);
 					}
 					//manage an entry deletion

@@ -132,7 +132,7 @@ public class GridServiceImpl implements GridService {
 	 */
 	@Override
 	@Transactional
-	public Grid updateGridElement(Grid g,GridElement ge,boolean autoupgrade) {
+	public Grid updateGridElement(Grid g,GridElement ge,boolean autoupgradeElement,boolean autoupgradeGrid) {
 		//elements already checked
 		HashMap<String,GridElement> checked	=	new HashMap<String,GridElement>();
 		//elements to be checked
@@ -153,11 +153,12 @@ public class GridServiceImpl implements GridService {
 			toBeChecked	=	nextCheck;
 		}
 		Grid updated	=	null;
-		if(autoupgrade	==	false){
+		if(autoupgradeGrid	==	false){
 			updated	=	g;	
 		}
 		else{
-			updated	=	this.upgradeGrid(g);
+			updated	=	g.clone();
+			updated.setVersion(g.getVersion()+1);
 		}
 		List <Goal> mainGoals	=	updated.getMainGoals();
 		for(int i=0;i<mainGoals.size();i++){

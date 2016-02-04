@@ -260,4 +260,9 @@ public class Metric extends GridElement{
 		return returnMap;
 	}
 
+	@Override
+	public ArrayList<GridElement> updateReferences(GridElement ge, boolean autoupgrade, boolean recursive) {
+		return this.updateReferences(ge, autoupgrade);
+	}
+
 }

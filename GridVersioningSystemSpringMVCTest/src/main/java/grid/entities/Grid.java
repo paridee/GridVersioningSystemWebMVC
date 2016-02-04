@@ -179,5 +179,23 @@ public class Grid implements Updatable{
 		}
 		return returnString;
 	}
-	
+	/**
+	 * Clone method
+	 */
+	public Grid clone(){
+		Grid cloned	=	new Grid();
+		cloned.setProject(this.project);
+		cloned.setVersion(this.version);
+		ArrayList<Goal> clonedMainGoals	=	new ArrayList<Goal>();
+		for(int i=0;i<this.mainGoals.size();i++){
+			clonedMainGoals.add(this.mainGoals.get(i));
+		}
+		cloned.setMainGoals(clonedMainGoals);
+		return cloned;
+	}
+
+	@Override
+	public ArrayList<GridElement> updateReferences(GridElement ge, boolean autoupgrade, boolean recursive) {
+		return this.updateReferences(ge, autoupgrade);
+	}
 }

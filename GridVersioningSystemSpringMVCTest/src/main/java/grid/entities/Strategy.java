@@ -85,7 +85,7 @@ public class Strategy extends GridElement{
 	 * {@inheritDoc}
 	 */
 	@Override
-	public ArrayList<GridElement> updateReferences(GridElement ge,boolean autoupgrade) {
+	public ArrayList<GridElement> updateReferences(GridElement ge,boolean autoupgrade,boolean recursive) {
 		Strategy updated	=	null;
 		if(autoupgrade	== true){
 			updated	=	(Strategy)this.clone();
@@ -102,8 +102,10 @@ public class Strategy extends GridElement{
 				addThis=true;
 			}
 		}
-		for(int i=0;i<this.goalList.size();i++){
-			Utils.mergeLists(returnList, this.goalList.get(i).updateReferences(ge,autoupgrade));
+		if(recursive	==	true){
+			for(int i=0;i<this.goalList.size();i++){
+				Utils.mergeLists(returnList, this.goalList.get(i).updateReferences(ge,autoupgrade));
+			}
 		}
 		if(addThis==true){
 			returnList.add(updated);
@@ -210,6 +212,12 @@ public class Strategy extends GridElement{
 			returnMap.putAll(this.goalList.get(i).obtainEmbeddedElements());
 		}
 		return returnMap;
+	}
+
+
+	@Override
+	public ArrayList<GridElement> updateReferences(GridElement ge, boolean autoupgrade) {
+		return this.updateReferences(ge, autoupgrade, true);
 	}
 	
 }

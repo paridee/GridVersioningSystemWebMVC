@@ -2,6 +2,7 @@ package grid.modification.elements;
 
 import java.lang.reflect.Field;
 import java.util.HashMap;
+import java.util.Iterator;
 
 import grid.entities.Grid;
 import grid.entities.GridElement;
@@ -45,6 +46,22 @@ public class ObjectFieldModification extends GridElementModification {
 		if(fieldsMap.containsKey(this.fieldToBeChanged)){
 			Field	aField	=	fieldsMap.get(this.fieldToBeChanged);
 			aField.setAccessible(true);
+			if(newValue instanceof GridElement){
+				System.out.println("rimpiazzo in elemento grid "+anElement.getLabel()+" attributo "+this.fieldToBeChanged+" con elemento "+((GridElement)newValue).getLabel());
+				GridElement newV	=	(GridElement)newValue;
+				if(aGrid.obtainAllEmbeddedElements().containsKey(newV.getLabel())){
+					newValue	=	aGrid.obtainAllEmbeddedElements().get(newV.getLabel());
+				}
+				else{
+					//if object not belonging to grid rebuild links
+					newValue	=	((GridElement) newValue).clone();
+					HashMap<String, GridElement> elements	=	aGrid.obtainAllEmbeddedElements();
+					Iterator<String> it	=	elements.keySet().iterator();
+					while(it.hasNext()){
+						((GridElement) newValue).updateReferences(elements.get(it.next()), false, false);
+					}
+				}
+			}
 			aField.set(anElement, newValue);
 		}
 		//is not a superclass field, check if is subclass field
