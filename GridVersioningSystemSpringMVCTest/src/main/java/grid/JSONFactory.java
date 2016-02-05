@@ -335,7 +335,7 @@ public class JSONFactory {
 	 * @param loaded objects already loaded
 	 * @return proper object
 	 */
-	private static GridElement loadGridObj(String objectStr,HashMap<String,Object> loaded) {
+	public static GridElement loadGridObj(String objectStr,HashMap<String,Object> loaded) {
 		JSONObject object	=	new JSONObject(objectStr);
 		GridElement loadedGE	=	null;
 		if(object.has("goalId")){

@@ -22,6 +22,7 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import grid.entities.Goal;
 import grid.entities.Grid;
 import grid.entities.GridElement;
+import grid.interfaces.services.ConflictService;
 import grid.interfaces.services.GridElementService;
 import grid.interfaces.services.GridService;
 import grid.modification.elements.GridElementModification;
@@ -39,6 +40,7 @@ public class GridModificationService {
 	private static final Logger logger = LoggerFactory.getLogger(GridModificationService.class);
 	private GridElementService 	gridElementService;
 	private GridService			gridService;
+	private ConflictService		conflictService;
 	
 	@Autowired(required=true)
 	@Qualifier(value="gridElementService")
@@ -50,6 +52,12 @@ public class GridModificationService {
 	@Qualifier(value="gridService")
 	public void setGridService(GridService gridService) {
 		this.gridService = gridService;
+	}
+	
+	@Autowired(required=true)
+	@Qualifier(value="conflictService")
+	public void setConflictService(ConflictService conflictService) {
+		this.conflictService = conflictService;
 	}
 	
 	/**
@@ -180,7 +188,7 @@ public class GridModificationService {
 				this.logger.info(aMod.toString());
 				if(aMod instanceof GridElementModification){
 					subj	=	elements.get(((GridElementModification) aMod).getSubjectLabel());
-					logger.info("involved class "+subj.getClass());
+					logger.info("Grid Element Modification: involved class "+subj.getClass()+" label "+subj.getLabel()+" label in mod "+((GridElementModification) aMod).getSubjectLabel());
 					if(Modification.minorUpdateClass.contains(subj.getClass())){
 						aMod.setModificationType(Modification.Type.Minor);
 					}
@@ -230,7 +238,7 @@ public class GridModificationService {
 									elementList.add(latestGrid.obtainAllEmbeddedElements().get(newElement.getLabel()));
 									elementList.add(newElement);
 									aConflict.setConflicting(elementList);
-									//this.conflictService.addConflict(aConflict);
+									this.conflictService.addConflict(aConflict);
 								}
 							}	
 						}
@@ -246,7 +254,7 @@ public class GridModificationService {
 									elementList.add(latestGrid.obtainAllEmbeddedElements().get(newElement.getLabel()));
 									elementList.add(newElement);
 									aConflict.setConflicting(elementList);
-									//this.conflictService.addConflict(aConflict);
+									this.conflictService.addConflict(aConflict);
 								}
 							}
 						}

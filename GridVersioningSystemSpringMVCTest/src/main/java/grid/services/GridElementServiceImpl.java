@@ -106,6 +106,8 @@ public class GridElementServiceImpl implements GridElementService {
 		
 	}
 
+	
+	//TODO check if is correct due to strange JAVERS behaviour (for example # etc...)
 	/**
 	 * {@inheritDoc}
 	 */
@@ -138,8 +140,8 @@ public class GridElementServiceImpl implements GridElementService {
 				}
 			}
 			//there is a change on a list, check if the new one contains, at least, all the referenced objects of the old one
-			else if(thisChange.getClass().equals(ListChange.class)){
-				System.out.println("List change detected");
+			else if(thisChange.getClass().equals(ListChange.class)&&(!thisChange.getAffectedGlobalId().value().contains("#"))){ //not a change in a linked object
+				System.out.println("List change detected: "+thisChange.toString()+" <-");
 				ListChange	thisListChange	=	(ListChange) thisChange;
 				Field listField;
 				try {
