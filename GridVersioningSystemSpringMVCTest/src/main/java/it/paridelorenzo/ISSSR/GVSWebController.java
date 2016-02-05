@@ -68,6 +68,12 @@ public class GVSWebController {
 		model.addAttribute("pageTitle", "Grids Versioning System");
 		return "GVShome";
     }
+	@RequestMapping(value = "/pending", method = RequestMethod.GET)
+    public String pendingView(Model model) {
+		model.addAttribute("pageTitle", "Grids Versioning System");
+		//get lista major updates (da approvare o rigettare)
+		return "pending";
+    }
 	
 	@RequestMapping(value = "/grids", method = RequestMethod.GET)
     public String listAllGrids(Model model) {
