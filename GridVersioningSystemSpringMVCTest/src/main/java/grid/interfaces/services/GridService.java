@@ -41,6 +41,8 @@ public interface GridService {
 	 */
 	public Grid upgradeGrid(Grid p);
 	
+	public Grid createStubUpgrade(Grid g);
+	
 	/**
 	 * Returns a list with all the grids present on persistence layer
 	 * @return Grid list
@@ -60,6 +62,14 @@ public interface GridService {
 	 * @return Grid desired
 	 */
 	public Grid getLatestGrid(int projid);
+	
+	
+	/**
+	 * Returns the latest working Grid for a project
+	 * @param projid id of project
+	 * @return Grid desired
+	 */
+	public Grid getLatestWorkingGrid(int projid);
 	
 	/**
 	 * Returns the history of Grids for a project

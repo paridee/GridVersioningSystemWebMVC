@@ -159,7 +159,7 @@ public class Grid implements Updatable{
 			if(aState	==	State.FINAL_KO){
 				return GridState.FINAL_KO;
 			}
-			if((aState	==	State.MAJOR_UPDATING)||(aState	==	State.MINOR_UPDATING)){
+			if((aState	==	State.MAJOR_UPDATING)||(aState	==	State.MINOR_CONFLICTING)||(aState	==	State.MAJOR_CONFLICTING)){
 				returnState	=	GridState.UPDATING;
 			}
 		}

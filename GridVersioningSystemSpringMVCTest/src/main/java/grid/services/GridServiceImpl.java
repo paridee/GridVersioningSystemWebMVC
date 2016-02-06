@@ -112,6 +112,27 @@ public class GridServiceImpl implements GridService {
 	 * {@inheritDoc}
 	 */
 	@Override
+	public Grid getLatestWorkingGrid(int projid) {
+		List<Grid> allGrids	=	this.gridDao.getGridLog(projid);
+		Grid aGrid	=	null;
+		if(allGrids.size()>0){
+			int ver	=	-1;
+			for(int i=0;i<allGrids.size();i++){
+				if(allGrids.get(i).getVersion()>ver){
+					if(allGrids.get(i).obtainGridState()==Grid.GridState.WORKING){
+						aGrid	=	allGrids.get(i);
+						ver		=	allGrids.get(i).getVersion();	
+					}
+				}
+			}
+		}
+		return aGrid;
+	}
+	
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
 	public List<Grid> getGridLog(int projid) {
 		return this.gridDao.getGridLog(projid);
 	}
@@ -207,6 +228,20 @@ public class GridServiceImpl implements GridService {
 	public JSONObject obtainJson(Grid element, JSONType type) {
 		// TODO Auto-generated method stub
 		return null;
+	}
+
+	@Override
+	public Grid createStubUpgrade(Grid g) {
+		Grid 						newVersion	=	new Grid();
+		ArrayList<Goal> mainGoalsCopy	=	new ArrayList<Goal>();
+		List<Goal> gridMainGoals	=	g.getMainGoals(); //a direct reference creates errors in hibernate (shared reference to a collection)	
+		for(int i=0;i<gridMainGoals.size();i++){
+			mainGoalsCopy.add(gridMainGoals.get(i));
+		}
+		newVersion.setMainGoals(mainGoalsCopy);
+		newVersion.setProject(g.getProject());
+		newVersion.setVersion(g.getVersion()+1);
+		return newVersion;
 	}
 
 }

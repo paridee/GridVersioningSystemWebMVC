@@ -180,8 +180,9 @@ public class ModificationController {
 			}
 			temp = JSONFactory.loadFromJson(jsonData, this.projectService);
 			Grid referenceGrid	=	null;
-			Grid latestGrid;	
-			referenceGrid	=	this.gridService.getLatestGrid(temp.getProject().getId());
+			Grid latestGrid;
+			//TODO get latest grid deve tornare ultima working grid
+			referenceGrid	=	this.gridService.getLatestWorkingGrid(temp.getProject().getId());
 			latestGrid		=	referenceGrid;
 			//TODO carciofo nota bene:
 			/*
@@ -263,7 +264,7 @@ public class ModificationController {
 					}
 				}
 				else{
-					logger.info("not managed");
+					logger.info("not managed "+m.getClass()+m+" <-");
 				}
 			}
 		}

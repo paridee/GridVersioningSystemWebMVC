@@ -22,12 +22,14 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import grid.entities.Goal;
 import grid.entities.Grid;
 import grid.entities.GridElement;
+import grid.entities.GridElement.State;
 import grid.interfaces.services.ConflictService;
 import grid.interfaces.services.GridElementService;
 import grid.interfaces.services.GridService;
 import grid.modification.elements.GridElementModification;
 import grid.modification.elements.Modification;
 import grid.modification.elements.ObjectModificationService;
+import grid.modification.grid.Conflict.Type;
 import it.paridelorenzo.ISSSR.ModificationController;
 
 /**
@@ -157,6 +159,7 @@ public class GridModificationService {
 	}
 	
 	public Grid applyModifications(List<Modification> mods,Grid latestGrid,ArrayList<String> modifiedObjectLabels) throws Exception{
+		Grid supplied	=	latestGrid;		//will be used late after re-assignment
 		for(int i=0;i<mods.size();i++){
 			System.out.println("found modification "+mods.get(i).toString());
 		}
@@ -164,15 +167,7 @@ public class GridModificationService {
 			return null;
 		}
 		else{
-			Grid 						newVersion	=	new Grid();
-			ArrayList<Goal> mainGoalsCopy	=	new ArrayList<Goal>();
-			List<Goal> gridMainGoals	=	latestGrid.getMainGoals(); //a direct reference creates errors in hibernate (shared reference to a collection)	
-			for(int i=0;i<gridMainGoals.size();i++){
-				mainGoalsCopy.add(gridMainGoals.get(i));
-			}
-			newVersion.setMainGoals(mainGoalsCopy);
-			newVersion.setProject(latestGrid.getProject());
-			newVersion.setVersion(latestGrid.getVersion()+1);
+			Grid newVersion	=	this.gridService.createStubUpgrade(latestGrid);
 //			HashMap<String,GridElement> addedElements	=	new HashMap<String,GridElement>();
 //			//saves all new items
 //			for(int i=0;i<mods.size();i++){
@@ -181,29 +176,82 @@ public class GridModificationService {
 //					addedElements.put(insertion.getLabel(), insertion);
 //				}
 //			}
+			ArrayList<GridElementModification>	minorNotConflict	=	new ArrayList<GridElementModification>();
 			for(int i=0;i<mods.size();i++){
 				HashMap<String,GridElement> elements	=	newVersion.obtainAllEmbeddedElements();
 				Modification 	aMod	=	mods.get(i);
 				GridElement 	subj;
-				this.logger.info(aMod.toString());
 				if(aMod instanceof GridElementModification){
 					subj	=	elements.get(((GridElementModification) aMod).getSubjectLabel());
 					logger.info("Grid Element Modification: involved class "+subj.getClass()+" label "+subj.getLabel()+" label in mod "+((GridElementModification) aMod).getSubjectLabel());
-					if(Modification.minorUpdateClass.contains(subj.getClass())){
-						aMod.setModificationType(Modification.Type.Minor);
-					}
-					else{
-						aMod.setModificationType(Modification.Type.Major);
-					}
 					//if is already in new grid use this one...
 					if(newVersion.obtainAllEmbeddedElements().containsKey(((GridElementModification) aMod).getSubjectLabel())){
 						subj	=	newVersion.obtainAllEmbeddedElements().get(((GridElementModification) aMod).getSubjectLabel());
 					}
-					if(elements.containsKey(((GridElementModification) aMod).getSubjectLabel())){
-						GridElement cloned	=	subj.clone();
-						cloned.setVersion(subj.getVersion()+1);
-						((GridElementModification) aMod).apply(cloned, newVersion);
-						newVersion	=	this.gridService.updateGridElement(newVersion, cloned,false,false);
+					if(Modification.minorUpdateClass.contains(subj.getClass())){
+						if(!modifiedObjectLabels.contains(subj.getLabel())){
+							minorNotConflict.add((GridElementModification)aMod);
+						}
+					}
+				}
+			}
+			//remove from previous and apply
+			for(int i=0;i<minorNotConflict.size();i++){
+				HashMap<String,GridElement> elements	=	newVersion.obtainAllEmbeddedElements();
+				newVersion	=	this.applyAModification(minorNotConflict.get(i),newVersion,elements);
+				mods.remove(minorNotConflict.get(i));
+			}
+			this.updateVersionNumbers(latestGrid,newVersion);
+			this.gridService.addGrid(newVersion);
+			latestGrid	=	newVersion;
+			newVersion	=	this.gridService.createStubUpgrade(newVersion);
+			for(int i=0;i<mods.size();i++){
+				HashMap<String,GridElement> elements	=	newVersion.obtainAllEmbeddedElements();
+				Modification 	aMod	=	mods.get(i);
+				this.logger.info(aMod.toString());
+				if(aMod instanceof GridElementModification){
+					GridElement 	subj;
+					String subjLabel	=	((GridElementModification) aMod).getSubjectLabel();
+					subj	=	elements.get(subjLabel);
+					logger.info("Grid Element Modification: involved class "+subj.getClass()+" label "+subj.getLabel()+" label in mod "+((GridElementModification) aMod).getSubjectLabel());
+					//if is already in new grid use this one...
+					if(newVersion.obtainAllEmbeddedElements().containsKey(subjLabel)){
+						subj	=	newVersion.obtainAllEmbeddedElements().get(subjLabel);
+					}
+					if(elements.containsKey(subjLabel)){
+						this.applyAModification(((GridElementModification) aMod), newVersion, elements);
+					}
+					if(Modification.minorUpdateClass.contains(subj.getClass())){	//is a minor mod
+						if(modifiedObjectLabels.contains(subjLabel)){				//if is in conflict
+							GridElement modified	=	newVersion.obtainAllEmbeddedElements().get(subjLabel);
+							modified.setState(State.MINOR_CONFLICTING);
+							//TODO send email for conflict
+							//Conflict aConflict	=	new Conflict();
+							//ArrayList<GridElement> conflicting	= new ArrayList<GridElement>();
+							//conflicting.add(modified);
+							//aConflict.setConflictState(Conflict.State.PENDING);
+							//aConflict.setConflictType(Type.MINOR);
+							//this.conflictService.addConflict(aConflict);
+						}
+						
+					}
+					else if(!Modification.minorUpdateClass.contains(subj.getClass())){	//is a major conflict
+						if(modifiedObjectLabels.contains(subjLabel)){
+							GridElement modified	=	newVersion.obtainAllEmbeddedElements().get(subjLabel);
+							modified.setState(State.MAJOR_CONFLICTING);
+						}
+						else{
+							GridElement modified	=	newVersion.obtainAllEmbeddedElements().get(subjLabel);
+							//TODO CHECK SCRITTO SUL FOGLIO modified.setState(State.MAJOR_UPDATING);
+						}
+						//Conflict aConflict	=	new Conflict();
+						//ArrayList<GridElement> conflicting	= new ArrayList<GridElement>();
+						//conflicting.add(modified);
+						//TODO find other conflicting objects and update state o all other elements involved
+						//aConflict.setConflictState(Conflict.State.PENDING);
+						//aConflict.setConflictType(Type.MAJOR);
+						//aConflict.setConflicting(conflicting);
+						//this.conflictService.addConflict(aConflict);
 					}
 					else return null;
 				}
@@ -215,60 +263,56 @@ public class GridModificationService {
 					this.logger.info("manage this case "+aMod.toString());
 				}
 			}
-			HashMap<String,GridElement> oldElements	=	latestGrid.obtainAllEmbeddedElements();
-			HashMap<String,GridElement> newElements	=	newVersion.obtainAllEmbeddedElements();
-			java.util.Iterator<String> anIt	=	newElements.keySet().iterator();
-			while(anIt.hasNext()){
-				String key	=	anIt.next();
-				if(oldElements.containsKey(key)){
-					GridElement oldElement 	=	oldElements.get(key);
-					GridElement newElement 	=	newElements.get(key);
-					if(newElement.getVersion()>oldElement.getVersion()){
-						newElement.setVersion(oldElement.getVersion()+1);
-						//if is minorupdate...
-						if(Modification.minorUpdateClass.contains(newElement.getClass())){
-							if(!this.gridElementService.isAddUpdate(oldElement, newElement)){
-								if(modifiedObjectLabels.contains(newElement.getLabel())){
-									//is a conflict
-									Conflict aConflict	=	new Conflict();
-									aConflict.setConflictState(Conflict.State.PENDING);
-									aConflict.setConflictType(Conflict.Type.MINOR);
-									newElement.setState(GridElement.State.MINOR_UPDATING);
-									ArrayList<GridElement> elementList	=	new ArrayList<GridElement>();
-									elementList.add(latestGrid.obtainAllEmbeddedElements().get(newElement.getLabel()));
-									elementList.add(newElement);
-									aConflict.setConflicting(elementList);
-									this.conflictService.addConflict(aConflict);
-								}
-							}	
-						}
-						else{//is major update
-							if(!this.gridElementService.isAddUpdate(oldElement, newElement)){
-								if(modifiedObjectLabels.contains(newElement.getLabel())){
-									//is a conflict
-									Conflict aConflict	=	new Conflict();
-									aConflict.setConflictState(Conflict.State.PENDING);
-									aConflict.setConflictType(Conflict.Type.MINOR);
-									newElement.setState(GridElement.State.MINOR_UPDATING);
-									ArrayList<GridElement> elementList	=	new ArrayList<GridElement>();
-									elementList.add(latestGrid.obtainAllEmbeddedElements().get(newElement.getLabel()));
-									elementList.add(newElement);
-									aConflict.setConflicting(elementList);
-									this.conflictService.addConflict(aConflict);
-								}
-							}
-						}
-					}
-					else{
-						newElement.setVersion(1);
-					}
-				}
-			}
+			this.updateVersionNumbers(latestGrid,newVersion);
+			this.gridService.addGrid(newVersion);
 			logger.info("mods summary");
 			for(int i=0;i<mods.size();i++){
 				logger.info(mods.get(i).toString());
 			}
 			return newVersion;
 		}
+	}
+
+	private void updateVersionNumbers(Grid latestGrid, Grid newVersion) {
+		HashMap<String,GridElement> oldElements	=	latestGrid.obtainAllEmbeddedElements();
+		HashMap<String,GridElement> newElements	=	newVersion.obtainAllEmbeddedElements();
+		java.util.Iterator<String> anIt	=	newElements.keySet().iterator();
+		while(anIt.hasNext()){
+			String key	=	anIt.next();
+			if(oldElements.containsKey(key)){
+				GridElement oldElement 	=	oldElements.get(key);
+				GridElement newElement 	=	newElements.get(key);
+				if(newElement.getVersion()>oldElement.getVersion()){
+					newElement.setVersion(oldElement.getVersion()+1);
+				}
+				else{
+					newElement.setVersion(1);
+				}
+			}
+		}
+	}
+
+	private Grid applyAModification(GridElementModification gridElementModification, Grid newVersion,HashMap<String,GridElement> elements) throws Exception {
+		GridElement 	subj;
+		subj	=	elements.get(gridElementModification.getSubjectLabel());
+		logger.info("Grid Element Modification: involved class "+subj.getClass()+" label "+subj.getLabel()+" label in mod "+gridElementModification.getSubjectLabel());
+		//if is already in new grid use this one...
+		if(newVersion.obtainAllEmbeddedElements().containsKey(gridElementModification.getSubjectLabel())){
+			subj	=	newVersion.obtainAllEmbeddedElements().get(gridElementModification.getSubjectLabel());
+		}
+		if(elements.containsKey(gridElementModification.getSubjectLabel())){
+			GridElement cloned	=	subj.clone();
+			cloned.setVersion(subj.getVersion()+1);
+			gridElementModification.apply(cloned, newVersion);
+			if(!Modification.minorUpdateClass.contains(cloned.getClass())){
+				cloned.setState(State.MAJOR_UPDATING);
+				logger.info("found major update");
+			}
+			else{
+				logger.info("found minor update");
+			}
+			newVersion	=	this.gridService.updateGridElement(newVersion, cloned,false,false);
+		}
+		return newVersion;
 	}
 }

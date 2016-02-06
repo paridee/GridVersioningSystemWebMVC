@@ -131,8 +131,6 @@ public class TestController {
 		s2goals.add(quarto);
 		s2.setGoalList(s2goals);
 		System.out.print(aFactory.obtainJson(newGrid, JSONType.FIRST,refVer));
-		
-		
 		return "home";
 	}
 	

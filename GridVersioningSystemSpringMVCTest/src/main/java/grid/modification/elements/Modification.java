@@ -22,16 +22,8 @@ public abstract class Modification {
 		add(Question.class);
 		add(Metric.class);
 	}};
-	public enum Type{Major,Minor};
-	
-	private Type 				modificationType;
+
 	private List<Practitioner> 	responsibles;
-	public Type getModificationType() {
-		return modificationType;
-	}
-	public void setModificationType(Type modificationType) {
-		this.modificationType = modificationType;
-	}
 	public List<Practitioner> getResponsibles() {
 		return responsibles;
 	}
