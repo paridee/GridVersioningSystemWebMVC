@@ -103,6 +103,20 @@ public class GridElementDAOImpl implements GridElementDao {
 		}
 		logger.info(g.getClass().getName()+" deleted successfully");
 	}
+	
+	/**
+	 * {@inheritDoc}
+	 */
+	@SuppressWarnings({ "rawtypes", "unchecked" })
+	@Override
+	public List<GridElement> getElementByState(String state) {
+		Session session				=	this.sessionFactory.getCurrentSession();
+		//List<GridElement> gElList	=	session.createQuery("from "+table+" where label = '"+id+"'").list();
+		for(GridElement g : gElList){
+			logger.info("GridElement List:"+g);
+		}
+		return gElList;
+	}
 
 
 }

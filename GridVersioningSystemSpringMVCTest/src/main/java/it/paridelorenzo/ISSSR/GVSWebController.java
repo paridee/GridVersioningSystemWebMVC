@@ -68,6 +68,24 @@ public class GVSWebController {
 		model.addAttribute("pageTitle", "Grids Versioning System");
 		return "GVShome";
     }
+	@RequestMapping(value = "/majorpending", method = RequestMethod.GET)
+    public String majorpendingView(Model model) {
+		model.addAttribute("pageTitle", "Grids Versioning System");
+		//get lista major updates (da approvare o rigettare)
+		return "majorpending";
+    }
+	@RequestMapping(value = "/majorcolliding", method = RequestMethod.GET)
+    public String majorcollidingView(Model model) {
+		model.addAttribute("pageTitle", "Grids Versioning System");
+		//get lista colliding major updates
+		return "majorcolliding";
+    }
+	@RequestMapping(value = "/minorcolliding", method = RequestMethod.GET)
+    public String minorcollidingView(Model model) {
+		model.addAttribute("pageTitle", "Grids Versioning System");
+		//get lista colliding minor updates
+		return "minorcolliding";
+    }
 	
 	@RequestMapping(value = "/grids", method = RequestMethod.GET)
     public String listAllGrids(Model model) {
