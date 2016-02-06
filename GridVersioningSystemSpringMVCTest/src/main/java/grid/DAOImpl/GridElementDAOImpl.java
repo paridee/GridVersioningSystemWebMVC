@@ -111,7 +111,8 @@ public class GridElementDAOImpl implements GridElementDao {
 	@Override
 	public List<GridElement> getElementByState(String state) {
 		Session session				=	this.sessionFactory.getCurrentSession();
-		//List<GridElement> gElList	=	session.createQuery("from "+table+" where label = '"+id+"'").list();
+		List<GridElement> gElList	=	null;
+		//TODO
 		for(GridElement g : gElList){
 			logger.info("GridElement List:"+g);
 		}
