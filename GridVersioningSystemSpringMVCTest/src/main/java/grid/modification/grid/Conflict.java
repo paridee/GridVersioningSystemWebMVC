@@ -18,6 +18,7 @@ import grid.entities.GridElement;
 public class Conflict {
 	public enum State{PENDING,SOLVED,ABORTED};
 	public enum Type{MAJOR,MINOR};
+	//ATTUALE,ROOT VERSION, LATEST VERSION
 	private ArrayList<GridElement> conflicting;
 	private State 	conflictState;
 	private Type 	conflictType;

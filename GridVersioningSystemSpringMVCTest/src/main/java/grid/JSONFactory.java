@@ -177,18 +177,18 @@ public class JSONFactory {
 	/**
  	 * Returns all the modifications defined in this json
 	 * @param json json string to be parsed
-	 * @param refGrid reference grid
+	 * @param latestGrid reference grid
 	 * @return Modification array
 	 * @throws JSONException in case of wrong format
 	 */
 	@SuppressWarnings({ "rawtypes", "unchecked" })
-	public ArrayList<Modification> loadModificationJson(String json,Grid refGrid) throws JSONException{
+	public ArrayList<Modification> loadModificationJson(String json,Grid latestGrid) throws JSONException{
 		ArrayList<Modification> response	=	new ArrayList<Modification>();
 		JSONObject	obj;
 		JSONObject	mods;
 		obj											=	new JSONObject(json);
 		mods										=	(JSONObject)obj.get("modifiche");
-		HashMap<String,GridElement> gridElements	=	refGrid.obtainAllEmbeddedElements();
+		HashMap<String,GridElement> gridElements	=	latestGrid.obtainAllEmbeddedElements();
 		ArrayList<JSONArray>	changesArray		=	new ArrayList<JSONArray>();
 		changesArray.add((JSONArray)mods.get("goals"));
 		changesArray.add((JSONArray)mods.get("metrics"));
@@ -295,12 +295,17 @@ public class JSONFactory {
 							}
 							else if(GridElement.class.isAssignableFrom(aField.getType())){
 								if(attrName.equals("measurementGoal")){
-									MeasurementGoal aMg	=	loadMeasurementGoalFromJson(currentObj.getString(JSONname), Utils.convertHashMap(gridElements));
-									ObjectFieldModification aModification	=	new ObjectFieldModification();
-									aModification.setFieldToBeChanged(attrName);
-									aModification.setSubjectLabel(objLabel);
-									aModification.setNewValue(aMg);
-									response.add(aModification);
+									//logger.info("measurement goal id "+currentObj.get(JSONname).toString());
+									
+									//label of measurement goal has changed... 
+									if(!((Goal)oldObj).getMeasurementGoal().getLabel().equals(currentObj.get(JSONname).toString())){
+										MeasurementGoal aMg	=	(MeasurementGoal)gridElements.get(currentObj.get(JSONname).toString());
+										ObjectFieldModification aModification	=	new ObjectFieldModification();
+										aModification.setFieldToBeChanged(attrName);
+										aModification.setSubjectLabel(objLabel);
+										aModification.setNewValue(aMg);
+										response.add(aModification);	
+									}
 								}
 							}
 							else{
@@ -330,7 +335,7 @@ public class JSONFactory {
 	 * @param loaded objects already loaded
 	 * @return proper object
 	 */
-	private static GridElement loadGridObj(String objectStr,HashMap<String,Object> loaded) {
+	public static GridElement loadGridObj(String objectStr,HashMap<String,Object> loaded) {
 		JSONObject object	=	new JSONObject(objectStr);
 		GridElement loadedGE	=	null;
 		if(object.has("goalId")){

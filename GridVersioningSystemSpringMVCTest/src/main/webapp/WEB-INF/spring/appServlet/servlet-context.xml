@@ -75,5 +75,10 @@
    	<beans:bean id="conflictService" class="grid.services.ConflictServiceImpl">
         <beans:property name="conflictDAO" ref="conflictDAO"></beans:property>
     </beans:bean>
+    
+    <beans:bean id="gridModificationService" class="grid.modification.grid.GridModificationService">
+        <beans:property name="gridService" ref="gridService"></beans:property>
+        <beans:property name="gridElementService" ref="gridElementService"></beans:property>
+    </beans:bean>
 	
 </beans:beans>
