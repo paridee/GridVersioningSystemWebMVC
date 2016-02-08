@@ -27,7 +27,7 @@ import grid.interfaces.Updatable;
 @Inheritance(strategy=InheritanceType.TABLE_PER_CLASS)
 public abstract class GridElement implements Updatable{
 	public enum State{
-		WORKING, MAJOR_UPDATING,MAJOR_CONFLICTING, MINOR_CONFLICTING, FINAL_KO
+		WORKING, MAJOR_UPDATING,MAJOR_CONFLICTING, MINOR_CONFLICTING, FINAL_KO, ABORTED
 	}
 	protected List<Practitioner> authors	=	new ArrayList<Practitioner>();
 	

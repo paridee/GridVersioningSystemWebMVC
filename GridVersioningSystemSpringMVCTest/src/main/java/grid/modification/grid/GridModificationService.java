@@ -19,10 +19,12 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 
+import grid.Utils;
 import grid.entities.Goal;
 import grid.entities.Grid;
 import grid.entities.GridElement;
 import grid.entities.GridElement.State;
+import grid.entities.Practitioner;
 import grid.interfaces.services.ConflictService;
 import grid.interfaces.services.GridElementService;
 import grid.interfaces.services.GridService;
@@ -269,13 +271,22 @@ public class GridModificationService {
 						}
 						else return null;
 						if(!sentNotificationLabel.contains(modified.getLabel())){
-							this.sendNotification(modified);
+							this.sendNotification(modified,newVersion);
 							sentNotificationLabel.add(modified.getLabel());
 						}
 					}
 					else if(aMod instanceof GridModification){
 						GridModification aGridModification	=	(GridModification)aMod;
 						aGridModification.apply(newVersion);
+						if(aMod instanceof GridElementAdd){
+							GridElementAdd anAddition	=	(GridElementAdd)aMod;
+							if(!sentNotificationLabel.contains(anAddition.getAppendedObjectLabel())){
+								GridElement newElement	=	anAddition.getGridElementAdded();
+								newElement.setState(GridElement.State.MAJOR_UPDATING);
+								this.sendNotification(newElement,newVersion);
+								sentNotificationLabel.add(anAddition.getAppendedObjectLabel());
+							}
+						}
 					}
 					else{
 						this.logger.info("manage this case "+aMod.toString());
@@ -292,7 +303,20 @@ public class GridModificationService {
 		}
 	}
 
-	private void sendNotification(GridElement modified) {
+	private void sendNotification(GridElement modified,Grid aGrid) {
+		ArrayList<Practitioner> responsibles	=	new ArrayList<Practitioner>();
+		if(Modification.minorUpdateClass.contains(modified.getClass())){
+			responsibles.addAll(modified.getAuthors());
+		}
+		else{
+			responsibles.add(aGrid.getProject().getProjectManager());
+		}
+		for(int i=0;i<responsibles.size();i++){
+			if(responsibles.get(i)!=null){
+				this.logger.info("sending email for "+modified.getLabel()+" to "+responsibles.get(i).getEmail());
+				Utils.mailSender("GQM+S Versioning alert", "Dear "+responsibles.get(i).getName()+", the following Grid element: "+(modified.getClass().getSimpleName())+" "+modified.getLabel()+" is in state "+modified.getState()+" and requires an action, please check at the following link http://blablabla/pippo/pasquale/"+modified.getLabel(), responsibles.get(i).getEmail());
+			}
+		}
 		this.logger.info("#~#~NOTIFICATION STUB for item "+modified.getLabel()+" in state "+modified.getState());
 	}
 
@@ -328,6 +352,11 @@ public class GridModificationService {
 			cloned.setVersion(subj.getVersion()+1);
 			gridElementModification.apply(cloned, newVersion);
 			newVersion	=	this.gridService.updateGridElement(newVersion, cloned,false,false);
+			//if element was pending in previous version declare aborted
+			if(subj.getState()==GridElement.State.MAJOR_CONFLICTING||subj.getState()==GridElement.State.MAJOR_UPDATING||subj.getState()==GridElement.State.MINOR_CONFLICTING){
+				subj.setState(GridElement.State.ABORTED);
+				this.gridElementService.updateGridElement(subj);
+			}
 		}
 		return newVersion;
 	}

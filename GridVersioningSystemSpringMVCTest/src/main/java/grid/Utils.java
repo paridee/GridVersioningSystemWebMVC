@@ -29,7 +29,7 @@ import grid.entities.GridElement;
 public class Utils {
 	
 	private static final Logger logger		=	LoggerFactory.getLogger(Utils.class);
-	private static final String SMTPHOST	=	"mail.smtp.host";
+	private static final String SMTPHOST	=	"smtps.aruba.it";
 	private static final String SMTPPORT	=	"465";
 	protected static final String SMTPUSER	=	"test@agriturismodegliacquedotti.it";
 	protected static final String SMTPPASS	=	"fujifilm";

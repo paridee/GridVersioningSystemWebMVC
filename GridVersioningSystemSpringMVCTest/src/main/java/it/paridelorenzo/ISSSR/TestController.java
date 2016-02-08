@@ -28,6 +28,7 @@ import grid.entities.Strategy;
 import grid.interfaces.services.ConflictService;
 import grid.interfaces.services.GridElementService;
 import grid.interfaces.services.GridService;
+import grid.interfaces.services.PractitionerService;
 import grid.interfaces.services.ProjectService;
 
 @Controller
@@ -37,6 +38,7 @@ public class TestController {
 	private ProjectService		projectService;
 	private JSONFactory 		jFact;
 	private ConflictService		conflictService;
+	private PractitionerService practitionerService;
 	
 	@Autowired(required=true)
 	@Qualifier(value="conflictService")
@@ -66,7 +68,14 @@ public class TestController {
 	
 	@RequestMapping(value = "/step1", method = RequestMethod.GET)
 	public String homeGri(Locale locale, Model model) {
+		Practitioner pm	=	new Practitioner();
+		pm.setEmail("paride.casulli@gmail.com");
+		pm.setName("Paride Casulli");
+		Practitioner lorenzo	=	new Practitioner();
+		lorenzo.setEmail("lorenzo.labanca@gmail.com");
+		lorenzo.setName("Lorenzo La Banca");
 		Project first	=	new Project();
+		first.setProjectManager(pm);
 		first.setDescription("primo");
 		first.setProjectId("first");
 		Goal aGoal	=	new Goal();
@@ -124,6 +133,10 @@ public class TestController {
 		Goal quarto	=	new Goal();
 		quarto.setLabel("g093");
 		quarto.setDescription("ancora un altro");
+		ArrayList<Practitioner> authors	=	new ArrayList<Practitioner>();
+		authors.add(pm);
+		authors.add(lorenzo);
+		quarto.setAuthors(authors);
 		newGrid.getMainGoals().add(quarto);
 		s2	=	(Strategy)this.gridElementService.upgradeGridElement(s2);
 		newGrid	=	this.gridService.updateGridElement(newGrid, s2, false, false);
@@ -134,7 +147,13 @@ public class TestController {
 		return "home";
 	}
 	
-     
+	//TODO remove test
+	@RequestMapping(value = "/testpad", method = RequestMethod.GET)
+	public String homeGridpad(Locale locale, Model model) { 
+	return "firepadtest";
+	}
+	
+	
 	//TODO remove test
 	@RequestMapping(value = "/testGrid", method = RequestMethod.GET)
 	public String homeGrid(Locale locale, Model model) {
