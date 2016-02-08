@@ -64,4 +64,11 @@ public interface GridElementService {
 	 */
 	public boolean isAddUpdate(GridElement oldElement,GridElement newElement);
 	
+	/**
+	 * Obtain all elements with the same label that are on pending state
+	 * @param subjLabel label of the object
+	 * @param class1 class of the object
+	 */
+	public List<GridElement> getElementByLabelAndState(String subjLabel, Class<? extends GridElement> class1,GridElement.State state);
+	
 }

@@ -1,6 +1,7 @@
 package grid.services;
 
 import java.lang.reflect.Field;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -173,6 +174,22 @@ public class GridElementServiceImpl implements GridElementService {
 			}
 		}
 		return true;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public List<GridElement> getElementByLabelAndState(String subjLabel, Class<? extends GridElement> class1,GridElement.State aState) {
+		ArrayList<GridElement> pendingElement	=	new ArrayList<GridElement>();
+		List<GridElement> allElements			=	this.gridElementDao.getElementLog(subjLabel, class1.getSimpleName());
+		for(GridElement el : pendingElement){
+			if(el.getState()==aState){
+				pendingElement.add(el);
+			}
+		}
+		return pendingElement;
+		
 	}
 	
 }
