@@ -2,9 +2,8 @@ package grid.interfaces.services;
 
 import java.util.List;
 
-import org.json.JSONObject;
-
 import grid.entities.GridElement;
+import grid.entities.Project;
 /**
  * Interface defining methods for a Grid element service, following CRUD operations and more
  * @author Paride Casulli
@@ -69,6 +68,7 @@ public interface GridElementService {
 	 * @param subjLabel label of the object
 	 * @param class1 class of the object
 	 */
-	public List<GridElement> getElementByLabelAndState(String subjLabel, Class<? extends GridElement> class1,GridElement.State state);
+	public List<GridElement> getElementByLabelAndState(Project prj, String subjLabel, Class<? extends GridElement> class1,GridElement.State state);
+	public List<GridElement> getElementByState(Project prj, Class<? extends GridElement> class1,GridElement.State state);
 	
 }

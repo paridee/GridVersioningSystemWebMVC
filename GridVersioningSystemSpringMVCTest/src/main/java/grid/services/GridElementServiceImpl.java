@@ -21,6 +21,7 @@ import org.springframework.transaction.annotation.Transactional;
 import grid.entities.GridElement;
 import grid.entities.MeasurementGoal;
 import grid.entities.Practitioner;
+import grid.entities.Project;
 import grid.interfaces.DAO.GridElementDao;
 import grid.interfaces.services.GridElementService;
 /**
@@ -180,7 +181,7 @@ public class GridElementServiceImpl implements GridElementService {
 	 * {@inheritDoc}
 	 */
 	@Override
-	public List<GridElement> getElementByLabelAndState(String subjLabel, Class<? extends GridElement> class1,GridElement.State aState) {
+	public List<GridElement> getElementByLabelAndState(Project prj, String subjLabel, Class<? extends GridElement> class1,GridElement.State aState) {
 		ArrayList<GridElement> pendingElement	=	new ArrayList<GridElement>();
 		List<GridElement> allElements			=	this.gridElementDao.getElementLog(subjLabel, class1.getSimpleName());
 		for(GridElement el : pendingElement){
@@ -191,5 +192,10 @@ public class GridElementServiceImpl implements GridElementService {
 		return pendingElement;
 		
 	}
+	public List<GridElement> getElementByState(Project prj, Class<? extends GridElement> class1,GridElement.State state){
+		
+		return null;
+	}
+
 	
 }
