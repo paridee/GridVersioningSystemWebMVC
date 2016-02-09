@@ -19,6 +19,7 @@ import grid.JSONFactory;
 import grid.JSONFactory.JSONType;
 import grid.entities.Goal;
 import grid.entities.Grid;
+import grid.entities.GridElement;
 import grid.entities.MeasurementGoal;
 import grid.entities.Metric;
 import grid.entities.Practitioner;
@@ -30,6 +31,7 @@ import grid.interfaces.services.GridElementService;
 import grid.interfaces.services.GridService;
 import grid.interfaces.services.PractitionerService;
 import grid.interfaces.services.ProjectService;
+import grid.modification.grid.GridModificationService;
 
 @Controller
 public class TestController {
@@ -39,6 +41,13 @@ public class TestController {
 	private JSONFactory 		jFact;
 	private ConflictService		conflictService;
 	private PractitionerService practitionerService;
+	private GridModificationService gridModificationService;
+	
+	@Autowired(required=true)
+	@Qualifier(value="gridModificationService")
+	public void setGridModificationService(GridModificationService gridModificationService) {
+		this.gridModificationService = gridModificationService;
+	}
 	
 	@Autowired(required=true)
 	@Qualifier(value="conflictService")
@@ -152,6 +161,76 @@ public class TestController {
 	public String homeGridpad(Locale locale, Model model) { 
 	return "firepadtest";
 	}
+	
+	//TODO remove test
+	@RequestMapping(value = "/testStep2", method = RequestMethod.GET)
+	public String homeGridpad2(Locale locale, Model model) { 
+		Grid aGrid		=	new Grid();
+		Goal example	=	new Goal();
+		Practitioner paride	=	new Practitioner();
+		paride.setEmail("paride.casulli@gmail.com");
+		paride.setName("Paride");
+		Project aProject	=	new Project();
+		aProject.setDescription("prova");
+		aProject.setProjectId("prj1");
+		aProject.setProjectManager(paride);
+		aGrid.setProject(aProject);
+		example.setAssumption("assunzione");
+		example.setDescription("pippo");
+		example.setLabel("unGoal");
+		ArrayList<Goal> mainG	=	new ArrayList<Goal>();
+		mainG.add(example);
+		aGrid.setMainGoals(mainG);
+		this.gridService.addGrid(aGrid);
+		Grid prev	=	aGrid;
+		aGrid	=	this.gridService.createStubUpgrade(aGrid);
+		aGrid.setVersion(prev.getVersion());
+		example	=	(Goal)example.clone();
+		Strategy aStrategy	=	new Strategy();
+		ArrayList<Practitioner> authors	=	new ArrayList<Practitioner>();
+		authors.add(paride);
+		aStrategy.setLabel("strategyLabel");
+		aStrategy.setDescription("prova");
+		aStrategy.setAuthors(authors);
+		Strategy strategy2	=	new Strategy();
+		strategy2.setLabel("secondStrategy");
+		strategy2.setDescription("strategyyyyyyy");
+		ArrayList<Strategy> strategies	=	new ArrayList<Strategy>();
+		strategies.add(aStrategy);
+		strategies.add(strategy2);
+		example.setStrategyList(strategies);
+		Goal secondGoal	=	new Goal();
+		secondGoal.setLabel("secondgoallabel");
+		secondGoal.setDescription("descrizione prima");
+		secondGoal.setAuthors(authors);
+		ArrayList<Goal> someGoals	=	new ArrayList<Goal>();
+		someGoals.add(secondGoal);
+		aStrategy.setGoalList(someGoals);
+		try {
+			Grid updated	=	this.gridModificationService.applyAModificationToASingleElement(prev, example);
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		int nsleep	=	0;
+		while(nsleep<30){
+			this.logger.info("wait "+(30-nsleep)+"seconds");
+			try {
+				nsleep	=	nsleep+1;
+				Thread.sleep(1000);
+			} catch (InterruptedException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			System.out.println(secondGoal.getDescription());
+			Goal sameElement	=	(Goal)this.gridElementService.getElementById(secondGoal.getIdElement(), secondGoal.getClass().getSimpleName());
+			System.out.println(sameElement.getDescription());
+		}
+		
+		
+		return "home";
+	}
+	
 	
 	
 	//TODO remove test

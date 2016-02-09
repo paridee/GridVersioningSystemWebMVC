@@ -71,6 +71,8 @@ public class GridElementDAOImpl implements GridElementDao {
 			return null;
 		}
 		GridElement g	=	(GridElement) returnres.get(0) ;
+		this.logger.info("refreshing "+g);
+		session.refresh(g);
 		return g;
 		
 		

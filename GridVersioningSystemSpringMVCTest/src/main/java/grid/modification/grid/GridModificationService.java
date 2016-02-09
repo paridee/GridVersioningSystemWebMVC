@@ -326,14 +326,14 @@ public class GridModificationService {
 		java.util.Iterator<String> anIt	=	newElements.keySet().iterator();
 		while(anIt.hasNext()){
 			String key	=	anIt.next();
+			this.logger.info("fixing version number element "+key);
 			if(oldElements.containsKey(key)){
+				this.logger.info("element "+key+" found in old set");
 				GridElement oldElement 	=	oldElements.get(key);
 				GridElement newElement 	=	newElements.get(key);
 				if(newElement.getVersion()>oldElement.getVersion()){
+					this.logger.info("element "+key+" fixing version from "+newElement.getVersion()+" to "+oldElement.getVersion()+1);
 					newElement.setVersion(oldElement.getVersion()+1);
-				}
-				else{
-					newElement.setVersion(1);
 				}
 			}
 		}
@@ -367,19 +367,22 @@ public class GridModificationService {
 			throw new Exception("object not found in current Grid");
 		}
 		else{
+			Grid updated	=	aGrid;
 			List<Modification> mods	=	new ArrayList<Modification>();
 			mods.addAll(ObjectModificationService.getModification(oldVersion, newGridElement));
+			updated	=	this.gridService.createStubUpgrade(aGrid);
 			if(mods.size()>0){
-				aGrid	=	this.gridService.createStubUpgrade(aGrid);
-				aGrid.setVersion(aGrid.getVersion()+1);
 				for(Modification aMod : mods){
+					this.logger.info("found modification "+aMod.toString());
 					if(aMod instanceof GridElementModification){
-						aGrid	=	this.applyAModification((GridElementModification)aMod, aGrid, aGrid.obtainAllEmbeddedElements());	
+						this.logger.info("apply modification "+aMod.toString());
+						updated	=	this.applyAModification((GridElementModification)aMod, updated, updated.obtainAllEmbeddedElements());
 					}
 				}	
-				this.gridService.addGrid(aGrid);
+				this.updateVersionNumbers(aGrid, updated);
+				this.gridService.addGrid(updated);
 			}
-			return aGrid;
+			return updated;
 		}
 	}
 }
