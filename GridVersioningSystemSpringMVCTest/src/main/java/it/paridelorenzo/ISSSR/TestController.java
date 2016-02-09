@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 
 import grid.JSONFactory;
+import grid.Utils;
 import grid.JSONFactory.JSONType;
 import grid.entities.Goal;
 import grid.entities.Grid;
@@ -217,7 +218,7 @@ public class TestController {
 			this.logger.info("wait "+(30-nsleep)+"seconds");
 			try {
 				nsleep	=	nsleep+1;
-				Thread.sleep(1000);
+				Thread.sleep(1);
 			} catch (InterruptedException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
@@ -226,9 +227,11 @@ public class TestController {
 			Goal sameElement	=	(Goal)this.gridElementService.getElementById(secondGoal.getIdElement(), secondGoal.getClass().getSimpleName());
 			System.out.println(sameElement.getDescription());
 		}
-		
-		
-		return "home";
+		ArrayList<GridElement> parameter	=	new ArrayList<GridElement>();
+		parameter.addAll(strategies);
+		String pad	=	Utils.generateEditor(parameter);
+		model.addAttribute("pad", pad);
+		return "firepadtest";
 	}
 	
 	
