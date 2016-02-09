@@ -192,10 +192,7 @@ public class GridElementServiceImpl implements GridElementService {
 		return pendingElement;
 		
 	}
-	public List<GridElement> getElementByState(Project prj, Class<? extends GridElement> class1,GridElement.State state){
-		
-		return null;
-	}
+	
 
 	
 }

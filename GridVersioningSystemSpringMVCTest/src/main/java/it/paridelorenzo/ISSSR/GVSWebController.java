@@ -2,7 +2,11 @@ package it.paridelorenzo.ISSSR;
 
 import java.lang.reflect.Field;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import org.json.JSONObject;
 import org.slf4j.Logger;
@@ -20,6 +24,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import grid.JSONFactory;
 import grid.entities.Grid;
 import grid.entities.GridElement;
+import grid.entities.GridElement.State;
 import grid.entities.Project;
 import grid.interfaces.services.ConflictService;
 import grid.interfaces.services.GridElementService;
@@ -68,11 +73,63 @@ public class GVSWebController {
 		model.addAttribute("pageTitle", "Grids Versioning System");
 		return "GVShome";
     }
-	@RequestMapping(value = "/majorpending", method = RequestMethod.GET)
-    public String majorpendingView(Model model) {
+	@RequestMapping(value = "/resolutionDashBoard/{state}", method = RequestMethod.GET)   //stati WORKING, MAJOR_UPDATING,MAJOR_CONFLICTING, MINOR_CONFLICTING, FINAL_KO
+    public String majorpendingView(@PathVariable("state") int state,Model model) {
 		model.addAttribute("pageTitle", "Grids Versioning System");
-		//get lista major updates (da approvare o rigettare)
-		return "majorpending";
+		//get all projects
+		List<Project> projList=this.projectService.listProjects();
+		List<Project> projPending=new ArrayList<Project>();
+		Map <String, List<Grid>> projectGrids=new HashMap<>();
+		Map <String, List<GridElement>> projectGridsMajorPendingElements=new HashMap<>();
+		//for all projects get pending grid elements
+		if (projList.size()>0){
+			for (int i=0; i<projList.size(); i++){
+				List<Grid> projGrids=this.gridService.getGridLog(projList.get(i).getId());
+				List<Grid> gridPending=new ArrayList<Grid>();
+				boolean addedGrid=false;
+				for(Grid g: projGrids){
+					if(g.obtainGridState()==Grid.GridState.UPDATING){
+						//ottieni elementi in stato major pending
+						HashMap<String, GridElement> elements=g.obtainAllEmbeddedElements();
+						Set<String>	keySet		=	elements.keySet();
+						Iterator<String> anIterator	=	keySet.iterator();
+						boolean addedElement=false;
+						List<GridElement> pendingElements=new ArrayList<GridElement>();
+						while(anIterator.hasNext()){
+							String key		=	anIterator.next();
+							State aState	=	elements.get(key).getState();
+							if(aState.ordinal()	==	state){
+								pendingElements.add(elements.get(key));
+								addedElement=true;
+								
+							}
+						}
+						if(addedElement){
+							addedGrid=true;
+							gridPending.add(g);
+							String temp=projList.get(i).getId()+"-"+g.getId();
+							projectGridsMajorPendingElements.put(temp, pendingElements);
+						}
+					}
+					
+				}
+				if(addedGrid){
+					projPending.add(projList.get(i));
+					projectGrids.put(projList.get(i).getId()+"", gridPending);
+					
+					
+				}
+				
+			}
+			
+			
+		}
+		model.addAttribute("PendingProjects", projPending);
+		model.addAttribute("PendingProjectsGrids", projectGrids);
+		model.addAttribute("PendingProjectsGridsElements", projectGridsMajorPendingElements);
+		
+		System.out.println(projectGridsMajorPendingElements.toString());
+		return "resolutionDashBoard";
     }
 	@RequestMapping(value = "/majorcolliding", method = RequestMethod.GET)
     public String majorcollidingView(Model model) {
