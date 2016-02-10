@@ -249,8 +249,8 @@ public class GridModificationService {
 								modified.setState(State.MAJOR_CONFLICTING);
 							}
 							else{
-								List<GridElement> pending	=	this.gridElementService.getElementByLabelAndState(newVersion.getProject(), subjLabel,modified.getClass(),GridElement.State.MAJOR_UPDATING);
-								pending.addAll(this.gridElementService.getElementByLabelAndState(newVersion.getProject(),subjLabel, modified.getClass(), GridElement.State.MAJOR_CONFLICTING));
+								List<GridElement> pending	=	this.gridElementService.getElementByLabelAndState(newVersion.getProject(), subjLabel,modified.getClass().getSimpleName(),GridElement.State.MAJOR_UPDATING);
+								pending.addAll(this.gridElementService.getElementByLabelAndState(newVersion.getProject(),subjLabel, modified.getClass().getSimpleName(), GridElement.State.MAJOR_CONFLICTING));
 								if(pending.size()==0){
 									modified.setState(State.MAJOR_UPDATING);
 								}
