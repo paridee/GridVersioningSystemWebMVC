@@ -204,7 +204,7 @@ public class GridModificationService {
 				mods.remove(minorNotConflict.get(i));
 			}
 			if(minorNotConflict.size()>0){
-				this.updateVersionNumbers(latestGrid,newVersion);
+				this.updateVersionNumbersAndStatus(latestGrid,newVersion);
 				this.gridService.addGrid(newVersion);
 			}
 			else{
@@ -292,7 +292,7 @@ public class GridModificationService {
 						this.logger.info("manage this case "+aMod.toString());
 					}
 				}
-				this.updateVersionNumbers(latestGrid,newVersion);
+				this.updateVersionNumbersAndStatus(latestGrid,newVersion);
 				this.gridService.addGrid(newVersion);
 				logger.info("mods summary");
 				for(int i=0;i<mods.size();i++){
@@ -328,7 +328,7 @@ public class GridModificationService {
 		this.logger.info("#~#~NOTIFICATION STUB for item "+modified.getLabel()+" in state "+modified.getState());
 	}
 
-	private void updateVersionNumbers(Grid latestGrid, Grid newVersion) {
+	private void updateVersionNumbersAndStatus(Grid latestGrid, Grid newVersion) {
 		HashMap<String,GridElement> oldElements	=	latestGrid.obtainAllEmbeddedElements();
 		HashMap<String,GridElement> newElements	=	newVersion.obtainAllEmbeddedElements();
 		java.util.Iterator<String> anIt	=	newElements.keySet().iterator();
@@ -342,6 +342,10 @@ public class GridModificationService {
 				if(newElement.getVersion()>oldElement.getVersion()){
 					this.logger.info("element "+key+" fixing version from "+newElement.getVersion()+" to "+oldElement.getVersion()+1);
 					newElement.setVersion(oldElement.getVersion()+1);
+					if((oldElement.getState()==GridElement.State.MAJOR_CONFLICTING)||(oldElement.getState()==GridElement.State.MAJOR_UPDATING)||(oldElement.getState()==GridElement.State.MINOR_CONFLICTING)){
+						oldElement.setState(GridElement.State.ABORTED);
+						this.gridElementService.updateGridElement(oldElement);
+					}
 				}
 			}
 		}
@@ -387,7 +391,7 @@ public class GridModificationService {
 						updated	=	this.applyAModification((GridElementModification)aMod, updated, updated.obtainAllEmbeddedElements());
 					}
 				}	
-				this.updateVersionNumbers(aGrid, updated);
+				this.updateVersionNumbersAndStatus(aGrid, updated);
 				this.gridService.addGrid(updated);
 			}
 			return updated;
