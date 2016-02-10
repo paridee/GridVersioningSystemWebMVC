@@ -204,7 +204,7 @@ public class GridModificationService {
 				mods.remove(minorNotConflict.get(i));
 			}
 			if(minorNotConflict.size()>0){
-				this.updateVersionNumbers(latestGrid,newVersion);
+				this.updateVersionNumbersAndStatus(latestGrid,newVersion);
 				this.gridService.addGrid(newVersion);
 			}
 			else{
@@ -292,7 +292,7 @@ public class GridModificationService {
 						this.logger.info("manage this case "+aMod.toString());
 					}
 				}
-				this.updateVersionNumbers(latestGrid,newVersion);
+				this.updateVersionNumbersAndStatus(latestGrid,newVersion);
 				this.gridService.addGrid(newVersion);
 				logger.info("mods summary");
 				for(int i=0;i<mods.size();i++){
@@ -314,26 +314,38 @@ public class GridModificationService {
 		for(int i=0;i<responsibles.size();i++){
 			if(responsibles.get(i)!=null){
 				this.logger.info("sending email for "+modified.getLabel()+" to "+responsibles.get(i).getEmail());
-				Utils.mailSender("GQM+S Versioning alert", "Dear "+responsibles.get(i).getName()+", the following Grid element: "+(modified.getClass().getSimpleName())+" "+modified.getLabel()+" is in state "+modified.getState()+" and requires an action, please check at the following link http://blablabla/pippo/pasquale/"+modified.getLabel(), responsibles.get(i).getEmail());
-			}
+				if(modified.getState().equals(GridElement.State.MINOR_CONFLICTING)){
+					Utils.mailSender("GQM+S Versioning alert", "Dear "+responsibles.get(i).getName()+", the following Grid element: "+(modified.getClass().getSimpleName())+" "+modified.getLabel()+" is in state "+modified.getState()+" and requires an action, please check at the following link "+Utils.systemURL+"/MINOR_CONFLICTING/"+aGrid.getProject().getId()+"/"+modified.getClass().getSimpleName()+"/"+modified.getIdElement(), responsibles.get(i).getEmail());
+				}
+				else if(modified.getState().equals(GridElement.State.MAJOR_UPDATING)){
+					Utils.mailSender("GQM+S Versioning alert", "Dear "+responsibles.get(i).getName()+", the following Grid element: "+(modified.getClass().getSimpleName())+" "+modified.getLabel()+" is in state "+modified.getState()+" and requires an action, please check at the following link "+Utils.systemURL+"/MAJOR_UPDATING/"+aGrid.getProject().getId()+"/"+modified.getClass().getSimpleName()+"/"+modified.getIdElement(), responsibles.get(i).getEmail());
+				}
+				else if(modified.getState().equals(GridElement.State.MAJOR_CONFLICTING)){
+					Utils.mailSender("GQM+S Versioning alert", "Dear "+responsibles.get(i).getName()+", the following Grid element: "+(modified.getClass().getSimpleName())+" "+modified.getLabel()+" is in state "+modified.getState()+" and requires an action, please check at the following link "+Utils.systemURL+"/MAJOR_CONFLICTING/"+aGrid.getProject().getId()+"/"+modified.getClass().getSimpleName()+"/"+modified.getIdElement(), responsibles.get(i).getEmail());
+				}
+		}
 		}
 		this.logger.info("#~#~NOTIFICATION STUB for item "+modified.getLabel()+" in state "+modified.getState());
 	}
 
-	private void updateVersionNumbers(Grid latestGrid, Grid newVersion) {
+	private void updateVersionNumbersAndStatus(Grid latestGrid, Grid newVersion) {
 		HashMap<String,GridElement> oldElements	=	latestGrid.obtainAllEmbeddedElements();
 		HashMap<String,GridElement> newElements	=	newVersion.obtainAllEmbeddedElements();
 		java.util.Iterator<String> anIt	=	newElements.keySet().iterator();
 		while(anIt.hasNext()){
 			String key	=	anIt.next();
+			this.logger.info("fixing version number element "+key);
 			if(oldElements.containsKey(key)){
+				this.logger.info("element "+key+" found in old set");
 				GridElement oldElement 	=	oldElements.get(key);
 				GridElement newElement 	=	newElements.get(key);
 				if(newElement.getVersion()>oldElement.getVersion()){
+					this.logger.info("element "+key+" fixing version from "+newElement.getVersion()+" to "+oldElement.getVersion()+1);
 					newElement.setVersion(oldElement.getVersion()+1);
-				}
-				else{
-					newElement.setVersion(1);
+					if((oldElement.getState()==GridElement.State.MAJOR_CONFLICTING)||(oldElement.getState()==GridElement.State.MAJOR_UPDATING)||(oldElement.getState()==GridElement.State.MINOR_CONFLICTING)){
+						oldElement.setState(GridElement.State.ABORTED);
+						this.gridElementService.updateGridElement(oldElement);
+					}
 				}
 			}
 		}
@@ -367,19 +379,22 @@ public class GridModificationService {
 			throw new Exception("object not found in current Grid");
 		}
 		else{
+			Grid updated	=	aGrid;
 			List<Modification> mods	=	new ArrayList<Modification>();
 			mods.addAll(ObjectModificationService.getModification(oldVersion, newGridElement));
+			updated	=	this.gridService.createStubUpgrade(aGrid);
 			if(mods.size()>0){
-				aGrid	=	this.gridService.createStubUpgrade(aGrid);
-				aGrid.setVersion(aGrid.getVersion()+1);
 				for(Modification aMod : mods){
+					this.logger.info("found modification "+aMod.toString());
 					if(aMod instanceof GridElementModification){
-						aGrid	=	this.applyAModification((GridElementModification)aMod, aGrid, aGrid.obtainAllEmbeddedElements());	
+						this.logger.info("apply modification "+aMod.toString());
+						updated	=	this.applyAModification((GridElementModification)aMod, updated, updated.obtainAllEmbeddedElements());
 					}
 				}	
-				this.gridService.addGrid(aGrid);
+				this.updateVersionNumbersAndStatus(aGrid, updated);
+				this.gridService.addGrid(updated);
 			}
-			return aGrid;
+			return updated;
 		}
 	}
 }

@@ -35,6 +35,7 @@ public class Utils {
 	private static final String SMTPPORT	=	"465";
 	protected static final String SMTPUSER	=	"test@agriturismodegliacquedotti.it";
 	protected static final String SMTPPASS	=	"fujifilm";
+	public static String systemURL			=	"http://localhost:8080/ISSSR";
 
 	
 	/**
@@ -97,6 +98,72 @@ public class Utils {
 	        result	=	false;
 	      }
 	      return result;
+	}
+	
+	public static String generateEditor(List<GridElement> elements){
+		if(elements.size()>0){
+			String top	=	"";
+			for(int k=0;k<elements.size();k++){;
+				GridElement editingElement	=	elements.get(k);
+				top					=	top+"<div id=\""+editingElement.getLabel()+"\"><h2>"+editingElement.getClass().getSimpleName()+": "+editingElement.getLabel()+" v"+editingElement.getVersion()+"</h2></br>";
+				Field[] fields				=	editingElement.getClass().getDeclaredFields();
+				for(int i=0;i<fields.length;i++){
+					fields[i].setAccessible(true);
+					String fieldName	=	fields[i].getName();
+					try {
+						Object value		=	fields[i].get(editingElement);
+						if(k==0&&(!((value instanceof GridElement)||(value instanceof List)||(fieldName.equals("strategyType"))))){
+							top				=	top+"</br>"+  
+												"<h3>"+fieldName+"</h3>"+
+												"<div id=\""+editingElement.getIdElement()+fieldName+"\" class=\"firepad-container\">"+
+												"<script>"+
+												"function init() {"+
+												"var firepadRef"+editingElement.getIdElement()+fieldName+" = new Firebase('fiery-torch-6050.firebaseio.com/"+editingElement.getIdElement()+fieldName+"');"+
+												"var codeMirror = CodeMirror(document.getElementById('"+editingElement.getIdElement()+fieldName+"'), {"+
+												"lineNumbers: true,"+
+												"mode: 'javascript'"+
+												"});"+
+												"var firepad"+editingElement.getIdElement()+fieldName+" = Firepad.fromCodeMirror(firepadRef"+editingElement.getIdElement()+fieldName+", codeMirror, {"+
+												"defaultText: '"+value.toString()+"'"+
+												"});"+
+												"}"+
+												"init();"+
+												"</script>"+
+												"</div>";	
+						}
+						else if(value instanceof GridElement){
+							top				=	top+"</br>"+  
+												"<h3>"+fieldName+"</h3></br><p>"+((GridElement)value).getLabel()+"</p>";
+						}
+						else if(value instanceof List){
+							List aList	=	(List)value;
+							top				=	top+"</br>"+  
+									"<h3>"+fieldName+"</h3></br>";
+							top	=	top+"<p>";
+							for(int j=0;j<aList.size();j++){
+								if(aList.get(j) instanceof GridElement){
+									top	=	top+((GridElement)aList.get(j)).getLabel();
+								}
+								else{
+									top = top+aList.get(j).toString();
+								}
+							}
+							top	=	top+"</p>";
+						}
+						else{
+							top				=	top+  
+											"<h3>"+fieldName+"</h3></br><p>"+value.toString()+"</p>";
+						}
+					} catch (IllegalArgumentException | IllegalAccessException e) {
+						e.printStackTrace();
+					}
+				}
+				top=top+"</div>";
+				top	=	top+"<hr>";
+			}
+			return top;
+		}
+		return "";
 	}
 	
 	public static String loadFile(String path){

@@ -22,51 +22,12 @@
        For demo purposes, we make firepad fill the entire browser. */
     .firepad-container {
       width: 100%;
-      height: 10%;
+      height: 50px;
     }
   </style>
 </head>
 
 <body>
-  <div id="primo" class="firepad-container">
-  <script>
-    function init() {
-      //// Initialize Firebase.
-      var firepadRef = new Firebase('fiery-torch-6050.firebaseio.com/objectlabel/field1');
-      //// Create CodeMirror (with line numbers and the JavaScript mode).
-      var codeMirror = CodeMirror(document.getElementById('primo'), {
-        lineNumbers: true,
-        mode: 'javascript'
-      });
-      //// Create Firepad.
-      var firepad = Firepad.fromCodeMirror(firepadRef, codeMirror, {
-        defaultText: 'editor per il primo attributo'
-      });
-    }
-    init();
-  </script>
-  </div>
-  
-  <div id="secondo" class="firepad-container">
-  <script>
-    function init() {
-      //// Initialize Firebase.
-      var firepadRef = new Firebase('fiery-torch-6050.firebaseio.com/objectlabel/field2');
-      //// Create CodeMirror (with line numbers and the JavaScript mode).
-      var codeMirror = CodeMirror(document.getElementById('secondo'), {
-        lineNumbers: true,
-        mode: 'javascript'
-      });
-      //// Create Firepad.
-      var firepad = Firepad.fromCodeMirror(firepadRef, codeMirror, {
-        defaultText: 'editor per il secondo attributo'
-      });
-    }
-    init();
-  </script>
-  </div>
-  
-  
-  
+${pad}
 </body>
 </html>
