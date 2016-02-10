@@ -4,8 +4,10 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
+import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Properties;
 
 import javax.mail.Message;
@@ -114,5 +116,54 @@ public class Utils {
 			e.printStackTrace();
 		}
 		return everything;
+	}
+	
+	public static String gridElementToHTMLString(GridElement ge){
+		String name=ge.getClass().getSimpleName()+" "+ge.getLabel()+" - <i>v"+ge.getVersion()+"</i><br>";
+		String desc="";
+		Field[] fields=ge.getClass().getDeclaredFields();
+		for(int j=0; j<fields.length;j++){
+			Field tempField=fields[j];
+			tempField.setAccessible(true);
+			try {
+				Object fieldValue=tempField.get(ge);
+				if(fieldValue instanceof GridElement){
+					GridElement fieldValueGE=(GridElement)fieldValue;
+					desc=desc+tempField.getName()+":  "+fieldValueGE.getLabel()+"_"+fieldValueGE.getVersion()+"<br>";
+				}
+				else if(fieldValue instanceof List){
+					List myList 	=	(List)fieldValue;
+					if(myList.size()>0){
+						desc=desc+tempField.getName()+": ";
+						for(int i=0; i<myList.size();i++){
+							Object	current	=	 myList.get(i);
+							if(current instanceof GridElement){
+								GridElement fieldValueGE=(GridElement)current;
+								desc=desc+tempField.getName()+": "+fieldValueGE.getLabel()+"_"+fieldValueGE.getVersion()+"<br>";
+							}
+						}
+					}
+				}
+				else{
+					//desc=desc+"<div style='float:left;min-width: 200px;'>"+tempField.getName()+": "+fieldValueStr+"</div>";
+					if(fieldValue!=null){
+						String fieldValueStr	=	(String)fieldValue.toString();
+						String txt=tempField.getName()+": "+fieldValueStr;
+						int maxLength=60;
+						if(txt.length()>maxLength) txt=txt.substring(0, maxLength)+"...";
+						desc=desc+txt+"<br>";
+					}
+				}
+			} catch (IllegalArgumentException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} catch (IllegalAccessException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
+		return name+desc;
+		
+		
 	}
 }

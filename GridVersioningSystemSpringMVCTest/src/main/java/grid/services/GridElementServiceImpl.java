@@ -181,10 +181,10 @@ public class GridElementServiceImpl implements GridElementService {
 	 * {@inheritDoc}
 	 */
 	@Override
-	public List<GridElement> getElementByLabelAndState(Project prj, String subjLabel, Class<? extends GridElement> class1,GridElement.State aState) {
+	public List<GridElement> getElementByLabelAndState(Project prj, String subjLabel, String class1,GridElement.State aState) {
 		ArrayList<GridElement> pendingElement	=	new ArrayList<GridElement>();
-		List<GridElement> allElements			=	this.gridElementDao.getElementLog(subjLabel, class1.getSimpleName());
-		for(GridElement el : pendingElement){
+		List<GridElement> allElements			=	this.gridElementDao.getElementLog(subjLabel, class1);
+		for(GridElement el : allElements){
 			if(el.getState()==aState){
 				pendingElement.add(el);
 			}

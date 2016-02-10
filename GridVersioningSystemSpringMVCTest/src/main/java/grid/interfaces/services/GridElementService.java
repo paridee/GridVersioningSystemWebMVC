@@ -68,6 +68,6 @@ public interface GridElementService {
 	 * @param subjLabel label of the object
 	 * @param class1 class of the object
 	 */
-	public List<GridElement> getElementByLabelAndState(Project prj, String subjLabel, Class<? extends GridElement> class1,GridElement.State state);
+	public List<GridElement> getElementByLabelAndState(Project prj, String subjLabel, String class1,GridElement.State state);
 	
 }

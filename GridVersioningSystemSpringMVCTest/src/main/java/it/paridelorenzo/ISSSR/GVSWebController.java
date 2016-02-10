@@ -82,67 +82,120 @@ public class GVSWebController {
 		Map <String, List<Grid>> projectGrids=new HashMap<>();
 		Map <String, List<GridElement>> projectGridsMajorPendingElements=new HashMap<>();
 		//for all projects get pending grid elements
-		if (projList.size()>0){
-			for (int i=0; i<projList.size(); i++){
-				List<Grid> projGrids=this.gridService.getGridLog(projList.get(i).getId());
-				List<Grid> gridPending=new ArrayList<Grid>();
-				boolean addedGrid=false;
-				for(Grid g: projGrids){
-					if(g.obtainGridState()==Grid.GridState.UPDATING){
-						//ottieni elementi in stato major pending
-						HashMap<String, GridElement> elements=g.obtainAllEmbeddedElements();
-						Set<String>	keySet		=	elements.keySet();
-						Iterator<String> anIterator	=	keySet.iterator();
-						boolean addedElement=false;
-						List<GridElement> pendingElements=new ArrayList<GridElement>();
-						while(anIterator.hasNext()){
-							String key		=	anIterator.next();
-							State aState	=	elements.get(key).getState();
-							if(aState.ordinal()	==	state){
-								pendingElements.add(elements.get(key));
-								addedElement=true;
-								
+		if(state==GridElement.State.MAJOR_UPDATING.ordinal()||state==GridElement.State.MAJOR_CONFLICTING.ordinal()||state==GridElement.State.MINOR_CONFLICTING.ordinal()){
+			if (projList.size()>0){
+				for (int i=0; i<projList.size(); i++){
+					List<Grid> projGrids=this.gridService.getGridLog(projList.get(i).getId());
+					List<Grid> gridPending=new ArrayList<Grid>();
+					boolean addedGrid=false;
+					for(Grid g: projGrids){
+						if(g.obtainGridState()==Grid.GridState.UPDATING){
+							//ottieni elementi in stato major pending
+							HashMap<String, GridElement> elements=g.obtainAllEmbeddedElements();
+							Set<String>	keySet		=	elements.keySet();
+							Iterator<String> anIterator	=	keySet.iterator();
+							boolean addedElement=false;
+							List<GridElement> pendingElements=new ArrayList<GridElement>();
+							while(anIterator.hasNext()){
+								String key		=	anIterator.next();
+								State aState	=	elements.get(key).getState();
+								if(aState.ordinal()	==	state){
+									pendingElements.add(elements.get(key));
+									addedElement=true;
+									
+								}
+							}
+							if(addedElement){
+								addedGrid=true;
+								gridPending.add(g);
+								String temp=projList.get(i).getId()+"-"+g.getId();
+								projectGridsMajorPendingElements.put(temp, pendingElements);
 							}
 						}
-						if(addedElement){
-							addedGrid=true;
-							gridPending.add(g);
-							String temp=projList.get(i).getId()+"-"+g.getId();
-							projectGridsMajorPendingElements.put(temp, pendingElements);
-						}
+						
+					}
+					if(addedGrid){
+						projPending.add(projList.get(i));
+						projectGrids.put(projList.get(i).getId()+"", gridPending);
+						
+						
 					}
 					
 				}
-				if(addedGrid){
-					projPending.add(projList.get(i));
-					projectGrids.put(projList.get(i).getId()+"", gridPending);
-					
-					
-				}
+				
 				
 			}
-			
-			
 		}
 		model.addAttribute("PendingProjects", projPending);
 		model.addAttribute("PendingProjectsGrids", projectGrids);
 		model.addAttribute("PendingProjectsGridsElements", projectGridsMajorPendingElements);
+		GridElement.State[] stati=GridElement.State.values();
+		String curr_state=stati[state].name();
+		model.addAttribute("CurrentState",curr_state);
 		
-		System.out.println(projectGridsMajorPendingElements.toString());
+		//System.out.println(projectGridsMajorPendingElements.toString());
 		return "resolutionDashBoard";
     }
-	@RequestMapping(value = "/majorcolliding", method = RequestMethod.GET)
-    public String majorcollidingView(Model model) {
+	
+	
+	
+	@RequestMapping(value = "/MAJOR_UPDATING/{projID}/{type}/{label}", method = RequestMethod.GET)
+	public String majPResolutionDashBoard(@PathVariable("type") String type,@PathVariable("projID") int projID,@PathVariable("label") String label,Model model) {
 		model.addAttribute("pageTitle", "Grids Versioning System");
-		//get lista colliding major updates
-		return "majorcolliding";
-    }
-	@RequestMapping(value = "/minorcolliding", method = RequestMethod.GET)
-    public String minorcollidingView(Model model) {
+		
+		List <GridElement> geList=this.gridElementService.getElementByLabelAndState(this.projectService.getProjectById(projID), label, type, GridElement.State.MAJOR_UPDATING);
+		if (geList.size()==1){
+			GridElement ge=(GridElement)geList.get(0);
+			//verify if it is an add or an update
+			model.addAttribute("majUpdateToApprove", ge);
+			Grid workingGrid=this.gridService.getLatestWorkingGrid(projID);
+			System.out.println(workingGrid.toString()+"-"+ge.getLabel());
+			GridElement workingElement=workingGrid.obtainAllEmbeddedElements().get(ge.getLabel());
+			if (workingElement!=null) {
+				model.addAttribute("workingElement", ge);
+			}
+			
+			
+		}
+		else if (geList.size()>1){
+			System.out.println(geList.toString());
+			model.addAttribute("error", "Inconsistent DB State");
+		}
+		else if (geList.size()==0){
+			List <GridElement> geConflictingList=this.gridElementService.getElementByLabelAndState(this.projectService.getProjectById(projID), label, type, GridElement.State.MAJOR_CONFLICTING);
+			if(geConflictingList.size()>0){
+				String toRedir="redirect:/MAJOR_CONFLICTING/"+projID+"/"+type+"/"+label;
+				return toRedir;
+			}
+			model.addAttribute("error", "No pending entries for this element");
+		}
+		
+		return "stateResolutionDashBoard";
+	}
+	@RequestMapping(value = "/MAJOR_CONFLICTING/{projID}/{type}/{gridElID}", method = RequestMethod.GET)
+	public String majCResolutionDashBoard(@PathVariable("type") String type,@PathVariable("projID") int projID,@PathVariable("gridElID") int gridElID,Model model) {
 		model.addAttribute("pageTitle", "Grids Versioning System");
-		//get lista colliding minor updates
-		return "minorcolliding";
-    }
+		GridElement ge=this.gridElementService.getElementById(gridElID, type);
+		
+		return "stateResolutionDashBoard";
+	}
+	@RequestMapping(value = "/MINOR_CONFLICTING/{projID}/{type}/{gridElID}", method = RequestMethod.GET)
+	public String minorCResolutionDashBoard(@PathVariable("type") String type,@PathVariable("projID") int projID,@PathVariable("gridElID") int gridElID,Model model) {
+		model.addAttribute("pageTitle", "Grids Versioning System");
+		GridElement ge=this.gridElementService.getElementById(gridElID, type);
+		
+		return "stateResolutionDashBoard";
+	}
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
 	
 	@RequestMapping(value = "/grids", method = RequestMethod.GET)
     public String listAllGrids(Model model) {
