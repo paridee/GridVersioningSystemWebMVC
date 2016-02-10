@@ -314,8 +314,16 @@ public class GridModificationService {
 		for(int i=0;i<responsibles.size();i++){
 			if(responsibles.get(i)!=null){
 				this.logger.info("sending email for "+modified.getLabel()+" to "+responsibles.get(i).getEmail());
-				Utils.mailSender("GQM+S Versioning alert", "Dear "+responsibles.get(i).getName()+", the following Grid element: "+(modified.getClass().getSimpleName())+" "+modified.getLabel()+" is in state "+modified.getState()+" and requires an action, please check at the following link http://blablabla/pippo/pasquale/"+modified.getLabel(), responsibles.get(i).getEmail());
-			}
+				if(modified.getState().equals(GridElement.State.MINOR_CONFLICTING)){
+					Utils.mailSender("GQM+S Versioning alert", "Dear "+responsibles.get(i).getName()+", the following Grid element: "+(modified.getClass().getSimpleName())+" "+modified.getLabel()+" is in state "+modified.getState()+" and requires an action, please check at the following link "+Utils.systemURL+"/MINOR_CONFLICTING/"+aGrid.getProject().getId()+"/"+modified.getClass().getSimpleName()+"/"+modified.getIdElement(), responsibles.get(i).getEmail());
+				}
+				else if(modified.getState().equals(GridElement.State.MAJOR_UPDATING)){
+					Utils.mailSender("GQM+S Versioning alert", "Dear "+responsibles.get(i).getName()+", the following Grid element: "+(modified.getClass().getSimpleName())+" "+modified.getLabel()+" is in state "+modified.getState()+" and requires an action, please check at the following link "+Utils.systemURL+"/MAJOR_UPDATING/"+aGrid.getProject().getId()+"/"+modified.getClass().getSimpleName()+"/"+modified.getIdElement(), responsibles.get(i).getEmail());
+				}
+				else if(modified.getState().equals(GridElement.State.MAJOR_CONFLICTING)){
+					Utils.mailSender("GQM+S Versioning alert", "Dear "+responsibles.get(i).getName()+", the following Grid element: "+(modified.getClass().getSimpleName())+" "+modified.getLabel()+" is in state "+modified.getState()+" and requires an action, please check at the following link "+Utils.systemURL+"/MAJOR_CONFLICTING/"+aGrid.getProject().getId()+"/"+modified.getClass().getSimpleName()+"/"+modified.getIdElement(), responsibles.get(i).getEmail());
+				}
+		}
 		}
 		this.logger.info("#~#~NOTIFICATION STUB for item "+modified.getLabel()+" in state "+modified.getState());
 	}

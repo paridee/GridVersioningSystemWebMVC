@@ -35,6 +35,7 @@ public class Utils {
 	private static final String SMTPPORT	=	"465";
 	protected static final String SMTPUSER	=	"test@agriturismodegliacquedotti.it";
 	protected static final String SMTPPASS	=	"fujifilm";
+	public static String systemURL			=	"http://localhost:8080/ISSSR";
 
 	
 	/**
@@ -111,7 +112,7 @@ public class Utils {
 					String fieldName	=	fields[i].getName();
 					try {
 						Object value		=	fields[i].get(editingElement);
-						if((!((value instanceof GridElement)||(value instanceof List)||(fieldName.equals("strategyType"))))&&k==0){
+						if(k==0&&(!((value instanceof GridElement)||(value instanceof List)||(fieldName.equals("strategyType"))))){
 							top				=	top+"</br>"+  
 												"<h3>"+fieldName+"</h3>"+
 												"<div id=\""+editingElement.getIdElement()+fieldName+"\" class=\"firepad-container\">"+
