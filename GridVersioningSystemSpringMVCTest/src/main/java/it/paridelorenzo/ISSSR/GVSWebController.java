@@ -76,6 +76,7 @@ public class GVSWebController {
 	@RequestMapping(value = "/resolutionDashBoard/{state}", method = RequestMethod.GET)   //stati WORKING, MAJOR_UPDATING,MAJOR_CONFLICTING, MINOR_CONFLICTING, FINAL_KO
     public String majorpendingView(@PathVariable("state") int state,Model model) {
 		model.addAttribute("pageTitle", "Grids Versioning System");
+		this.setActiveButton(2, model);
 		//get all projects
 		List<Project> projList=this.projectService.listProjects();
 		List<Project> projPending=new ArrayList<Project>();
