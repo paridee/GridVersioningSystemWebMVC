@@ -28,6 +28,8 @@ import grid.interfaces.Updatable;
 public abstract class GridElement implements Updatable{
 	public enum State{
 		WORKING, MAJOR_UPDATING,MAJOR_CONFLICTING, MINOR_CONFLICTING, FINAL_KO, ABORTED
+		//WORKING, MAJOR_UPDATE, MAJOR_DELETE, MAJOR_ADD, MAJOR_CONFLICTING, MINOR_CONFLICTING, MAJOR_SOLVED, FINAL_KO, ABORTED
+
 	}
 	protected List<Practitioner> authors	=	new ArrayList<Practitioner>();
 	

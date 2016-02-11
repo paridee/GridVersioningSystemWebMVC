@@ -199,6 +199,7 @@ public class GVSWebController {
 		if(geList.size()==1){
 			GridElement ge=geList.get(0);
 			ge.setState(GridElement.State.WORKING);
+			//TODO nuova funz update
 			this.gridElementService.updateGridElement(ge);
 			JSONObject response = new JSONObject();
 			response.put("msg", "result");
@@ -218,13 +219,24 @@ public class GVSWebController {
     public @ResponseBody String rejectPendingUpdate(@RequestBody String jsonData) {
 		JSONObject obj = new JSONObject(jsonData);
 		String label = obj.getString("label");
-		System.out.println(label);
-		
-		
-		JSONObject response = new JSONObject();
-		response.put("msg", "result");
-		response.put("resp", "ok");
-		return response.toString();
+		String type = obj.getString("type");
+		System.out.println(label+"-"+type);
+		List <GridElement> geList=this.gridElementService.getElementByLabelAndState(label, type, GridElement.State.MAJOR_UPDATING);
+		if(geList.size()==1){
+			GridElement ge=geList.get(0);
+			//ge.setState(GridElement.State.);
+			this.gridElementService.updateGridElement(ge);
+			JSONObject response = new JSONObject();
+			response.put("msg", "result");
+			response.put("resp", "ok");
+			return response.toString();
+		}
+		else{
+			JSONObject response = new JSONObject();
+			response.put("msg", "error");
+			response.put("resp", "no pending elements");
+			return response.toString();
+		}
 	}
 	
 	
