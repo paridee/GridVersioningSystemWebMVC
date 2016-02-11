@@ -196,7 +196,7 @@ public class Utils {
 				Object fieldValue=tempField.get(ge);
 				if(fieldValue instanceof GridElement){
 					GridElement fieldValueGE=(GridElement)fieldValue;
-					desc=desc+tempField.getName()+":  "+fieldValueGE.getLabel()+"_"+fieldValueGE.getVersion()+"<br>";
+					desc=desc+tempField.getName()+":  "+fieldValueGE.getLabel()+"_v"+fieldValueGE.getVersion()+"<br>";
 				}
 				else if(fieldValue instanceof List){
 					List myList 	=	(List)fieldValue;
@@ -206,7 +206,7 @@ public class Utils {
 							Object	current	=	 myList.get(i);
 							if(current instanceof GridElement){
 								GridElement fieldValueGE=(GridElement)current;
-								desc=desc+tempField.getName()+": "+fieldValueGE.getLabel()+"_"+fieldValueGE.getVersion()+"<br>";
+								desc=desc+tempField.getName()+": "+fieldValueGE.getLabel()+"_v"+fieldValueGE.getVersion()+"<br>";
 							}
 						}
 					}

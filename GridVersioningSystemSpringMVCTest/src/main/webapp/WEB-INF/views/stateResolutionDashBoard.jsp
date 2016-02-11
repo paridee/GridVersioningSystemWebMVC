@@ -22,9 +22,9 @@
 					  		url: "/ISSSR/acceptPendingUpdate",
 						   	contentType: "application/json; charset=utf-8",
 						    dataType: "json",
-						   	data: "{\"label\":\"<%out.print(ge.getLabel());%>\" }",
+						   	data: "{\"label\":\"<%out.print(ge.getLabel());%>\",\"type\":\"<%out.print(ge.getClass().getSimpleName());%>\",  }",
 						  	success: function (msg) { 
-						  		//alert(msg) 
+						  		alert(msg) 
 					  		},
 							error: function (err){
 								alert(err.responseText)
@@ -40,9 +40,9 @@
 					  		url: "/ISSSR/rejectPendingUpdate",
 						   	contentType: "application/json; charset=utf-8",
 						    dataType: "json",
-						   	data: "{\"label\":\"<%out.print(ge.getLabel());%>\" }",
+						   	data: "{\"label\":\"<%out.print(ge.getLabel());%>\",\"type\":\"<%out.print(ge.getClass().getSimpleName());%>\",  }",
 						  	success: function (msg) { 
-						  		//alert(msg) 
+						  		alert(msg) 
 					  		},
 							error: function (err){
 								alert(err.responseText)

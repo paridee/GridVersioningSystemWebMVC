@@ -144,7 +144,7 @@ public class GVSWebController {
 	public String majPResolutionDashBoard(@PathVariable("type") String type,@PathVariable("projID") int projID,@PathVariable("label") String label,Model model) {
 		model.addAttribute("pageTitle", "Grids Versioning System");
 		
-		List <GridElement> geList=this.gridElementService.getElementByLabelAndState(this.projectService.getProjectById(projID), label, type, GridElement.State.MAJOR_UPDATING);
+		List <GridElement> geList=this.gridElementService.getElementByLabelAndState(label, type, GridElement.State.MAJOR_UPDATING);
 		if (geList.size()==1){
 			GridElement ge=(GridElement)geList.get(0);
 			//verify if it is an add or an update
@@ -163,7 +163,7 @@ public class GVSWebController {
 			model.addAttribute("error", "Inconsistent DB State");
 		}
 		else if (geList.size()==0){
-			List <GridElement> geConflictingList=this.gridElementService.getElementByLabelAndState(this.projectService.getProjectById(projID), label, type, GridElement.State.MAJOR_CONFLICTING);
+			List <GridElement> geConflictingList=this.gridElementService.getElementByLabelAndState( label, type, GridElement.State.MAJOR_CONFLICTING);
 			if(geConflictingList.size()>0){
 				String toRedir="redirect:/MAJOR_CONFLICTING/"+projID+"/"+type+"/"+label;
 				return toRedir;
@@ -189,6 +189,43 @@ public class GVSWebController {
 	}
 	
 	
+	@RequestMapping(value = "/acceptPendingUpdate", method=RequestMethod.POST)
+    public @ResponseBody String acceptPendingUpdate(@RequestBody String jsonData) {
+		JSONObject obj = new JSONObject(jsonData);
+		String label = obj.getString("label");
+		String type = obj.getString("type");
+		System.out.println(label+"-"+type);
+		List <GridElement> geList=this.gridElementService.getElementByLabelAndState(label, type, GridElement.State.MAJOR_UPDATING);
+		if(geList.size()==1){
+			GridElement ge=geList.get(0);
+			ge.setState(GridElement.State.WORKING);
+			this.gridElementService.updateGridElement(ge);
+			JSONObject response = new JSONObject();
+			response.put("msg", "result");
+			response.put("resp", "ok");
+			return response.toString();
+		}
+		else{
+			JSONObject response = new JSONObject();
+			response.put("msg", "error");
+			response.put("resp", "no pending elements");
+			return response.toString();
+		}
+		
+		
+	}
+	@RequestMapping(value = "/rejectPendingUpdate", method=RequestMethod.POST)
+    public @ResponseBody String rejectPendingUpdate(@RequestBody String jsonData) {
+		JSONObject obj = new JSONObject(jsonData);
+		String label = obj.getString("label");
+		System.out.println(label);
+		
+		
+		JSONObject response = new JSONObject();
+		response.put("msg", "result");
+		response.put("resp", "ok");
+		return response.toString();
+	}
 	
 	
 	
@@ -397,30 +434,6 @@ public class GVSWebController {
 		return "updategrid";
     }
 	
-	@RequestMapping(value = "/acceptPendingUpdate", method=RequestMethod.POST)
-    public @ResponseBody String acceptPendingUpdate(@RequestBody String jsonData) {
-		JSONObject obj = new JSONObject(jsonData);
-		String label = obj.getString("label");
-		System.out.println(label);
-		
-		
-		JSONObject response = new JSONObject();
-		response.put("msg", "result");
-		response.put("resp", "ok");
-		return response.toString();
-	}
-	@RequestMapping(value = "/rejectPendingUpdate", method=RequestMethod.POST)
-    public @ResponseBody String rejectPendingUpdate(@RequestBody String jsonData) {
-		JSONObject obj = new JSONObject(jsonData);
-		String label = obj.getString("label");
-		System.out.println(label);
-		
-		
-		JSONObject response = new JSONObject();
-		response.put("msg", "result");
-		response.put("resp", "ok");
-		return response.toString();
-	}
 	
 	public String gridElementToFormattedString(GridElement ge){
 		String name=ge.getClass().getSimpleName()+" "+ge.getLabel()+" - <i>v"+ge.getVersion()+"</i><br>";
