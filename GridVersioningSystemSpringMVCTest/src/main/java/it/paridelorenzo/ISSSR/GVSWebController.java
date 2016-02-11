@@ -396,6 +396,31 @@ public class GVSWebController {
 		return "updategrid";
     }
 	
+	@RequestMapping(value = "/acceptPendingUpdate", method=RequestMethod.POST)
+    public @ResponseBody String acceptPendingUpdate(@RequestBody String jsonData) {
+		JSONObject obj = new JSONObject(jsonData);
+		String label = obj.getString("label");
+		System.out.println(label);
+		
+		
+		JSONObject response = new JSONObject();
+		response.put("msg", "result");
+		response.put("resp", "ok");
+		return response.toString();
+	}
+	@RequestMapping(value = "/rejectPendingUpdate", method=RequestMethod.POST)
+    public @ResponseBody String rejectPendingUpdate(@RequestBody String jsonData) {
+		JSONObject obj = new JSONObject(jsonData);
+		String label = obj.getString("label");
+		System.out.println(label);
+		
+		
+		JSONObject response = new JSONObject();
+		response.put("msg", "result");
+		response.put("resp", "ok");
+		return response.toString();
+	}
+	
 	public String gridElementToFormattedString(GridElement ge){
 		String name=ge.getClass().getSimpleName()+" "+ge.getLabel()+" - <i>v"+ge.getVersion()+"</i><br>";
 		String desc="";
