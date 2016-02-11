@@ -152,7 +152,7 @@ public class GVSWebController {
 			System.out.println(workingGrid.toString()+"-"+ge.getLabel());
 			GridElement workingElement=workingGrid.obtainAllEmbeddedElements().get(ge.getLabel());
 			if (workingElement!=null) {
-				model.addAttribute("workingElement", ge);
+				model.addAttribute("workingElement", workingElement);
 			}
 			
 			
