@@ -37,6 +37,7 @@ public class Grid implements Updatable{
 	private	int 		version=1; //TODO make String Version
 	private List<Goal> 	mainGoals				=	null;
 	private Project		project;
+	private boolean		mainGoalsChanged		=	false;
 	//TODO mancano attributi della grid di Serena e Marco
 	
 	/**
@@ -121,6 +122,22 @@ public class Grid implements Updatable{
 	}
 
 	/**
+	 * Returns a boolean check for main goals changed
+	 * @return main goal change state
+	 */
+	public boolean isMainGoalsChanged() {
+		return mainGoalsChanged;
+	}
+
+	/**
+	 * Set to true if main goal list changed
+	 * @param mainGoalsChanged new main goal change state
+	 */
+	public void setMainGoalsChanged(boolean mainGoalsChanged) {
+		this.mainGoalsChanged = mainGoalsChanged;
+	}
+
+	/**
 	 * {@inheritDoc}
 	 */
 	@Override
@@ -186,6 +203,7 @@ public class Grid implements Updatable{
 		Grid cloned	=	new Grid();
 		cloned.setProject(this.project);
 		cloned.setVersion(this.version);
+		cloned.setMainGoalsChanged(this.mainGoalsChanged);
 		ArrayList<Goal> clonedMainGoals	=	new ArrayList<Goal>();
 		for(int i=0;i<this.mainGoals.size();i++){
 			clonedMainGoals.add(this.mainGoals.get(i));

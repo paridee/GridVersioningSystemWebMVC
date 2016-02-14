@@ -27,10 +27,6 @@ public class GridElementAdd extends GridModification {
 
 	@Override
 	public void apply(Grid grid) throws Exception {
-		if(!(Modification.minorUpdateClass.contains(this.gridElementAdded.getClass()))){
-			//adding a new GQM+S element requires confirmation by PM
-			gridElementAdded.setState(GridElement.State.MAJOR_UPDATING);
-		}
 	}
 
 	@Override

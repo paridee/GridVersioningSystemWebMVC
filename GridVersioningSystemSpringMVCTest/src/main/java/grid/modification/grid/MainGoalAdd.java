@@ -54,6 +54,7 @@ public class MainGoalAdd extends GridModification {
 			Goal aGoal		=	(Goal)this.appendedObject;
 			list.add(aGoal);
 		}
+		grid.setMainGoalsChanged(true);
 	}
 
 	/**

@@ -52,6 +52,14 @@ public interface GridElementService {
 	public List<GridElement> getElementLog(String label, String table);
 	
 	/**
+	 * Returns the latest version number of an element of a grid
+	 * @param label id of the element
+	 * @param c class of the element
+	 * @return latest object found (may be null)
+	 */
+	public int getLatestVersion(String label, String table);
+	
+	/**
 	 * Removes a grid element from persistence layer
 	 * @param id id of the object to be removed
 	 * @param c class of the object to be removed

@@ -192,6 +192,21 @@ public class GridElementServiceImpl implements GridElementService {
 		return pendingElement;
 		
 	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public int getLatestVersion(String label, String table) {
+		int version	=	0;
+		List<GridElement> elements	=	this.getElementLog(label, table);
+		for(GridElement el:elements){
+			if(el.getVersion()>version){
+				version	=	el.getVersion();
+			}
+		}
+		return version;
+	}
 	
 
 	

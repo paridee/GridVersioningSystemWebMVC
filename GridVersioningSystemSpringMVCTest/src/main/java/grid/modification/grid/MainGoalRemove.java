@@ -23,7 +23,13 @@ public class MainGoalRemove extends GridModification{
 		if(elements.containsKey(this.RemovedObjectLabel)){
 			GridElement goal	=	elements.get(this.RemovedObjectLabel);
 			if(goal instanceof Goal){
-				grid.getMainGoals().remove(goal);
+				if(grid.getMainGoals().contains(goal)){
+					grid.getMainGoals().remove(goal);
+					grid.setMainGoalsChanged(true);
+				}
+				else{
+					throw new Exception("Goal "+this.RemovedObjectLabel+" is not a main goal, impossible to remove");
+				}
 			}
 			else{
 				throw new Exception("Element "+this.RemovedObjectLabel+" is not a goal");

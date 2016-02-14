@@ -3,7 +3,7 @@
 -- http://www.phpmyadmin.net
 --
 -- Host: localhost
--- Creato il: Feb 08, 2016 alle 19:56
+-- Creato il: Feb 14, 2016 alle 14:12
 -- Versione del server: 5.6.27-0ubuntu1
 -- Versione PHP: 5.6.11-1ubuntu3.1
 
@@ -69,8 +69,9 @@ INSERT INTO `Goal` (`assumption`, `description`, `context`, `id`, `label`, `vers
 ('', 'second', '', 3, 'g2', 1, 4, 0),
 ('', 'second', '', 5, 'g2', 2, 6, 0),
 ('', 'terzo incomodo', '', 9, 'g4556', 1, NULL, 0),
-('', 'ancora un altro', '', 12, 'g093', 1, NULL, 1),
-('', 'second', '', 13, 'g2', 3, 6, 0);
+('', 'ancora un altro', '', 11, 'g093', 2, NULL, 0),
+('', 'goal...', '', 12, 'g1', 2, 2, 1),
+('', 'second', '', 14, 'g2', 3, 6, 0);
 
 -- --------------------------------------------------------
 
@@ -90,8 +91,9 @@ CREATE TABLE IF NOT EXISTS `GoalToStrategyList` (
 INSERT INTO `GoalToStrategyList` (`goalID`, `strID`) VALUES
 (5, 7),
 (5, 8),
-(13, 7),
-(13, 11);
+(12, 13),
+(14, 7),
+(14, 10);
 
 -- --------------------------------------------------------
 
@@ -102,17 +104,18 @@ INSERT INTO `GoalToStrategyList` (`goalID`, `strID`) VALUES
 CREATE TABLE IF NOT EXISTS `Grid` (
   `id` int(11) NOT NULL,
   `version` int(10) NOT NULL,
-  `projID` int(11) NOT NULL
+  `projID` int(11) NOT NULL,
+  `mainGoalsChanged` int(11) NOT NULL DEFAULT '0'
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 --
 -- Dump dei dati per la tabella `Grid`
 --
 
-INSERT INTO `Grid` (`id`, `version`, `projID`) VALUES
-(1, 1, 1),
-(2, 2, 1),
-(3, 3, 1);
+INSERT INTO `Grid` (`id`, `version`, `projID`, `mainGoalsChanged`) VALUES
+(1, 1, 1, 0),
+(2, 2, 1, 0),
+(3, 3, 1, 1);
 
 -- --------------------------------------------------------
 
@@ -146,10 +149,10 @@ INSERT INTO `GridToRootGoal` (`gridID`, `goalID`) VALUES
 (2, 1),
 (2, 5),
 (2, 9),
-(3, 1),
-(3, 13),
+(3, 12),
+(3, 14),
 (3, 9),
-(3, 12);
+(3, 11);
 
 -- --------------------------------------------------------
 
@@ -335,8 +338,8 @@ CREATE TABLE IF NOT EXISTS `Strategy` (
 INSERT INTO `Strategy` (`id`, `version`, `label`, `description`, `strategyType`, `strategicProjectId`, `state`) VALUES
 (7, 1, 's1', 'a strategy', 'TERMINAL', '', 0),
 (8, 1, 's2', 'another strategy', 'TERMINAL', '', 0),
-(10, 2, 's2', 'another strategy', 'TERMINAL', '', 0),
-(11, 2, 's2', 'another strategy', 'TERMINAL', '', 2);
+(10, 2, 's2', 'another strategy', 'TERMINAL', '', 2),
+(13, 2, 'extraStrategy', 'dovrebbe innescare major pending', 'TERMINAL', '', 0);
 
 -- --------------------------------------------------------
 
@@ -354,7 +357,7 @@ CREATE TABLE IF NOT EXISTS `StrategyToGoalList` (
 --
 
 INSERT INTO `StrategyToGoalList` (`strID`, `goalID`) VALUES
-(11, 12);
+(10, 11);
 
 --
 -- Indici per le tabelle scaricate

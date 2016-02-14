@@ -139,8 +139,10 @@ public class GridDAOImpl implements GridDAO {
 		for(int i=0;i<oldGoals.size();i++){
 			mainGoals.add(oldGoals.get(i));
 		}
+		upgraded.setMainGoalsChanged(g.isMainGoalsChanged());
 		upgraded.setMainGoals(mainGoals);
 		upgraded.setVersion(g.getVersion()+1);
+		upgraded.setMainGoalsChanged(g.isMainGoalsChanged());
 		this.addGrid(upgraded);
 		return upgraded;
 	}

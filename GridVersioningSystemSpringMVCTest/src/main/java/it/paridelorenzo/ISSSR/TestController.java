@@ -122,7 +122,7 @@ public class TestController {
 		strs.add(s1);
 		strs.add(s2);
 		aGoal2	=	(Goal)this.gridElementService.upgradeGridElement(aGoal2);
-		this.gridService.updateGridElement(newGrid, aGoal2, false, false);
+		newGrid	=	this.gridService.updateGridElement(newGrid, aGoal2, false, false);
 		aGoal2.setStrategyList(strs);
 		MeasurementGoal another	=	new MeasurementGoal();
 		another.setLabel("mg4");
@@ -137,7 +137,7 @@ public class TestController {
 		List <Goal> maingoals	=	newGrid.getMainGoals();
 		maingoals.add(terzo);
 		newGrid.setMainGoals(maingoals);
-		this.gridService.addGrid(newGrid);
+		this.gridService.addGrid(newGrid);/*
 		newGrid	=	newGrid.clone();
 		newGrid.setVersion(newGrid.getVersion()+1);
 		Goal quarto	=	new Goal();
@@ -153,7 +153,14 @@ public class TestController {
 		ArrayList<Goal> s2goals	=	new ArrayList<Goal>();
 		s2goals.add(quarto);
 		s2.setGoalList(s2goals);
+		Strategy extra	=	new Strategy();
+		extra.setDescription("dovrebbe innescare major pending");
+		extra.setLabel("extraStrategy");
+		ArrayList<Strategy> strNewList	=	new ArrayList<Strategy>();
+		strNewList.add(extra);
+		aGoal.setStrategyList(strNewList);
 		System.out.print(aFactory.obtainJson(newGrid, JSONType.FIRST,refVer));
+		//this.gridService.addGrid(newGrid);*/
 		return "home";
 	}
 	

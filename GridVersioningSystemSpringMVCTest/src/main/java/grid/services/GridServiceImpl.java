@@ -241,6 +241,7 @@ public class GridServiceImpl implements GridService {
 		newVersion.setMainGoals(mainGoalsCopy);
 		newVersion.setProject(g.getProject());
 		newVersion.setVersion(g.getVersion()+1);
+		newVersion.setMainGoalsChanged(g.isMainGoalsChanged());
 		return newVersion;
 	}
 

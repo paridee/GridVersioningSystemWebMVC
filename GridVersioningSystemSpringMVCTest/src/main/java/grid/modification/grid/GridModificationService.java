@@ -161,7 +161,6 @@ public class GridModificationService {
 	}
 	
 	public Grid applyModifications(List<Modification> mods,Grid latestGrid,ArrayList<String> modifiedObjectLabels) throws Exception{
-		Grid supplied	=	latestGrid;		//will be used late after re-assignment
 		for(int i=0;i<mods.size();i++){
 			System.out.println("found modification "+mods.get(i).toString());
 		}
@@ -247,6 +246,7 @@ public class GridModificationService {
 						else if(!Modification.minorUpdateClass.contains(subj.getClass())){	//is a major conflict
 							if(modifiedObjectLabels.contains(subjLabel)){
 								modified.setState(State.MAJOR_CONFLICTING);
+								this.logger.info("element in major conflict with an element of the current working grid");
 							}
 							else{
 								List<GridElement> pending	=	this.gridElementService.getElementByLabelAndState( subjLabel,modified.getClass().getSimpleName(),GridElement.State.MAJOR_UPDATING);
@@ -282,7 +282,7 @@ public class GridModificationService {
 							GridElementAdd anAddition	=	(GridElementAdd)aMod;
 							if(!sentNotificationLabel.contains(anAddition.getAppendedObjectLabel())){
 								GridElement newElement	=	anAddition.getGridElementAdded();
-								newElement.setState(GridElement.State.MAJOR_UPDATING);
+								//newElement.setState(GridElement.State.MAJOR_UPDATING);
 								this.sendNotification(newElement,newVersion);
 								sentNotificationLabel.add(anAddition.getAppendedObjectLabel());
 							}
@@ -291,7 +291,7 @@ public class GridModificationService {
 					else{
 						this.logger.info("manage this case "+aMod.toString());
 					}
-				}
+				}	
 				this.updateVersionNumbersAndStatus(latestGrid,newVersion);
 				this.gridService.addGrid(newVersion);
 				logger.info("mods summary");
@@ -348,6 +348,13 @@ public class GridModificationService {
 					}
 				}
 			}
+			else{
+				GridElement newElement 	=	newElements.get(key);
+				int olderVersion		=	this.gridElementService.getLatestVersion(key, newElement.getClass().getSimpleName());
+				if(olderVersion>0){
+					newElement.setVersion(olderVersion+1);;
+				}
+			}
 		}
 	}
 
@@ -394,7 +401,30 @@ public class GridModificationService {
 				this.updateVersionNumbersAndStatus(aGrid, updated);
 				this.gridService.addGrid(updated);
 			}
+			//TODO set right state for all elements
 			return updated;
 		}
+	}
+	
+	
+	/**
+	 * checks if is possible to apply a change to an element (there are not pending elements embedded)
+	 * @param anElement
+	 * @return result
+	 */
+	public boolean isEmbeddedPending(GridElement anElement){
+		HashMap<String, GridElement> embedded	=	anElement.obtainEmbeddedElements();
+		embedded.remove(anElement.getLabel());
+		Iterator<String> iterator			=	embedded.keySet().iterator();
+		while(iterator.hasNext()){
+			GridElement anEmbedded		=	embedded.get(iterator.next());
+			List<GridElement> elements	=	this.gridElementService.getElementByLabelAndState(anEmbedded.getLabel(), anEmbedded.getClass().getSimpleName(), GridElement.State.MAJOR_CONFLICTING);
+			elements.addAll(this.gridElementService.getElementByLabelAndState(anEmbedded.getLabel(), anEmbedded.getClass().getSimpleName(), GridElement.State.MAJOR_UPDATING));
+			elements.addAll(this.gridElementService.getElementByLabelAndState(anEmbedded.getLabel(), anEmbedded.getClass().getSimpleName(), GridElement.State.MINOR_CONFLICTING));
+			if(elements.size()>0){
+				return true;
+			}
+		}
+		return false;
 	}
 }
