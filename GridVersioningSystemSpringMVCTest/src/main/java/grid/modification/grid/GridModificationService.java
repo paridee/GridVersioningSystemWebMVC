@@ -65,18 +65,13 @@ public class GridModificationService {
 	}
 	
 	/**
-	 * Calculate the differences between two grids
-	 * @param oldGrid older grid
-	 * @param newGrid newer grid
+	 * Get modification on main goals list
+	 * @param oldMainGoals older list
+	 * @param newMainGoals newer list
 	 * @return differences
-	 * @throws Exception in case of errors
 	 */
-	public static ArrayList<Modification> getModification(Grid oldGrid,Grid newGrid) throws Exception{
+	public static ArrayList<Modification> getMainGoalsModification(List<Goal> oldMainGoals,List<Goal> newMainGoals){
 		ArrayList<Modification>	allMods		=	new ArrayList<Modification>();
-		//get main goals from both grids
-		List<Goal>		oldMainGoals		=	oldGrid.getMainGoals();
-		List<Goal>		newMainGoals		=	newGrid.getMainGoals();
-		//put all these goals in a map
 		HashMap<String,Goal> oldGoalsMap	=	new HashMap<String,Goal>();
 		HashMap<String,Goal> newGoalsMap	=	new HashMap<String,Goal>();
 		for(int i=0;i<oldMainGoals.size();i++){
@@ -115,7 +110,23 @@ public class GridModificationService {
 				}
 			}
 		}
-
+		return allMods;
+	}
+	
+	/**
+	 * Calculate the differences between two grids
+	 * @param oldGrid older grid
+	 * @param newGrid newer grid
+	 * @return differences
+	 * @throws Exception in case of errors
+	 */
+	public static ArrayList<Modification> getModification(Grid oldGrid,Grid newGrid) throws Exception{
+		ArrayList<Modification>	allMods		=	null;//new ArrayList<Modification>();
+		//get main goals from both grids
+		List<Goal>		oldMainGoals		=	oldGrid.getMainGoals();
+		List<Goal>		newMainGoals		=	newGrid.getMainGoals();
+		//put all these goals in a map
+		allMods	=	GridModificationService.getMainGoalsModification(oldMainGoals,newMainGoals);
 		//as before put all the embedded elements of the grid in a map
 		HashMap<String,GridElement> oldElementsMap	=	oldGrid.obtainAllEmbeddedElements();
 		HashMap<String,GridElement> newElementsMap	=	newGrid.obtainAllEmbeddedElements();
@@ -130,9 +141,10 @@ public class GridModificationService {
 				allMods.addAll(someMods);
 			}
 		}
+		Javers 					javers			=	JaversBuilder.javers().registerValueObject(GridElement.class).build();
 		//take insertion and delections
-		diff			=	javers.compare(oldElementsMap, newElementsMap);
-		changesInner	=	diff.getChanges();
+		Diff diff					=	javers.compare(oldElementsMap, newElementsMap);
+		List<Change> changesInner	=	diff.getChanges();
 		System.out.println("DIFF "+diff);
 		for(int j=0;j<changesInner.size();j++){
 			Change innerChange	=	changesInner.get(j);
