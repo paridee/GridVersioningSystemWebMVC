@@ -164,6 +164,66 @@ public class TestController {
 		return "home";
 	}
 	
+	@RequestMapping(value = "/testLorenzo", method = RequestMethod.GET)
+	public String homeGridfdf(Locale locale, Model model) {
+		Practitioner pm	=	new Practitioner();
+		pm.setEmail("paride.casulli@gmail.com");
+		pm.setName("Paride Casulli");
+		Practitioner lorenzo	=	new Practitioner();
+		lorenzo.setEmail("lorenzo.labanca@gmail.com");
+		lorenzo.setName("Lorenzo La Banca");
+		Project first	=	new Project();
+		first.setProjectManager(pm);
+		first.setDescription("test1");
+		first.setProjectId("prj-test1");
+		Goal firstg		=	new Goal();
+		firstg.setLabel("goal1");
+		firstg.setDescription("primo");
+		Goal secondg	=	new Goal();
+		secondg.setLabel("goal2");
+		secondg.setDescription("secondo goal");
+		Grid prj1Grid	=	new Grid();
+		prj1Grid.setProject(first);
+		ArrayList<Goal> mainGoals	=	new ArrayList<Goal>();
+		mainGoals.add(firstg);
+		mainGoals.add(secondg);
+		prj1Grid.setMainGoals(mainGoals);
+		Strategy s1		=	new Strategy();
+		Strategy s2		=	new Strategy();
+		s1.setLabel("str1");
+		s1.setDescription("first strategy");
+		s2.setLabel("str2");
+		s2.setDescription("second strategy");
+		ArrayList<Strategy> g1Str	=	new ArrayList<Strategy>();
+		g1Str.add(s1);
+		firstg.setStrategyList(g1Str);
+		ArrayList<Strategy> g2Str	=	new ArrayList<Strategy>();
+		g2Str.add(s2);
+		secondg.setStrategyList(g2Str);
+		this.gridService.addGrid(prj1Grid);
+		/*
+		Grid ref	=	prj1Grid;
+		prj1Grid	=	this.gridService.upgradeGrid(prj1Grid);
+		Strategy third = new Strategy();
+		third.setLabel("str3");
+		third.setDescription("third strategy");
+		secondg	=	(Goal) this.gridElementService.upgradeGridElement(secondg);
+		List<Strategy> secondGStr	=	secondg.getStrategyList();
+		secondGStr.add(third);
+		secondg.setStrategyList(secondGStr);
+		this.gridService.updateGridElement(prj1Grid, secondg, false, false);
+		this.gridService.updateGrid(prj1Grid);
+		JSONFactory aFactory	=	new JSONFactory();
+		Grid secondJson	=	this.gridService.createStubUpgrade(prj1Grid);
+		third	=	(Strategy) this.gridElementService.upgradeGridElement(third);
+		third.setDescription("descrizione modificata");
+		this.gridService.updateGridElement(secondJson, third, false, false);
+		System.out.println(aFactory.obtainJson(prj1Grid, JSONType.FIRST,ref));
+		System.out.println("##########");
+		System.out.println(aFactory.obtainJson(secondJson,JSONType.FIRST,prj1Grid));*/
+		return "home";
+	}
+	
 	//TODO remove test
 	@RequestMapping(value = "/testpad", method = RequestMethod.GET)
 	public String homeGridpad(Locale locale, Model model) { 

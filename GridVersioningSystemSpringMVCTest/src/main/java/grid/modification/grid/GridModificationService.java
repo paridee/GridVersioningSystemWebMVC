@@ -364,6 +364,10 @@ public class GridModificationService {
 				GridElement newElement 	=	newElements.get(key);
 				int olderVersion		=	this.gridElementService.getLatestVersion(key, newElement.getClass().getSimpleName());
 				if(olderVersion>0){
+					//modifica richiesta da Lorenzo: se oggetto e' gia' presente nel DB ed e' di classe "Major" viene instanziato in major pending
+					if(!Modification.minorUpdateClass.contains(newElement.getClass())){
+						newElement.setState(GridElement.State.MAJOR_UPDATING);
+					}
 					newElement.setVersion(olderVersion+1);;
 				}
 			}

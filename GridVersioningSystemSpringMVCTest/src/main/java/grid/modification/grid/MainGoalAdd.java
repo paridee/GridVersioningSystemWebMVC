@@ -1,6 +1,7 @@
 package grid.modification.grid;
 
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 
 import grid.entities.Goal;
@@ -52,6 +53,12 @@ public class MainGoalAdd extends GridModification {
 		else{
 			List<Goal>	list	=	grid.getMainGoals();
 			Goal aGoal		=	(Goal)this.appendedObject;
+			aGoal	=	(Goal) aGoal.clone();
+			HashMap<String, GridElement> gElements	=	grid.obtainAllEmbeddedElements();
+			Iterator<String> it	=	gElements.keySet().iterator();
+			while(it.hasNext()){
+				aGoal.updateReferences(gElements.get(it.next()), false, false);
+			}
 			list.add(aGoal);
 		}
 		grid.setMainGoalsChanged(true);
