@@ -137,7 +137,7 @@ public class TestController {
 		List <Goal> maingoals	=	newGrid.getMainGoals();
 		maingoals.add(terzo);
 		newGrid.setMainGoals(maingoals);
-		this.gridService.addGrid(newGrid);/*
+		this.gridService.addGrid(newGrid);
 		newGrid	=	newGrid.clone();
 		newGrid.setVersion(newGrid.getVersion()+1);
 		Goal quarto	=	new Goal();
@@ -229,6 +229,23 @@ public class TestController {
 	public String homeGridpad(Locale locale, Model model) { 
 	return "firepadtest";
 	}
+	
+	@RequestMapping(value = "/testHibernate", method = RequestMethod.GET)
+	public String homeGridpadxx(Locale locale, Model model) { 
+		for(int i=0;i<20;i++){
+			try {
+				Thread.sleep(1000);
+				GridElement test	=	this.gridElementService.getElementById(1, "Goal");
+				System.out.println(test);
+			} catch (InterruptedException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			
+		}
+		return "home";
+	}
+	
 	
 	//TODO remove test
 	@RequestMapping(value = "/testStep2", method = RequestMethod.GET)

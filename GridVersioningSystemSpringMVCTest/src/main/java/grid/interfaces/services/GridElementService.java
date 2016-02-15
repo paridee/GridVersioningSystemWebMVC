@@ -78,4 +78,12 @@ public interface GridElementService {
 	 */
 	public List<GridElement> getElementByLabelAndState(String subjLabel, String class1,GridElement.State state);
 	
+	/**
+	 * Returns the latest working version of an element of a grid
+	 * @param label id of the element
+	 * @param classn class of the element
+	 * @return latest object found (may be null)
+	 */
+	public GridElement getLatestWorking(String key,String classn);
+	
 }

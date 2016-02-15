@@ -208,6 +208,24 @@ public class GridElementServiceImpl implements GridElementService {
 		return version;
 	}
 	
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public GridElement getLatestWorking(String key, String classn) {
+		GridElement 		latestW		=	null;
+		int					version		=	0;
+		List<GridElement>	allWorking	=	this.getElementByLabelAndState(key, classn, GridElement.State.WORKING);
+		for(GridElement ge:allWorking){
+			if(ge.getVersion()>version){
+				latestW	=	ge;
+				version	=	ge.getVersion();
+			}
+		}
+		// TODO Auto-generated method stub
+		return latestW;
+	}
+	
 
 	
 }

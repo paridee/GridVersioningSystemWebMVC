@@ -283,7 +283,7 @@ public class GridModificationService {
 						}
 						else return null;
 						if(!sentNotificationLabel.contains(modified.getLabel())){
-							this.sendNotification(modified,newVersion);
+							this.sendGridElementNotification(modified,newVersion);
 							sentNotificationLabel.add(modified.getLabel());
 						}
 					}
@@ -295,7 +295,7 @@ public class GridModificationService {
 							if(!sentNotificationLabel.contains(anAddition.getAppendedObjectLabel())){
 								GridElement newElement	=	anAddition.getGridElementAdded();
 								//newElement.setState(GridElement.State.MAJOR_UPDATING);
-								this.sendNotification(newElement,newVersion);
+								this.sendGridElementNotification(newElement,newVersion);
 								sentNotificationLabel.add(anAddition.getAppendedObjectLabel());
 							}
 						}
@@ -304,6 +304,9 @@ public class GridModificationService {
 						this.logger.info("manage this case "+aMod.toString());
 					}
 				}	
+				if(newVersion.isMainGoalsChanged()){
+					this.sendMainGoalChangeNotification(newVersion);
+				}
 				this.updateVersionNumbersAndStatus(latestGrid,newVersion);
 				this.gridService.addGrid(newVersion);
 				logger.info("mods summary");
@@ -314,8 +317,13 @@ public class GridModificationService {
 			return newVersion;
 		}
 	}
-
-	private void sendNotification(GridElement modified,Grid aGrid) {
+	
+	private void sendMainGoalChangeNotification(Grid newGrid){
+		Practitioner pm	=	newGrid.getProject().getProjectManager();
+		Utils.mailSender("GQM+S Versioning alert", "Dear "+pm.getName()+", the following Project: "+newGrid.getProject().getProjectId()+" had a main Goal change and requires an action, please check at the following link "+Utils.systemURL+"/MAIN_GOAL_CHANGE/"+newGrid.getProject().getId(),pm.getEmail());//+"/"+modified.getClass().getSimpleName()+"/"+modified.getIdElement(), responsibles.get(i).getEmail());
+	}
+	
+	private void sendGridElementNotification(GridElement modified,Grid aGrid) {
 		ArrayList<Practitioner> responsibles	=	new ArrayList<Practitioner>();
 		if(Modification.minorUpdateClass.contains(modified.getClass())){
 			responsibles.addAll(modified.getAuthors());
@@ -344,6 +352,10 @@ public class GridModificationService {
 		HashMap<String,GridElement> oldElements	=	latestGrid.obtainAllEmbeddedElements();
 		HashMap<String,GridElement> newElements	=	newVersion.obtainAllEmbeddedElements();
 		java.util.Iterator<String> anIt	=	newElements.keySet().iterator();
+		int latestVersionNumber			=	this.gridService.getLatestGrid(newVersion.getProject().getId()).getVersion();
+		if(latestVersionNumber>=newVersion.getVersion()){
+			newVersion.setVersion(latestVersionNumber+1);
+		}
 		while(anIt.hasNext()){
 			String key	=	anIt.next();
 			this.logger.info("fixing version number element "+key);
@@ -354,6 +366,7 @@ public class GridModificationService {
 				if(newElement.getVersion()>oldElement.getVersion()){
 					this.logger.info("element "+key+" fixing version from "+newElement.getVersion()+" to "+oldElement.getVersion()+1);
 					newElement.setVersion(oldElement.getVersion()+1);
+					//manages "on cascading update..." invalidates older version
 					if((oldElement.getState()==GridElement.State.MAJOR_CONFLICTING)||(oldElement.getState()==GridElement.State.MAJOR_UPDATING)||(oldElement.getState()==GridElement.State.MINOR_CONFLICTING)){
 						oldElement.setState(GridElement.State.ABORTED);
 						this.gridElementService.updateGridElement(oldElement);
@@ -373,6 +386,7 @@ public class GridModificationService {
 			}
 		}
 	}
+	
 
 	private Grid applyAModification(GridElementModification gridElementModification, Grid newVersion,HashMap<String,GridElement> elements) throws Exception {
 		GridElement 	subj;
@@ -396,6 +410,49 @@ public class GridModificationService {
 		return newVersion;
 	}
 	
+	
+	
+	/**
+	 * refreshes all the links in a Grid using all the latest working elements with a label //soluzione "sporca", aggiunta per modifiche al modello fatte da Lorenzo, serve per linkare grid element "Major" working che non sono linkati nella grid
+	 * @param aGrid grid to be updated
+	 * @return updated grid
+	 */
+	private Grid refreshLinks(Grid aGrid){
+		aGrid	=	aGrid.clone();
+		HashMap<String,GridElement> embeddedEl	=	aGrid.obtainAllEmbeddedElements();
+		ArrayList<GridElement> updated			=	new ArrayList<GridElement>();
+		Iterator<String> elements				=	embeddedEl.keySet().iterator();
+		while(elements.hasNext()){
+			String key			=	elements.next();
+			GridElement current	=	embeddedEl.get(key);
+			GridElement mostUp	=	this.gridElementService.getLatestWorking(key,current.getClass().getSimpleName());
+			if(mostUp.getVersion()>=current.getVersion()){
+				List<GridElementModification> mods;
+				try {
+					mods = ObjectModificationService.getModification(current, mostUp);	//check if most updated is different from current
+					if(mods.size()>0){
+						updated.add(mostUp);
+					}
+				} catch (Exception e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+			}
+		}
+		for(GridElement el:updated){	//for each element in updated list
+			el	=	el.clone();
+			el.setVersion(el.getVersion()+1);
+			Iterator<String> it	=	embeddedEl.keySet().iterator();
+			while(it.hasNext()){		//restore links to current elements
+				el.updateReferences(embeddedEl.get(it.next()), false, false);
+			}
+			this.gridService.updateGridElement(aGrid, el, false, false);
+			embeddedEl	=	aGrid.obtainAllEmbeddedElements(); //updates with the current element
+		}
+		return aGrid;
+	}
+
+	
 	public Grid applyAModificationToASingleElement(Grid aGrid,GridElement newGridElement) throws Exception{
 		GridElement oldVersion	=	aGrid.obtainAllEmbeddedElements().get(newGridElement.getLabel());
 		if(oldVersion == null){
@@ -415,9 +472,10 @@ public class GridModificationService {
 					}
 				}	
 				this.updateVersionNumbersAndStatus(aGrid, updated);
+				updated	=	this.refreshLinks(updated);
+				//TODO set right state for all elements
 				this.gridService.addGrid(updated);
 			}
-			//TODO set right state for all elements
 			return updated;
 		}
 	}
