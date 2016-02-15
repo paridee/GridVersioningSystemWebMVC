@@ -195,6 +195,7 @@ public class GVSWebController {
 		String label = obj.getString("label");
 		String type = obj.getString("type");
 		System.out.println(label+"-"+type);
+		//
 		List <GridElement> geList=this.gridElementService.getElementByLabelAndState(label, type, GridElement.State.MAJOR_UPDATING);
 		if(geList.size()==1){
 			GridElement ge=geList.get(0);
@@ -304,7 +305,8 @@ public class GVSWebController {
 			List<Object> newStack=new ArrayList<Object>();
 			GridElement ge=(GridElement)stack.get(i);
 			name=stack.get(i).getClass().getSimpleName()+" "+ge.getLabel()+" - <i>v"+ge.getVersion()+"</i>";
-			desc="";
+			desc="<div class='txtElement'><i>"+ge.getState().name()+"</i></div>";
+			
 			Field[] fields=ge.getClass().getDeclaredFields();
 			for(int j=0; j<fields.length;j++){
 				Field tempField=fields[j];
