@@ -206,7 +206,7 @@ public class Utils {
 							Object	current	=	 myList.get(i);
 							if(current instanceof GridElement){
 								GridElement fieldValueGE=(GridElement)current;
-								desc=desc+tempField.getName()+": "+fieldValueGE.getLabel()+"_v"+fieldValueGE.getVersion()+"<br>";
+								desc=desc+" "+fieldValueGE.getLabel()+"_v"+fieldValueGE.getVersion()+"<br>";
 							}
 						}
 					}

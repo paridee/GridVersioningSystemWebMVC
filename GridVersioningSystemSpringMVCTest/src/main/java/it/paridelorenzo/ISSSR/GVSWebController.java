@@ -250,13 +250,19 @@ public class GVSWebController {
 		List <GridElement> geList=this.gridElementService.getElementByLabelAndState(label, type, GridElement.State.MAJOR_UPDATING);
 		geList.addAll(this.gridElementService.getElementByLabelAndState(label, type, GridElement.State.MAJOR_CONFLICTING));
 		geList.addAll(this.gridElementService.getElementByLabelAndState(label, type, GridElement.State.MINOR_CONFLICTING));
-		if (geList.size()>0){
+		GridElement workingGE=this.gridElementService.getLatestWorking(label, type);
+		if (geList.size()>0&&workingGE!=null){
+			model.addAttribute("workingGE", workingGE);
+			model.addAttribute("updatingElements", geList);
 			
-			return "resolutionDashBoard";
+		}
+		else if (workingGE!=null&&geList.size()==0){
+			model.addAttribute("error", "The requested Grid Element is in a consistent state");
 		}
 		else{
-			return "resolutionDashBoard";
+			model.addAttribute("error", "The requested Grid Element is not available");
 		}
+		return "GEResolution";
 	}
 	
 	
@@ -279,6 +285,7 @@ public class GVSWebController {
 			GridElement workingElement=workingGrid.obtainAllEmbeddedElements().get(ge.getLabel());
 			if (workingElement!=null) {
 				model.addAttribute("workingElement", workingElement);
+			
 			}
 			
 			
