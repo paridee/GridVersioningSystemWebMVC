@@ -320,7 +320,7 @@ public class GridModificationService {
 	
 	private void sendMainGoalChangeNotification(Grid newGrid){
 		Practitioner pm	=	newGrid.getProject().getProjectManager();
-		Utils.mailSender("GQM+S Versioning alert", "Dear "+pm.getName()+", the following Project: "+newGrid.getProject().getProjectId()+" had a main Goal change and requires an action, please check at the following link "+Utils.systemURL+"/MAIN_GOAL_CHANGE/"+newGrid.getProject().getId(),pm.getEmail());//+"/"+modified.getClass().getSimpleName()+"/"+modified.getIdElement(), responsibles.get(i).getEmail());
+		Utils.mailSender("GQM+S Versioning alert", "Dear "+pm.getName()+", the following Project: "+newGrid.getProject().getProjectId()+" had a main Goal change and requires an action, please check at the following link "+Utils.systemURL+"/MGLCResolution/"+newGrid.getId(),pm.getEmail());//+"/"+modified.getClass().getSimpleName()+"/"+modified.getIdElement(), responsibles.get(i).getEmail());
 	}
 	
 	private void sendGridElementNotification(GridElement modified,Grid aGrid) {
@@ -335,15 +335,15 @@ public class GridModificationService {
 			if(responsibles.get(i)!=null){
 				this.logger.info("sending email for "+modified.getLabel()+" to "+responsibles.get(i).getEmail());
 				if(modified.getState().equals(GridElement.State.MINOR_CONFLICTING)){
-					Utils.mailSender("GQM+S Versioning alert", "Dear "+responsibles.get(i).getName()+", the following Grid element: "+(modified.getClass().getSimpleName())+" "+modified.getLabel()+" is in state "+modified.getState()+" and requires an action, please check at the following link "+Utils.systemURL+"/MINOR_CONFLICTING/"+aGrid.getProject().getId()+"/"+modified.getClass().getSimpleName()+"/"+modified.getIdElement(), responsibles.get(i).getEmail());
+					Utils.mailSender("GQM+S Versioning alert", "Dear "+responsibles.get(i).getName()+", the following Grid element: "+(modified.getClass().getSimpleName())+" "+modified.getLabel()+" is in state "+modified.getState()+" and requires an action, please check at the following link "+Utils.systemURL+"/GEResolution/"+modified.getClass().getSimpleName()+"/"+modified.getLabel(), responsibles.get(i).getEmail());
 				}
 				else if(modified.getState().equals(GridElement.State.MAJOR_UPDATING)){
-					Utils.mailSender("GQM+S Versioning alert", "Dear "+responsibles.get(i).getName()+", the following Grid element: "+(modified.getClass().getSimpleName())+" "+modified.getLabel()+" is in state "+modified.getState()+" and requires an action, please check at the following link "+Utils.systemURL+"/MAJOR_UPDATING/"+aGrid.getProject().getId()+"/"+modified.getClass().getSimpleName()+"/"+modified.getIdElement(), responsibles.get(i).getEmail());
+					Utils.mailSender("GQM+S Versioning alert", "Dear "+responsibles.get(i).getName()+", the following Grid element: "+(modified.getClass().getSimpleName())+" "+modified.getLabel()+" is in state "+modified.getState()+" and requires an action, please check at the following link "+Utils.systemURL+"/GEResolution/"+modified.getClass().getSimpleName()+"/"+modified.getLabel(), responsibles.get(i).getEmail());
 				}
 				else if(modified.getState().equals(GridElement.State.MAJOR_CONFLICTING)){
-					Utils.mailSender("GQM+S Versioning alert", "Dear "+responsibles.get(i).getName()+", the following Grid element: "+(modified.getClass().getSimpleName())+" "+modified.getLabel()+" is in state "+modified.getState()+" and requires an action, please check at the following link "+Utils.systemURL+"/MAJOR_CONFLICTING/"+aGrid.getProject().getId()+"/"+modified.getClass().getSimpleName()+"/"+modified.getIdElement(), responsibles.get(i).getEmail());
+					Utils.mailSender("GQM+S Versioning alert", "Dear "+responsibles.get(i).getName()+", the following Grid element: "+(modified.getClass().getSimpleName())+" "+modified.getLabel()+" is in state "+modified.getState()+" and requires an action, please check at the following link "+Utils.systemURL+"/GEResolution/"+modified.getClass().getSimpleName()+"/"+modified.getLabel(), responsibles.get(i).getEmail());
 				}
-		}
+			}
 		}
 		this.logger.info("#~#~NOTIFICATION STUB for item "+modified.getLabel()+" in state "+modified.getState());
 	}
