@@ -13,16 +13,8 @@
           <ul class="nav navbar-nav">
             <li ${navClass0}><a href="<c:url value='/projects'/>">Projects</a></li>
             <li ${navClass1}><a href="<c:url value='/grids'/>">Grids</a></li>
-            <li ${navClass2}>
-		        <a class="dropdown-toggle" data-toggle="dropdown" href="#">Pending Changes
-		        <span class="caret"></span></a>
-		        <ul class="dropdown-menu">
-		          <li><a href="<c:url value='/resolutionDashBoard/1'/>">Major Updates</a></li>
-		          <li><a href="<c:url value='/resolutionDashBoard/2'/>">Major colliding Updates</a></li>
-		          <li><a href="<c:url value='/resolutionDashBoard/3'/>">Minor colliding Updates</a></li>
-		        </ul>
-		      </li>
-          </ul>
+            <li ${navClass2}><a href="<c:url value='/resolutionDashBoard'/>">Pending changes</a></li>
+		  </ul>
         </div><!--/.nav-collapse -->
       </div>
     </nav>
