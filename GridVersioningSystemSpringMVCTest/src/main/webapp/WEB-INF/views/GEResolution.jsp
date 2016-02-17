@@ -45,7 +45,12 @@
        				<div style="width: 50%; float: left;">
        					<h2>Current version:</h2><br>
       						<% out.println(Utils.gridElementToHTMLString(we));%><br>
-      						<input type="button" value="Accept" onclick="acceptGE('<%String s=gson.toJson(we); s=s.replaceAll("\"", "#"); out.print(s);%>')"/>
+      						<input type="button" value="Accept" onclick="acceptGE('<%
+      								String s=gson.toJson(we); 
+      								s=s.replaceAll("\"", "#"); 
+      								String type=we.getClass().toString();
+      								type=type.substring(6, type.length());
+      								out.print(type+","+pendinglist.size()+s);%>')"/>
        				</div>
        				<%
        				for(GridElement ge: pendinglist){
@@ -55,7 +60,12 @@
 	       					<h2>Update to approve:</h2><br>
 	       					<%out.println(Utils.gridElementToHTMLString(ge)); %>
 	       					<div style="width: 100%; float: left; text-align: left; margin-top: 40px;">
-								<input type="button" value="Accept" onclick="acceptGE('<%s=gson.toJson(ge); s=s.replaceAll("\"", "#"); out.print(s);%>')"/>
+								<input type="button" value="Accept" onclick="acceptGE('<%
+										s=gson.toJson(ge); 
+										s=s.replaceAll("\"", "#"); 
+										type=ge.getClass().toString();
+	      								type=type.substring(6, type.length());
+	      								out.print(type+","+pendinglist.size()+s);%>')"/>
 				   			</div>
 	       				</div>
        				<%

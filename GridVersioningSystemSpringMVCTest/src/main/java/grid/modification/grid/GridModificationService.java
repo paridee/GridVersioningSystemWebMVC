@@ -33,8 +33,6 @@ import grid.interfaces.services.ProjectService;
 import grid.modification.elements.GridElementModification;
 import grid.modification.elements.Modification;
 import grid.modification.elements.ObjectModificationService;
-import grid.modification.grid.Conflict.Type;
-import it.paridelorenzo.ISSSR.ModificationController;
 
 /**
  * This class owns the task of calculating differences between two grids
@@ -468,10 +466,16 @@ public class GridModificationService {
 	 * @throws Exception
 	 */
 	public void applyAModificationToASingleElement(GridElement newGridElement) throws Exception{
+		System.out.println("test");
 		List<Project> 	projects	=	this.projectService.listProjects();
 		for(Project p:projects){
 			Grid latest	=	this.gridService.getLatestWorkingGrid(p.getId());
-			this.applyAModificationToASingleElement(latest, newGridElement);
+			try{
+				this.applyAModificationToASingleElement(latest, newGridElement);
+			}
+			catch(GridElementNotFoundInAGridException e){
+				this.logger.info("skipping a grid, object not found");
+			}
 		}
 	}
 	
@@ -485,7 +489,7 @@ public class GridModificationService {
 	public Grid applyAModificationToASingleElement(Grid aGrid,GridElement newGridElement) throws Exception{
 		GridElement oldVersion	=	aGrid.obtainAllEmbeddedElements().get(newGridElement.getLabel());
 		if(oldVersion == null){
-			throw new Exception("object not found in current Grid");
+			throw new GridElementNotFoundInAGridException("object not found in current Grid");
 		}
 		else{
 			Grid updated	=	aGrid;

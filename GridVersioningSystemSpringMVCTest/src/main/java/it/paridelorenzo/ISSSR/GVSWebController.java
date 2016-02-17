@@ -22,23 +22,26 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.google.gson.Gson;
+import com.google.gson.JsonSyntaxException;
 
 import grid.JSONFactory;
+import grid.entities.Goal;
 import grid.entities.Grid;
 import grid.entities.GridElement;
 import grid.entities.GridElement.State;
 import grid.entities.Project;
-import grid.entities.Strategy;
 import grid.interfaces.services.ConflictService;
 import grid.interfaces.services.GridElementService;
 import grid.interfaces.services.GridService;
 import grid.interfaces.services.ProjectService;
+import grid.modification.grid.GridModificationService;
  
  
 @Controller
 public class GVSWebController {
      
 	private GridElementService 	gridElementService;
+	private GridModificationService gridModificationService;
 	private GridService			gridService;
 	private ProjectService		projectService;
 	private JSONFactory 		jFact;
@@ -55,6 +58,12 @@ public class GVSWebController {
 	@Qualifier(value="gridElementService")
 	public void setGridElementService(GridElementService gridElementService) {
 		this.gridElementService = gridElementService;
+	}
+	
+	@Autowired(required=true)
+	@Qualifier(value="gridModificationService")
+	public void setGridModificationService(GridModificationService gridModificationService) {
+		this.gridModificationService = gridModificationService;
 	}
 
 	@Autowired(required=true)
@@ -272,14 +281,51 @@ public class GVSWebController {
 	@RequestMapping(value = "/solveUpdate", method=RequestMethod.POST)
     public @ResponseBody String solveUpdate(@RequestBody String jsonData) {
 		System.out.println(jsonData.toString());
+		String type=jsonData.substring(0, jsonData.indexOf(","));
+		System.out.println(type);
+		int nconflict=Integer.parseInt(jsonData.substring(jsonData.indexOf(",")+1,jsonData.indexOf("{") ));
+		System.out.println(nconflict);
 		Gson gson = new Gson();
-		Strategy ge=gson.fromJson(jsonData, Strategy.class);
-		System.out.println(ge.toString());
+		String jsonGE=jsonData.substring(jsonData.indexOf("{"), jsonData.length());
+		System.out.println(jsonGE);
+		GridElement ge=null;
+		try {
+			ge = (GridElement)gson.fromJson(jsonGE, Class.forName(type));
+			System.out.println(ge.toString());
+			List<GridElement> pending=this.gridElementService.getElementByLabelAndState(ge.getLabel(), Class.forName(type).getSimpleName(), GridElement.State.MAJOR_CONFLICTING);
+			pending.addAll(this.gridElementService.getElementByLabelAndState(ge.getLabel(), Class.forName(type).getSimpleName(), GridElement.State.MAJOR_UPDATING));
+			pending.addAll(this.gridElementService.getElementByLabelAndState(ge.getLabel(), Class.forName(type).getSimpleName(), GridElement.State.MINOR_CONFLICTING));
+			System.out.println("pendingsize:"+pending.size());
+			if(pending.size()==nconflict){
+				//apply modifications to grid element
+				System.out.println("entro");
+				this.gridModificationService.applyAModificationToASingleElement(ge);
+				JSONObject jsonObject = new JSONObject();
+				jsonObject.put("msg", "result");
+				jsonObject.put("resp", "okkkkkkkk");
+				return jsonObject.toString();
+				
+			}
+			else{
+				JSONObject jsonObject = new JSONObject();
+				jsonObject.put("msg", "result");
+				jsonObject.put("resp", "error, other incoming updates to solve");
+				return jsonObject.toString();
+				
+			}
+			
+			
+			
+			
+		} catch (Exception e) {
+			JSONObject jsonObject = new JSONObject();
+			jsonObject.put("msg", "result");
+			jsonObject.put("resp", "error");
+			e.printStackTrace();
+			return jsonObject.toString();
+			
+		} 
 		
-		JSONObject jsonObject = new JSONObject();
-		jsonObject.put("msg", "result");
-		jsonObject.put("resp", "ok");
-		return jsonObject.toString();
     }
 	
 	
