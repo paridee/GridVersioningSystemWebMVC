@@ -21,11 +21,14 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import com.google.gson.Gson;
+
 import grid.JSONFactory;
 import grid.entities.Grid;
 import grid.entities.GridElement;
 import grid.entities.GridElement.State;
 import grid.entities.Project;
+import grid.entities.Strategy;
 import grid.interfaces.services.ConflictService;
 import grid.interfaces.services.GridElementService;
 import grid.interfaces.services.GridService;
@@ -266,111 +269,20 @@ public class GVSWebController {
 	}
 	
 	
-	
-	
-	
-	
-	
-	@RequestMapping(value = "/MAJOR_UPDATING/{projID}/{type}/{label}", method = RequestMethod.GET)
-	public String majPResolutionDashBoard(@PathVariable("type") String type,@PathVariable("projID") int projID,@PathVariable("label") String label,Model model) {
-		model.addAttribute("pageTitle", "Grids Versioning System");
+	@RequestMapping(value = "/solveUpdate", method=RequestMethod.POST)
+    public @ResponseBody String solveUpdate(@RequestBody String jsonData) {
+		System.out.println(jsonData.toString());
+		Gson gson = new Gson();
+		Strategy ge=gson.fromJson(jsonData, Strategy.class);
+		System.out.println(ge.toString());
 		
-		List <GridElement> geList=this.gridElementService.getElementByLabelAndState(label, type, GridElement.State.MAJOR_UPDATING);
-		if (geList.size()==1){
-			GridElement ge=(GridElement)geList.get(0);
-			//verify if it is an add or an update
-			model.addAttribute("majUpdateToApprove", ge);
-			Grid workingGrid=this.gridService.getLatestWorkingGrid(projID);
-			System.out.println(workingGrid.toString()+"-"+ge.getLabel());
-			GridElement workingElement=workingGrid.obtainAllEmbeddedElements().get(ge.getLabel());
-			if (workingElement!=null) {
-				model.addAttribute("workingElement", workingElement);
-			
-			}
-			
-			
-		}
-		else if (geList.size()>1){
-			System.out.println(geList.toString());
-			model.addAttribute("error", "Inconsistent DB State");
-		}
-		else if (geList.size()==0){
-			List <GridElement> geConflictingList=this.gridElementService.getElementByLabelAndState( label, type, GridElement.State.MAJOR_CONFLICTING);
-			if(geConflictingList.size()>0){
-				String toRedir="redirect:/MAJOR_CONFLICTING/"+projID+"/"+type+"/"+label;
-				return toRedir;
-			}
-			model.addAttribute("error", "No pending entries for this element");
-		}
-		
-		return "stateResolutionDashBoard";
-	}
-	@RequestMapping(value = "/MAJOR_CONFLICTING/{projID}/{type}/{gridElID}", method = RequestMethod.GET)
-	public String majCResolutionDashBoard(@PathVariable("type") String type,@PathVariable("projID") int projID,@PathVariable("gridElID") int gridElID,Model model) {
-		model.addAttribute("pageTitle", "Grids Versioning System");
-		GridElement ge=this.gridElementService.getElementById(gridElID, type);
-		
-		return "stateResolutionDashBoard";
-	}
-	@RequestMapping(value = "/MINOR_CONFLICTING/{projID}/{type}/{gridElID}", method = RequestMethod.GET)
-	public String minorCResolutionDashBoard(@PathVariable("type") String type,@PathVariable("projID") int projID,@PathVariable("gridElID") int gridElID,Model model) {
-		model.addAttribute("pageTitle", "Grids Versioning System");
-		GridElement ge=this.gridElementService.getElementById(gridElID, type);
-		
-		return "stateResolutionDashBoard";
-	}
+		JSONObject jsonObject = new JSONObject();
+		jsonObject.put("msg", "result");
+		jsonObject.put("resp", "ok");
+		return jsonObject.toString();
+    }
 	
 	
-	@RequestMapping(value = "/acceptPendingUpdate", method=RequestMethod.POST)
-    public @ResponseBody String acceptPendingUpdate(@RequestBody String jsonData) {
-		JSONObject obj = new JSONObject(jsonData);
-		String label = obj.getString("label");
-		String type = obj.getString("type");
-		System.out.println(label+"-"+type);
-		//
-		List <GridElement> geList=this.gridElementService.getElementByLabelAndState(label, type, GridElement.State.MAJOR_UPDATING);
-		if(geList.size()==1){
-			GridElement ge=geList.get(0);
-			ge.setState(GridElement.State.WORKING);
-			//TODO nuova funz update
-			this.gridElementService.updateGridElement(ge);
-			JSONObject response = new JSONObject();
-			response.put("msg", "result");
-			response.put("resp", "ok");
-			return response.toString();
-		}
-		else{
-			JSONObject response = new JSONObject();
-			response.put("msg", "error");
-			response.put("resp", "no pending elements");
-			return response.toString();
-		}
-		
-		
-	}
-	@RequestMapping(value = "/rejectPendingUpdate", method=RequestMethod.POST)
-    public @ResponseBody String rejectPendingUpdate(@RequestBody String jsonData) {
-		JSONObject obj = new JSONObject(jsonData);
-		String label = obj.getString("label");
-		String type = obj.getString("type");
-		System.out.println(label+"-"+type);
-		List <GridElement> geList=this.gridElementService.getElementByLabelAndState(label, type, GridElement.State.MAJOR_UPDATING);
-		if(geList.size()==1){
-			GridElement ge=geList.get(0);
-			//ge.setState(GridElement.State.);
-			this.gridElementService.updateGridElement(ge);
-			JSONObject response = new JSONObject();
-			response.put("msg", "result");
-			response.put("resp", "ok");
-			return response.toString();
-		}
-		else{
-			JSONObject response = new JSONObject();
-			response.put("msg", "error");
-			response.put("resp", "no pending elements");
-			return response.toString();
-		}
-	}
 	
 	
 	
