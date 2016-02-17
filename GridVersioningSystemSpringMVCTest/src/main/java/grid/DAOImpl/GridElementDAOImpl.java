@@ -1,6 +1,9 @@
 package grid.DAOImpl;
 
 import java.util.List;
+
+import javax.persistence.Transient;
+
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.slf4j.Logger;
@@ -91,7 +94,8 @@ public class GridElementDAOImpl implements GridElementDao {
 		}
 		return gElList;
 	}
-
+	
+	
 	/**
 	 * {@inheritDoc}
 	 */

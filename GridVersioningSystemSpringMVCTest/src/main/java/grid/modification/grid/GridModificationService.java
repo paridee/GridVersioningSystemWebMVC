@@ -1,5 +1,6 @@
 package grid.modification.grid;
 
+import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -24,6 +25,7 @@ import grid.entities.Goal;
 import grid.entities.Grid;
 import grid.entities.GridElement;
 import grid.entities.GridElement.State;
+import grid.entities.MeasurementGoal;
 import grid.entities.Practitioner;
 import grid.entities.Project;
 import grid.interfaces.services.ConflictService;
@@ -561,4 +563,71 @@ public class GridModificationService {
 		}
 		return false;
 	}
+
+	public void updateSingleElement(GridElement ge) {
+		int lastVersion=this.gridElementService.getLatestVersion(ge.getLabel(), ge.getClass().getSimpleName());
+		ge.setVersion(lastVersion+1);
+		ge.setIdElement(0);
+		ge.setState(GridElement.State.WORKING);
+		//update link to working GE
+		Field[] fields=ge.getClass().getDeclaredFields();
+		for(int j=0; j<fields.length;j++){
+			Field tempField=fields[j];
+			tempField.setAccessible(true);
+			try {
+				Object fieldValue=tempField.get(ge);
+				if(fieldValue instanceof GridElement){
+					GridElement temp=(GridElement)fieldValue;
+					GridElement active=this.gridElementService.getLatestWorking(temp.getLabel(), temp.getClass().getSimpleName());
+					tempField.set(ge, active);
+				}
+				else if(fieldValue instanceof List){
+					List myList 	=	(List)fieldValue;
+					List<GridElement> newList=new ArrayList<GridElement>();
+					List<GridElement> toConnect=new ArrayList<GridElement>();
+					boolean gridElementList=false;
+					if(myList.size()>0){
+						Object	first	=	 myList.get(0);
+						if(first instanceof GridElement){
+							for(Object current:myList){
+								GridElement currentGE=(GridElement)current;
+								GridElement active=this.gridElementService.getLatestWorking(currentGE.getLabel(), currentGE.getClass().getSimpleName());   
+								newList.add(active);
+							}
+							gridElementList=true;
+						}
+					}
+					if(gridElementList){
+						tempField.set(ge, newList);
+					}
+				}
+			} catch (IllegalArgumentException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} catch (IllegalAccessException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
+		//save grid element
+		this.gridElementService.addGridElement(ge);
+		//for each project
+			//for each working grid
+				//clone Working Grid
+				//update references to GE
+		
+		
+		
+		
+		
+		
+		
+				
+				
+				
+			
+			
+			
+	}
+	
 }
