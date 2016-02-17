@@ -21,11 +21,14 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import com.google.gson.Gson;
+
 import grid.JSONFactory;
 import grid.entities.Grid;
 import grid.entities.GridElement;
 import grid.entities.GridElement.State;
 import grid.entities.Project;
+import grid.entities.Strategy;
 import grid.interfaces.services.ConflictService;
 import grid.interfaces.services.GridElementService;
 import grid.interfaces.services.GridService;
@@ -266,7 +269,18 @@ public class GVSWebController {
 	}
 	
 	
-	
+	@RequestMapping(value = "/solveUpdate", method=RequestMethod.POST)
+    public @ResponseBody String solveUpdate(@RequestBody String jsonData) {
+		System.out.println(jsonData.toString());
+		Gson gson = new Gson();
+		Strategy ge=gson.fromJson(jsonData, Strategy.class);
+		System.out.println(ge.toString());
+		
+		JSONObject jsonObject = new JSONObject();
+		jsonObject.put("msg", "result");
+		jsonObject.put("resp", "ok");
+		return jsonObject.toString();
+    }
 	
 	
 	
