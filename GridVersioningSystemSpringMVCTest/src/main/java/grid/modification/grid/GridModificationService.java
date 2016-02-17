@@ -471,12 +471,14 @@ public class GridModificationService {
 		for(Project p:projects){
 			Grid latest	=	this.gridService.getLatestWorkingGrid(p.getId());
 			try{
+				System.out.println("test2");
 				this.applyAModificationToASingleElement(latest, newGridElement);
 			}
 			catch(GridElementNotFoundInAGridException e){
 				this.logger.info("skipping a grid, object not found");
 			}
 		}
+		this.abortAllPending(newGridElement);
 	}
 	
 	/**
@@ -487,14 +489,19 @@ public class GridModificationService {
 	 * @throws Exception
 	 */
 	public Grid applyAModificationToASingleElement(Grid aGrid,GridElement newGridElement) throws Exception{
+		System.out.println("1");
 		GridElement oldVersion	=	aGrid.obtainAllEmbeddedElements().get(newGridElement.getLabel());
+		System.out.println("2");
 		if(oldVersion == null){
+			System.out.println("3");
 			throw new GridElementNotFoundInAGridException("object not found in current Grid");
 		}
 		else{
+			System.out.println("4");
 			Grid updated	=	aGrid;
 			List<Modification> mods	=	new ArrayList<Modification>();
 			mods.addAll(ObjectModificationService.getModification(oldVersion, newGridElement));
+			System.out.println("5");
 			if(mods.size()>0){
 				updated	=	this.gridService.createStubUpgrade(aGrid);
 				for(Modification aMod : mods){
@@ -510,7 +517,6 @@ public class GridModificationService {
 					updatedEl.setState(GridElement.State.WORKING);
 				}
 				updated	=	this.refreshLinks(updated);
-				this.abortAllPending(newGridElement);
 				//TODO set right state for all elements
 				this.gridService.addGrid(updated);
 			}
@@ -521,11 +527,15 @@ public class GridModificationService {
 	
 	private void abortAllPending(GridElement newGridElement) {
 		String label	=	newGridElement.getLabel();
+		this.logger.info("aborting pending");
 		List<GridElement> pending	=	this.gridElementService.getElementByLabelAndState(newGridElement.getLabel(), newGridElement.getClass().getSimpleName(), GridElement.State.MAJOR_CONFLICTING);
 		pending.addAll(this.gridElementService.getElementByLabelAndState(newGridElement.getLabel(), newGridElement.getClass().getSimpleName(), GridElement.State.MAJOR_UPDATING));
 		pending.addAll(this.gridElementService.getElementByLabelAndState(newGridElement.getLabel(), newGridElement.getClass().getSimpleName(), GridElement.State.MINOR_CONFLICTING));
+		this.logger.info("aborting pending"+pending.toString());
+		newGridElement.setState(GridElement.State.SOLVED);
 		for(GridElement ge : pending){
 			ge.setState(GridElement.State.SOLVED);
+			this.logger.info("setting to solved the following element id "+ge.getIdElement()+" label "+ge.getLabel()+" version "+ge.getVersion());
 			this.gridElementService.updateGridElement(ge);
 		}
 		
