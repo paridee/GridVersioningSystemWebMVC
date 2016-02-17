@@ -25,9 +25,11 @@ import grid.entities.Grid;
 import grid.entities.GridElement;
 import grid.entities.GridElement.State;
 import grid.entities.Practitioner;
+import grid.entities.Project;
 import grid.interfaces.services.ConflictService;
 import grid.interfaces.services.GridElementService;
 import grid.interfaces.services.GridService;
+import grid.interfaces.services.ProjectService;
 import grid.modification.elements.GridElementModification;
 import grid.modification.elements.Modification;
 import grid.modification.elements.ObjectModificationService;
@@ -45,7 +47,15 @@ public class GridModificationService {
 	private GridElementService 	gridElementService;
 	private GridService			gridService;
 	private ConflictService		conflictService;
+	private ProjectService		projectService;
 	
+	
+	@Autowired(required=true)
+	@Qualifier(value="projectService")
+	public void setProjectService(ProjectService projectService) {
+		this.projectService = projectService;
+	}
+
 	@Autowired(required=true)
 	@Qualifier(value="gridElementService")
 	public void setGridElementService(GridElementService gridElementService) {
@@ -304,11 +314,11 @@ public class GridModificationService {
 						this.logger.info("manage this case "+aMod.toString());
 					}
 				}	
+				this.updateVersionNumbersAndStatus(latestGrid,newVersion);
+				this.gridService.addGrid(newVersion);
 				if(newVersion.isMainGoalsChanged()){
 					this.sendMainGoalChangeNotification(newVersion);
 				}
-				this.updateVersionNumbersAndStatus(latestGrid,newVersion);
-				this.gridService.addGrid(newVersion);
 				logger.info("mods summary");
 				for(int i=0;i<mods.size();i++){
 					logger.info(mods.get(i).toString());
@@ -452,7 +462,26 @@ public class GridModificationService {
 		return aGrid;
 	}
 
+	/**
+	 * Apply a modification to a GridElement to all projects
+	 * @param newGridElement element to be updated
+	 * @throws Exception
+	 */
+	public void applyAModificationToASingleElement(GridElement newGridElement) throws Exception{
+		List<Project> 	projects	=	this.projectService.listProjects();
+		for(Project p:projects){
+			Grid latest	=	this.gridService.getLatestWorkingGrid(p.getId());
+			this.applyAModificationToASingleElement(latest, newGridElement);
+		}
+	}
 	
+	/**
+	 * Apply a modification to a GridElement to a project
+	 * @param aGrid grid to apply this project
+	 * @param newGridElement new grid element
+	 * @return
+	 * @throws Exception
+	 */
 	public Grid applyAModificationToASingleElement(Grid aGrid,GridElement newGridElement) throws Exception{
 		GridElement oldVersion	=	aGrid.obtainAllEmbeddedElements().get(newGridElement.getLabel());
 		if(oldVersion == null){
@@ -462,8 +491,8 @@ public class GridModificationService {
 			Grid updated	=	aGrid;
 			List<Modification> mods	=	new ArrayList<Modification>();
 			mods.addAll(ObjectModificationService.getModification(oldVersion, newGridElement));
-			updated	=	this.gridService.createStubUpgrade(aGrid);
 			if(mods.size()>0){
+				updated	=	this.gridService.createStubUpgrade(aGrid);
 				for(Modification aMod : mods){
 					this.logger.info("found modification "+aMod.toString());
 					if(aMod instanceof GridElementModification){
@@ -472,7 +501,12 @@ public class GridModificationService {
 					}
 				}	
 				this.updateVersionNumbersAndStatus(aGrid, updated);
+				GridElement updatedEl	=	updated.obtainAllEmbeddedElements().get(newGridElement.getLabel());
+				if(updatedEl!=null){
+					updatedEl.setState(GridElement.State.WORKING);
+				}
 				updated	=	this.refreshLinks(updated);
+				this.abortAllPending(newGridElement);
 				//TODO set right state for all elements
 				this.gridService.addGrid(updated);
 			}
@@ -481,6 +515,18 @@ public class GridModificationService {
 	}
 	
 	
+	private void abortAllPending(GridElement newGridElement) {
+		String label	=	newGridElement.getLabel();
+		List<GridElement> pending	=	this.gridElementService.getElementByLabelAndState(newGridElement.getLabel(), newGridElement.getClass().getSimpleName(), GridElement.State.MAJOR_CONFLICTING);
+		pending.addAll(this.gridElementService.getElementByLabelAndState(newGridElement.getLabel(), newGridElement.getClass().getSimpleName(), GridElement.State.MAJOR_UPDATING));
+		pending.addAll(this.gridElementService.getElementByLabelAndState(newGridElement.getLabel(), newGridElement.getClass().getSimpleName(), GridElement.State.MINOR_CONFLICTING));
+		for(GridElement ge : pending){
+			ge.setState(GridElement.State.SOLVED);
+			this.gridElementService.updateGridElement(ge);
+		}
+		
+	}
+
 	/**
 	 * checks if is possible to apply a change to an element (there are not pending elements embedded)
 	 * @param anElement

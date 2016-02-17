@@ -151,6 +151,7 @@ public class ObjectModificationService {
 						modifications.add(append);
 					}
 					else if(entryChange.getClass().equals(EntryRemoved.class)){
+						System.out.println("found removal on list "+listname+" element "+involvedObjlabel);
 						EntryRemoved 	thisRem	=	(EntryRemoved)entryChange;
 						ListRemoval		remove	=	new ListRemoval();
 						remove.setRemovedObjectLabel(thisRem.getKey().toString());

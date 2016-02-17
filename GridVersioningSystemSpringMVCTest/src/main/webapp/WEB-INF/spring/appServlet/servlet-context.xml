@@ -79,6 +79,7 @@
     <beans:bean id="gridModificationService" class="grid.modification.grid.GridModificationService">
         <beans:property name="gridService" ref="gridService"></beans:property>
         <beans:property name="gridElementService" ref="gridElementService"></beans:property>
+        <beans:property name="projectService" ref="projectService"></beans:property>
     </beans:bean>
 	
 </beans:beans>

@@ -201,7 +201,6 @@ public class TestController {
 		g2Str.add(s2);
 		secondg.setStrategyList(g2Str);
 		this.gridService.addGrid(prj1Grid);
-		/*
 		Grid ref	=	prj1Grid;
 		prj1Grid	=	this.gridService.upgradeGrid(prj1Grid);
 		Strategy third = new Strategy();
@@ -218,9 +217,43 @@ public class TestController {
 		third	=	(Strategy) this.gridElementService.upgradeGridElement(third);
 		third.setDescription("descrizione modificata");
 		this.gridService.updateGridElement(secondJson, third, false, false);
+		Goal nuovoMainGoal	=	new Goal();
+		nuovoMainGoal.setDescription("nuovo main goal");
+		nuovoMainGoal.setLabel("goal234");
+		secondJson.getMainGoals().add(nuovoMainGoal);
 		System.out.println(aFactory.obtainJson(prj1Grid, JSONType.FIRST,ref));
 		System.out.println("##########");
-		System.out.println(aFactory.obtainJson(secondJson,JSONType.FIRST,prj1Grid));*/
+		System.out.println(aFactory.obtainJson(secondJson,JSONType.FIRST,prj1Grid));
+		//second step test
+		this.gridService.addGrid(secondJson);
+		nuovoMainGoal	=	(Goal) nuovoMainGoal.clone();
+		nuovoMainGoal.setDescription("descrizione modificata main goal");
+		ArrayList<Strategy> aStrategyList	=	new ArrayList<Strategy>();
+		aStrategyList.add(s2);
+		aStrategyList.add(s1);
+		nuovoMainGoal.setStrategyList(aStrategyList);
+		try {
+			secondJson	=	this.gridModificationService.applyAModificationToASingleElement(secondJson, nuovoMainGoal);
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		nuovoMainGoal	=	(Goal) nuovoMainGoal.clone();
+		aStrategyList	=	new ArrayList<Strategy>();
+		aStrategyList.add(s2);
+		nuovoMainGoal.setStrategyList(aStrategyList);
+		Goal innerGoal	=	new Goal();
+		innerGoal.setLabel("test");
+		innerGoal.setDescription("speriamo che ci sia");
+		ArrayList<Goal> s2glist	=	new ArrayList<Goal>();
+		s2glist.add(innerGoal);
+		s2.setGoalList(s2glist);
+		try {
+			secondJson	=   this.gridModificationService.applyAModificationToASingleElement(secondJson, nuovoMainGoal);
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 		return "home";
 	}
 	
