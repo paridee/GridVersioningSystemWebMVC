@@ -85,6 +85,12 @@ public interface GridElementService {
 	 * @return latest object found (may be null)
 	 */
 	public GridElement getLatestWorking(String key,String classn);
+
+	/**
+	 * Returns all working elements on grid at the latest working version
+	 * @return list of working elements
+	 */
+	public List<GridElement> getAllLatestWorking();
 	
 	/**
 	 * Returns the list of latest working elements

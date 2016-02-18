@@ -109,7 +109,7 @@ public class TestController {
 		newGrid.setMainGoals(goals);
 		newGrid.setProject(first);
 		Grid refVer	=	newGrid;
-		this.gridService.addGrid(newGrid);
+		this.gridService.addGrid(newGrid);/*
 		newGrid	= newGrid.clone();//this.gridService.upgradeGrid(newGrid);
 		newGrid.setVersion(newGrid.getVersion()+1);
 		Strategy s1	=	new Strategy();
@@ -159,8 +159,8 @@ public class TestController {
 		ArrayList<Strategy> strNewList	=	new ArrayList<Strategy>();
 		strNewList.add(extra);
 		aGoal.setStrategyList(strNewList);
-		System.out.print(aFactory.obtainJson(newGrid, JSONType.FIRST,refVer));
-		//this.gridService.addGrid(newGrid);*/
+		System.out.print(aFactory.obtainJson(newGrid, JSONType.FIRST,refVer));*/
+		//this.gridService.addGrid(newGrid);
 		return "home";
 	}
 	
@@ -211,7 +211,7 @@ public class TestController {
 		secondGStr.add(third);
 		secondg.setStrategyList(secondGStr);
 		this.gridService.updateGridElement(prj1Grid, secondg, false, false);
-		this.gridService.updateGrid(prj1Grid);
+		this.gridService.updateGrid(prj1Grid);/*
 		JSONFactory aFactory	=	new JSONFactory();
 		Grid secondJson	=	this.gridService.createStubUpgrade(prj1Grid);
 		third	=	(Strategy) this.gridElementService.upgradeGridElement(third);
@@ -253,7 +253,7 @@ public class TestController {
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
-		}
+		}*/
 		return "home";
 	}
 	

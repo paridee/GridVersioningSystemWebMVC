@@ -18,10 +18,14 @@ import org.json.JSONObject;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import grid.entities.Goal;
 import grid.entities.GridElement;
 import grid.entities.MeasurementGoal;
+import grid.entities.Metric;
 import grid.entities.Practitioner;
 import grid.entities.Project;
+import grid.entities.Question;
+import grid.entities.Strategy;
 import grid.interfaces.DAO.GridElementDao;
 import grid.interfaces.services.GridElementService;
 /**
@@ -224,6 +228,34 @@ public class GridElementServiceImpl implements GridElementService {
 		}
 		// TODO Auto-generated method stub
 		return latestW;
+	}
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public List<GridElement> getAllLatestWorking() {
+		HashMap <String,Class> 	labelsClass	=	new HashMap<String,Class>();
+		List<GridElement>	all		=	new ArrayList<GridElement>();
+		List<GridElement>	latest	=	new ArrayList<GridElement>();
+		all.addAll(this.listElement(Goal.class));
+		all.addAll(this.listElement(MeasurementGoal.class));
+		all.addAll(this.listElement(Metric.class));
+		all.addAll(this.listElement(Question.class));
+		all.addAll(this.listElement(Strategy.class));
+		for(GridElement ge:all){
+			if(!labelsClass.containsKey(ge.getLabel())){
+				labelsClass.put(ge.getLabel(), ge.getClass());
+			}
+		}
+		Iterator<String> anIt	=	labelsClass.keySet().iterator();
+		while(anIt.hasNext()){
+			String aLabel		=	anIt.next();
+			GridElement aLatest	=	this.getLatestWorking(aLabel, labelsClass.get(aLabel).getSimpleName());
+			if(aLatest!=null){
+				latest.add(aLatest);
+			}
+		}
+		return latest;
 	}
 	
 	/**
