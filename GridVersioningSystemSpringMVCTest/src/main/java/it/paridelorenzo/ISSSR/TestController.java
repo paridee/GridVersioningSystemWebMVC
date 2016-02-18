@@ -179,11 +179,18 @@ public class TestController {
 		Goal firstg		=	new Goal();
 		firstg.setLabel("goal1");
 		firstg.setDescription("primo");
+		Grid firstGrid	=	new Grid();
+		firstGrid.setProject(first);
+		ArrayList<Goal> firstTest	=	new ArrayList<Goal>();
+		firstTest.add(firstg);
+		firstGrid.setMainGoals(firstTest);
+		this.gridService.addGrid(firstGrid);
 		Goal secondg	=	new Goal();
 		secondg.setLabel("goal2");
 		secondg.setDescription("secondo goal");
 		Grid prj1Grid	=	new Grid();
 		prj1Grid.setProject(first);
+		prj1Grid.setVersion(2);
 		ArrayList<Goal> mainGoals	=	new ArrayList<Goal>();
 		mainGoals.add(firstg);
 		mainGoals.add(secondg);
@@ -211,7 +218,7 @@ public class TestController {
 		secondGStr.add(third);
 		secondg.setStrategyList(secondGStr);
 		this.gridService.updateGridElement(prj1Grid, secondg, false, false);
-		this.gridService.updateGrid(prj1Grid);/*
+		this.gridService.updateGrid(prj1Grid);
 		JSONFactory aFactory	=	new JSONFactory();
 		Grid secondJson	=	this.gridService.createStubUpgrade(prj1Grid);
 		third	=	(Strategy) this.gridElementService.upgradeGridElement(third);
@@ -245,15 +252,28 @@ public class TestController {
 		Goal innerGoal	=	new Goal();
 		innerGoal.setLabel("test");
 		innerGoal.setDescription("speriamo che ci sia");
+		this.gridElementService.addGridElement(innerGoal);
+		innerGoal	=	(Goal) innerGoal.clone();
+		innerGoal.setVersion(innerGoal.getVersion()+1);
+		innerGoal.setState(GridElement.State.MAJOR_CONFLICTING);
 		ArrayList<Goal> s2glist	=	new ArrayList<Goal>();
 		s2glist.add(innerGoal);
 		s2.setGoalList(s2glist);
+		Strategy leaf	=	new Strategy();
+		leaf.setLabel("a leaf strategy");
+		this.gridElementService.addGridElement(leaf);
+		leaf	=	(Strategy) leaf.clone();
+		leaf.setVersion(leaf.getVersion()+1);
+		leaf.setState(GridElement.State.MAJOR_CONFLICTING);
+		ArrayList<Strategy> leafstr	=	new ArrayList<Strategy>();
+		leafstr.add(leaf);
+		innerGoal.setStrategyList(leafstr);
 		try {
 			secondJson	=   this.gridModificationService.applyAModificationToASingleElement(secondJson, nuovoMainGoal);
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
-		}*/
+		}
 		return "home";
 	}
 	
