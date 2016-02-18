@@ -297,8 +297,19 @@ public class GVSWebController {
 			pending.addAll(this.gridElementService.getElementByLabelAndState(ge.getLabel(), Class.forName(type).getSimpleName(), GridElement.State.MINOR_CONFLICTING));
 			//System.out.println("pendingsize:"+pending.size());
 			if(pending.size()==nconflict){
+				//if ge is not linked to pending objects
+				boolean withPending=false;
+				
+				for(GridElement currentGE: pending){
+					if((!withPending)&&(this.gridModificationService.isEmbeddedPending(currentGE))){
+						withPending=true;
+						
+					}
+				}
+				
 				//apply modifications to grid element
-				this.gridModificationService.applyAModificationToASingleElement(ge);
+				if(!withPending)this.gridModificationService.applyAModificationToASingleElement(ge);
+				else System.out.println("cannot update: linked to pending elements");
 				
 				
 				/*GridElement geNew=this.gridModificationService.updateSingleElement(ge);
