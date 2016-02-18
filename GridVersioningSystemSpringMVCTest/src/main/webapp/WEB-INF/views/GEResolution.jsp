@@ -1,4 +1,4 @@
-<%@page import="grid.Utils"%>
+<%@ page import="grid.Utils"%>
 <%@ page import =" grid.entities.GridElement" %>
 <%@ page import =" java.lang.reflect.Field" %>
 <%@ page import =" java.util.List" %>

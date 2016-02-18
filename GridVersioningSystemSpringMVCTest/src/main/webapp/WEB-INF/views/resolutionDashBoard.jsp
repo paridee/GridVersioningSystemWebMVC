@@ -1,3 +1,8 @@
+<%@ page import="grid.modification.grid.GridModificationService"%>
+<%@ page import =" grid.entities.GridElement" %>
+<%@ page import =" java.lang.reflect.Field" %>
+<%@ page import =" java.util.List" %>
+
 <%@ include file="head.jsp" %>
 
   <body>
@@ -15,10 +20,17 @@
 		        		<c:set var="currentLabel">${PendingProjectsItem.id}-${PendingProjectsGridItem.id}</c:set>
 		        		<b>GridID:${currentGridId} </b><br> 
 		        		<c:if test="${!empty MajorPendingProjectsGridsElements[currentLabel]}">
+		        			<%
+		        			//List <GridElement> pendinglist=(List<GridElement>)request.getAttribute("updatingElements");
+		        			
+		        			%>
 			        		<div style="float: left; width: 100%;">
 				        		Major Updates (${MajorPendingProjectsGridsElements[currentLabel].size()}):   
 				        		<c:forEach items="${MajorPendingProjectsGridsElements[currentLabel]}" var="MajorPendingProjectsGridsElementsItem">
+				        		<% //if(MajorPendingProjectsGridsElementsItem==null){%>
 				        			<a href="<c:url value='/GEResolution/${MajorPendingProjectsGridsElementsItem.getClass().getSimpleName()}/${MajorPendingProjectsGridsElementsItem.label}'/>">${MajorPendingProjectsGridsElementsItem.label}</a> -</c:forEach>
+			        			<%//} %>
+			        		
 			        		</div>
 		        		</c:if>
 			        	<c:if test="${!empty MajorConflictProjectsGridsElements[currentLabel]}">

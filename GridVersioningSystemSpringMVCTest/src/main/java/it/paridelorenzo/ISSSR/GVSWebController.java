@@ -309,7 +309,13 @@ public class GVSWebController {
 				
 				//apply modifications to grid element
 				if(!withPending)this.gridModificationService.applyAModificationToASingleElement(ge);
-				else System.out.println("cannot update: linked to pending elements");
+				else {
+					System.out.println("cannot update: linked to pending elements");
+					JSONObject jsonObject = new JSONObject();
+					jsonObject.put("msg", "result");
+					jsonObject.put("resp", "erroreeeee");
+					return jsonObject.toString();
+				}
 				
 				
 				/*GridElement geNew=this.gridModificationService.updateSingleElement(ge);
