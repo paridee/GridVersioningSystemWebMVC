@@ -226,6 +226,15 @@ public class GridElementServiceImpl implements GridElementService {
 		return latestW;
 	}
 	
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public List<GridElement> getLatestWorkingElements() {
+		List<GridElement>	allWorking	=	this.gridElementDao.getLatestWorkingElements();
+		return allWorking;
+	}
+	
 
 	
 }

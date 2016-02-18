@@ -280,26 +280,33 @@ public class GVSWebController {
 	
 	@RequestMapping(value = "/solveUpdate", method=RequestMethod.POST)
     public @ResponseBody String solveUpdate(@RequestBody String jsonData) {
-		System.out.println(jsonData.toString());
+		//System.out.println(jsonData.toString());
 		String type=jsonData.substring(0, jsonData.indexOf(","));
-		System.out.println(type);
+		//System.out.println(type);
 		int nconflict=Integer.parseInt(jsonData.substring(jsonData.indexOf(",")+1,jsonData.indexOf("{") ));
-		System.out.println(nconflict);
+		//System.out.println(nconflict);
 		Gson gson = new Gson();
 		String jsonGE=jsonData.substring(jsonData.indexOf("{"), jsonData.length());
-		System.out.println(jsonGE);
+		//System.out.println(jsonGE);
 		GridElement ge=null;
 		try {
 			ge = (GridElement)gson.fromJson(jsonGE, Class.forName(type));
-			System.out.println(ge.toString());
+			//System.out.println(ge.toString());
 			List<GridElement> pending=this.gridElementService.getElementByLabelAndState(ge.getLabel(), Class.forName(type).getSimpleName(), GridElement.State.MAJOR_CONFLICTING);
 			pending.addAll(this.gridElementService.getElementByLabelAndState(ge.getLabel(), Class.forName(type).getSimpleName(), GridElement.State.MAJOR_UPDATING));
 			pending.addAll(this.gridElementService.getElementByLabelAndState(ge.getLabel(), Class.forName(type).getSimpleName(), GridElement.State.MINOR_CONFLICTING));
-			System.out.println("pendingsize:"+pending.size());
+			//System.out.println("pendingsize:"+pending.size());
 			if(pending.size()==nconflict){
 				//apply modifications to grid element
-				System.out.println("entro");
-				this.gridModificationService.updateSingleElement(ge);
+				GridElement geNew=this.gridModificationService.updateSingleElement(ge);
+				List<GridElement> elementsToUpdate=new ArrayList<GridElement>();
+				elementsToUpdate.add(geNew);
+				this.gridModificationService.updateReferencesToGe(elementsToUpdate);
+				
+				
+				
+				
+				
 				JSONObject jsonObject = new JSONObject();
 				jsonObject.put("msg", "result");
 				jsonObject.put("resp", "okkkkkkkk");

@@ -1,16 +1,15 @@
 package grid.DAOImpl;
 
+import java.util.ArrayList;
 import java.util.List;
-
-import javax.persistence.Transient;
 
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Repository;
+
 import grid.entities.GridElement;
-import grid.entities.Project;
 import grid.interfaces.DAO.GridElementDao;
 
 @Repository
@@ -93,6 +92,26 @@ public class GridElementDAOImpl implements GridElementDao {
 			logger.info("GridElement List:"+g);
 		}
 		return gElList;
+	}
+	
+	/**
+	 * {@inheritDoc}
+	 */
+	@SuppressWarnings({ "rawtypes", "unchecked" })
+	@Override
+	public List<GridElement> getLatestWorkingElements() {
+		Session session				=	this.sessionFactory.getCurrentSession();
+		List<String> tablesToCheck=new ArrayList<String>();
+		tablesToCheck.add("Goal");tablesToCheck.add("MeasurementGoal");tablesToCheck.add("Metric");tablesToCheck.add("Question");tablesToCheck.add("Strategy");
+		List<GridElement> latestWorkingElements	=new ArrayList<GridElement>();
+		for(String s:tablesToCheck){
+			List<GridElement> gElList	=	session.createQuery("from "+s+" where state = '"+GridElement.State.WORKING+"' group by label").list();
+			for(GridElement g : gElList){
+				List<GridElement> gElList2	=	session.createQuery("from "+s+" where state = '"+GridElement.State.WORKING+"' and label='"+g.getLabel()+"' order by version desc").list();
+				latestWorkingElements.add(gElList2.get(0));
+			}
+		}
+		return latestWorkingElements;
 	}
 	
 	

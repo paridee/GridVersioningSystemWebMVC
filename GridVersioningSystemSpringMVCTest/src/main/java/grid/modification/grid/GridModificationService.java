@@ -564,12 +564,13 @@ public class GridModificationService {
 		return false;
 	}
 
-	public void updateSingleElement(GridElement ge) {
+		/*
+	public GridElement updateSingleElement(GridElement ge) {
 		int lastVersion=this.gridElementService.getLatestVersion(ge.getLabel(), ge.getClass().getSimpleName());
 		ge.setVersion(lastVersion+1);
 		ge.setIdElement(0);
 		ge.setState(GridElement.State.WORKING);
-		//update link to working GE
+		//update link to working GEs
 		Field[] fields=ge.getClass().getDeclaredFields();
 		for(int j=0; j<fields.length;j++){
 			Field tempField=fields[j];
@@ -579,7 +580,9 @@ public class GridModificationService {
 				if(fieldValue instanceof GridElement){
 					GridElement temp=(GridElement)fieldValue;
 					GridElement active=this.gridElementService.getLatestWorking(temp.getLabel(), temp.getClass().getSimpleName());
+					System.out.println("set "+ge.getLabel()+"-v"+ge.getVersion()+":"+tempField.getName()+"[old:"+temp.getLabel()+"-v"+temp.getVersion()+" , new:"+active.getLabel()+"-v"+active.getVersion());
 					tempField.set(ge, active);
+					
 				}
 				else if(fieldValue instanceof List){
 					List myList 	=	(List)fieldValue;
@@ -592,6 +595,7 @@ public class GridModificationService {
 							for(Object current:myList){
 								GridElement currentGE=(GridElement)current;
 								GridElement active=this.gridElementService.getLatestWorking(currentGE.getLabel(), currentGE.getClass().getSimpleName());   
+								System.out.println("set "+ge.getLabel()+"-v"+ge.getVersion()+":"+tempField.getName()+"[old:"+currentGE.getLabel()+"-v"+currentGE.getVersion()+" , new:"+active.getLabel()+"-v"+active.getVersion());
 								newList.add(active);
 							}
 							gridElementList=true;
@@ -611,23 +615,52 @@ public class GridModificationService {
 		}
 		//save grid element
 		this.gridElementService.addGridElement(ge);
+		return ge;
+		//List<GridElement> elementsToUpdate=new ArrayList<GridElement>();
+		//elementsToUpdate.add(ge);
+		//this.gridElementService.updateReferencesToGe(elementsToUpdate);
+		//for each last working grid element
+			//if GE is related to currentGE
+				//clone currentGE
+				//update references to GE
+				//update references to currentGE
+		
+		
+		
 		//for each project
 			//for each working grid
-				//clone Working Grid
-				//update references to GE
+				//update main goals
 		
 		
-		
-		
-		
-		
-		
-				
-				
-				
-			
-			
+					
 			
 	}
+	public void updateReferencesToGe(List<GridElement> geList) {
+		System.out.println(geList.toString());
+		List<GridElement> workingGEs=this.gridElementService.getLatestWorkingElements();
+		
+		List<GridElement> elementsToUpdate=new ArrayList<GridElement>();
+		for(GridElement currentGE: workingGEs){
+			HashMap<String,GridElement> elements=currentGE.obtainEmbeddedElements();
+			//check if it contains any reference to update
+			for (GridElement geToCheck: workingGEs){
+				if(elements.containsKey(geToCheck.getLabel())){
+					GridElement cloned=currentGE.clone();
+					if(!cloned.equals(geToCheck)){
+						this.updateSingleElement(cloned);
+						elementsToUpdate.add(cloned);
+					}
+					
+					
+				}
+			}
+		}
+		if(elementsToUpdate.size()>0){
+			this.updateReferencesToGe(elementsToUpdate);
+		}
+		
+		
+	}
+	*/
 	
 }
