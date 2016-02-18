@@ -29,6 +29,43 @@ import grid.entities.GridElement;
  * @author Lorenzo La Banca
  */
 public class Utils {
+	public static class MailSender implements Runnable{
+		String title	=	"";
+		String body		=	"";
+		String toAddr	=	"";
+		public MailSender(String title, String body, String toAddr) {
+			this.title	=	title;
+			this.body	=	body;
+			this.toAddr	=	toAddr;
+		}
+
+		@Override
+		public void run() {
+			Properties props = new Properties();
+			props.put("mail.smtp.host", SMTPHOST);
+			props.put("mail.smtp.socketFactory.port", SMTPPORT);
+			props.put("mail.smtp.socketFactory.class","javax.net.ssl.SSLSocketFactory");
+			props.put("mail.smtp.auth", "true");
+			props.put("mail.smtp.port", SMTPPORT); 
+			Session session = Session.getDefaultInstance(props,new javax.mail.Authenticator() {
+				@Override
+		        protected PasswordAuthentication getPasswordAuthentication() {
+					return new PasswordAuthentication(SMTPUSER,SMTPPASS);
+		            }
+		        });
+		    try {
+		    	MimeMessage message = new MimeMessage(session);
+		        message.setFrom(new InternetAddress("gqmplusstrategy@versioning.com"));
+		        message.setRecipients(Message.RecipientType.TO,InternetAddress.parse(toAddr));
+		        message.setSubject(title);
+		        message.setText(body,"utf-8","html");
+		        Transport.send(message);
+		      } catch (MessagingException e) {
+		        e.printStackTrace();
+		      }			
+		}
+		
+	}
 	
 	private static final Logger logger		=	LoggerFactory.getLogger(Utils.class);
 	private static final String SMTPHOST	=	"smtps.aruba.it";
@@ -72,32 +109,10 @@ public class Utils {
 	 * @param body body of the mail
 	 * @param toAddr destination addresses, divided by commas without spaces
 	 */
-	public static boolean mailSender(String title,String body,String toAddr){
-		boolean result=true;
-		Properties props = new Properties();
-		props.put("mail.smtp.host", SMTPHOST);
-		props.put("mail.smtp.socketFactory.port", SMTPPORT);
-		props.put("mail.smtp.socketFactory.class","javax.net.ssl.SSLSocketFactory");
-		props.put("mail.smtp.auth", "true");
-		props.put("mail.smtp.port", SMTPPORT); 
-		Session session = Session.getDefaultInstance(props,new javax.mail.Authenticator() {
-			@Override
-	        protected PasswordAuthentication getPasswordAuthentication() {
-				return new PasswordAuthentication(SMTPUSER,SMTPPASS);
-	            }
-	        });
-	    try {
-	    	MimeMessage message = new MimeMessage(session);
-	        message.setFrom(new InternetAddress("gqmplusstrategy@versioning.com"));
-	        message.setRecipients(Message.RecipientType.TO,InternetAddress.parse(toAddr));
-	        message.setSubject(title);
-	        message.setText(body,"utf-8","html");
-	        Transport.send(message);
-	      } catch (MessagingException e) {
-	        e.printStackTrace();
-	        result	=	false;
-	      }
-	      return result;
+	public static void mailSender(String title,String body,String toAddr){
+		MailSender	sender =	new MailSender(title,body,toAddr);
+		Thread mailSend	=	new Thread(sender);
+		mailSend.start();
 	}
 	
 	public static String generateEditor(List<GridElement> elements){

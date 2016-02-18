@@ -183,6 +183,7 @@ public class GridModificationService {
 	}
 	
 	public Grid applyModifications(List<Modification> mods,Grid latestGrid,ArrayList<String> modifiedObjectLabels) throws Exception{
+		Grid	latestOriginal	=	latestGrid;
 		for(int i=0;i<mods.size();i++){
 			System.out.println("found modification "+mods.get(i).toString());
 		}
@@ -225,6 +226,7 @@ public class GridModificationService {
 				mods.remove(minorNotConflict.get(i));
 			}
 			if(minorNotConflict.size()>0){
+				logger.info("going to update version numbers (2)");
 				this.updateVersionNumbersAndStatus(latestGrid,newVersion);
 				this.gridService.addGrid(newVersion);
 			}
@@ -314,7 +316,8 @@ public class GridModificationService {
 						this.logger.info("manage this case "+aMod.toString());
 					}
 				}	
-				this.updateVersionNumbersAndStatus(latestGrid,newVersion);
+				logger.info("going to update version numbers (3)");
+				this.updateVersionNumbersAndStatus(latestOriginal,newVersion);
 				this.gridService.addGrid(newVersion);
 				if(newVersion.isMainGoalsChanged()){
 					this.sendMainGoalChangeNotification(newVersion);
@@ -373,7 +376,7 @@ public class GridModificationService {
 				this.logger.info("element "+key+" found in old set");
 				GridElement oldElement 	=	oldElements.get(key);
 				GridElement newElement 	=	newElements.get(key);
-				if(newElement.getVersion()>oldElement.getVersion()){
+				if(newElement.getVersion()>(oldElement.getVersion()+1)){
 					this.logger.info("element "+key+" fixing version from "+newElement.getVersion()+" to "+oldElement.getVersion()+1);
 					newElement.setVersion(this.gridElementService.getLatestVersion(newElement.getLabel(), newElement.getClass().getSimpleName())+1);
 					//manages "on cascading update..." invalidates older version
@@ -385,12 +388,15 @@ public class GridModificationService {
 			}
 			else{
 				GridElement newElement 	=	newElements.get(key);
-				int olderVersion		=	this.gridElementService.getLatestVersion(key, newElement.getClass().getSimpleName());
-				if(olderVersion>0){
+				int olderVersion		=	0;
+				List<GridElement> older		=	this.gridElementService.getElementLog(newElement.getLabel(),newElement.getClass().getSimpleName());
+				if(older.size()>1||(older.size()==1&&(older.get(0).getIdElement()!=newElement.getIdElement()))){
 					//modifica richiesta da Lorenzo: se oggetto e' gia' presente nel DB ed e' di classe "Major" viene instanziato in major pending
 					if(!Modification.minorUpdateClass.contains(newElement.getClass())){
+						logger.info("found older element for "+newElement.getLabel()+" found in grid with Id "+latestGrid.getId()+" "+latestGrid.obtainGridState());
 						newElement.setState(GridElement.State.MAJOR_UPDATING);
 					}
+					olderVersion	=	this.gridElementService.getLatestVersion(newElement.getLabel(), newElement.getClass().getSimpleName());
 					newElement.setVersion(olderVersion+1);;
 				}
 			}
@@ -539,6 +545,7 @@ public class GridModificationService {
 						updated	=	this.applyAModification((GridElementModification)aMod, updated, updated.obtainAllEmbeddedElements());
 					}
 				}	
+				logger.info("going to update version numbers (1)");
 				this.updateVersionNumbersAndStatus(aGrid, updated);
 				GridElement updatedEl	=	updated.obtainAllEmbeddedElements().get(newGridElement.getLabel());
 				if(updatedEl!=null){

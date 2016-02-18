@@ -123,7 +123,8 @@ public class ModificationController {
 				mainGoalsJSONArray	=	anObject.getJSONArray("changedObjects");
 			}
 			Project thisProject	=	this.projectService.getProjectByProjectId(aProjectId);
-			Grid refGrid	=	null;
+			Grid latestGrid							=	this.gridService.getLatestWorkingGrid(thisProject.getId());
+			Grid refGrid	=	latestGrid;
 			if(refVersion>-1){
 				List<Grid> grids	=	this.gridService.getGridLog(thisProject.getId());
 				for(int i=0;i<grids.size();i++){
@@ -133,7 +134,7 @@ public class ModificationController {
 					}
 				}
 			}
-			Grid latestGrid							=	this.gridService.getLatestGrid(thisProject.getId());
+			this.logger.info("got latest working grid, id "+latestGrid.getId()+" state "+latestGrid.obtainGridState());
 			ArrayList<String> modifiedObjectLabels	=	modifiedObjects(refGrid,latestGrid);
 			HashMap<String,GridElement> latestEl	=	latestGrid.obtainAllEmbeddedElements();
 			HashMap<String,Object>		modifiedEl	=	new HashMap<String,Object>();

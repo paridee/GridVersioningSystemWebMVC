@@ -185,6 +185,7 @@ public class TestController {
 		firstTest.add(firstg);
 		firstGrid.setMainGoals(firstTest);
 		this.gridService.addGrid(firstGrid);
+		/*
 		Goal secondg	=	new Goal();
 		secondg.setLabel("goal2");
 		secondg.setDescription("secondo goal");
@@ -249,13 +250,13 @@ public class TestController {
 		aStrategyList	=	new ArrayList<Strategy>();
 		aStrategyList.add(s2);
 		nuovoMainGoal.setStrategyList(aStrategyList);
+		secondJson.getMainGoals().add(nuovoMainGoal);
 		Goal innerGoal	=	new Goal();
 		innerGoal.setLabel("test");
 		innerGoal.setDescription("speriamo che ci sia");
 		this.gridElementService.addGridElement(innerGoal);
 		innerGoal	=	(Goal) innerGoal.clone();
 		innerGoal.setVersion(innerGoal.getVersion()+1);
-		innerGoal.setState(GridElement.State.MAJOR_CONFLICTING);
 		ArrayList<Goal> s2glist	=	new ArrayList<Goal>();
 		s2glist.add(innerGoal);
 		s2.setGoalList(s2glist);
@@ -264,16 +265,11 @@ public class TestController {
 		this.gridElementService.addGridElement(leaf);
 		leaf	=	(Strategy) leaf.clone();
 		leaf.setVersion(leaf.getVersion()+1);
-		leaf.setState(GridElement.State.MAJOR_CONFLICTING);
 		ArrayList<Strategy> leafstr	=	new ArrayList<Strategy>();
 		leafstr.add(leaf);
 		innerGoal.setStrategyList(leafstr);
-		try {
-			secondJson	=   this.gridModificationService.applyAModificationToASingleElement(secondJson, nuovoMainGoal);
-		} catch (Exception e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+		System.out.println("a json:");
+		System.out.println(aFactory.obtainJson(secondJson,JSONType.FIRST,null));*/
 		return "home";
 	}
 	
