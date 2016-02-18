@@ -355,7 +355,7 @@ public class GridModificationService {
 		}
 		this.logger.info("#~#~NOTIFICATION STUB for item "+modified.getLabel()+" in state "+modified.getState());
 	}
-
+	
 	private void updateVersionNumbersAndStatus(Grid latestGrid, Grid newVersion) {
 		HashMap<String,GridElement> oldElements	=	latestGrid.obtainAllEmbeddedElements();
 		HashMap<String,GridElement> newElements	=	newVersion.obtainAllEmbeddedElements();
@@ -373,7 +373,7 @@ public class GridModificationService {
 				GridElement newElement 	=	newElements.get(key);
 				if(newElement.getVersion()>oldElement.getVersion()){
 					this.logger.info("element "+key+" fixing version from "+newElement.getVersion()+" to "+oldElement.getVersion()+1);
-					newElement.setVersion(oldElement.getVersion()+1);
+					newElement.setVersion(this.gridElementService.getLatestVersion(newElement.getLabel(), newElement.getClass().getSimpleName())+1);
 					//manages "on cascading update..." invalidates older version
 					if((oldElement.getState()==GridElement.State.MAJOR_CONFLICTING)||(oldElement.getState()==GridElement.State.MAJOR_UPDATING)||(oldElement.getState()==GridElement.State.MINOR_CONFLICTING)){
 						oldElement.setState(GridElement.State.ABORTED);
@@ -466,18 +466,44 @@ public class GridModificationService {
 	 * @throws Exception
 	 */
 	public void applyAModificationToASingleElement(GridElement newGridElement) throws Exception{
+		newGridElement	=	newGridElement.clone();
+		newGridElement.setIdElement(0);
 		System.out.println("test");
 		List<Project> 	projects	=	this.projectService.listProjects();
+		int moddedGrid	=	0;
 		for(Project p:projects){
 			Grid latest	=	this.gridService.getLatestWorkingGrid(p.getId());
 			try{
-				System.out.println("test2");
+				logger.info("updating element on grid id "+latest.getId());
 				this.applyAModificationToASingleElement(latest, newGridElement);
+				if(latest.obtainAllEmbeddedElements().containsKey(newGridElement.getLabel())){
+					logger.info("grid id "+latest.getId()+" contains the element "+newGridElement.getLabel());
+					moddedGrid++;
+				}
 			}
 			catch(GridElementNotFoundInAGridException e){
-				this.logger.info("skipping a grid, object not found");
+				logger.info("skipping a grid, object not found");
 			}
 		}
+		if(moddedGrid==0){
+			logger.info("element not found in any grid");
+			List<GridElement> latestWorkingElements	=	this.gridElementService.getAllLatestWorking();
+			for(GridElement ge:latestWorkingElements){
+				newGridElement.updateReferences(ge, false, true);
+				newGridElement.setVersion(this.gridElementService.getLatestVersion(newGridElement.getLabel(), newGridElement.getClass().getSimpleName())+1);
+				newGridElement.setState(GridElement.State.WORKING);
+			}
+			List<GridElement> logGe	=	this.gridElementService.getElementLog(newGridElement.getLabel(), newGridElement.getClass().getSimpleName());
+			for(GridElement logged:logGe){
+				if(logged.getState()==GridElement.State.MAJOR_CONFLICTING||logged.getState()==GridElement.State.MAJOR_UPDATING||logged.getState()==GridElement.State.MINOR_CONFLICTING){
+					logged.setState(GridElement.State.SOLVED);
+					this.gridElementService.updateGridElement(logged);
+				}
+			}
+			this.gridElementService.addGridElement(newGridElement);
+			logger.info("added working element "+newGridElement.getLabel()+" version "+newGridElement.getVersion()+" with ID "+newGridElement.getIdElement());
+		}
+		logger.info("modded grids "+moddedGrid);
 		this.abortAllPending(newGridElement);
 	}
 	
@@ -514,11 +540,34 @@ public class GridModificationService {
 				this.updateVersionNumbersAndStatus(aGrid, updated);
 				GridElement updatedEl	=	updated.obtainAllEmbeddedElements().get(newGridElement.getLabel());
 				if(updatedEl!=null){
+					logger.info("setting state Working to element "+updatedEl.getIdElement());
 					updatedEl.setState(GridElement.State.WORKING);
+					if(updatedEl.getIdElement()==0){
+						logger.info("Element is not on DB "+updatedEl.getIdElement());
+						this.gridElementService.addGridElement(updatedEl);
+						logger.info("Element saved on DB "+updatedEl.getIdElement()+" "+updatedEl.getState());
+					}
+					else{
+						logger.info("Element is already on DB "+updatedEl.getIdElement()+" "+updatedEl.getState());
+						this.gridElementService.updateGridElement(updatedEl);
+					}
+				}
+				else{
+					logger.info("element not in grid");
 				}
 				updated	=	this.refreshLinks(updated);
 				//TODO set right state for all elements
 				this.gridService.addGrid(updated);
+			}
+			else{
+				this.logger.info("no modification needed ");
+				Grid updatedg		=	this.gridService.createStubUpgrade(aGrid);
+				updatedg.setVersion(this.gridService.getLatestGrid(updatedg.getProject().getId()).getVersion()+1);
+				GridElement thisG	=	updatedg.obtainAllEmbeddedElements().get(newGridElement.getLabel()).clone();
+				thisG.setVersion(this.gridElementService.getLatestVersion(thisG.getLabel(), thisG.getClass().getSimpleName()));
+				thisG.setState(GridElement.State.WORKING);
+				this.gridService.updateGridElement(updatedg, thisG, false, false);
+				this.gridService.addGrid(updatedg);
 			}
 			return updated;
 		}
