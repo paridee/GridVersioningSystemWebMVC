@@ -298,11 +298,11 @@ public class GVSWebController {
 			//System.out.println("pendingsize:"+pending.size());
 			if(pending.size()==nconflict){
 				//apply modifications to grid element
-				GridElement geNew=this.gridModificationService.updateSingleElement(ge);
+				/*GridElement geNew=this.gridModificationService.updateSingleElement(ge);
 				List<GridElement> elementsToUpdate=new ArrayList<GridElement>();
 				elementsToUpdate.add(geNew);
 				this.gridModificationService.updateReferencesToGe(elementsToUpdate);
-				
+				*/
 				
 				
 				
