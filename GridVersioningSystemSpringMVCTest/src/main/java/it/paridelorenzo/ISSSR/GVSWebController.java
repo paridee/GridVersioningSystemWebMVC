@@ -299,7 +299,7 @@ public class GVSWebController {
 			if(pending.size()==nconflict){
 				//apply modifications to grid element
 				System.out.println("entro");
-				this.gridModificationService.applyAModificationToASingleElement(ge);
+				this.gridModificationService.updateSingleElement(ge);
 				JSONObject jsonObject = new JSONObject();
 				jsonObject.put("msg", "result");
 				jsonObject.put("resp", "okkkkkkkk");
