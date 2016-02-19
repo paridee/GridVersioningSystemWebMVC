@@ -353,23 +353,49 @@ public class GVSWebController {
 		    	
 		    }
 		}
-		for(GridElement ge: mainGoalList){
-			System.out.println(ge.getLabel()+"-"+ge.getVersion()+"-"+ge.getState());
+		boolean solvable=true;
+		for(Goal ge: mainGoalList){
+			List<GridElement> pending=this.gridElementService.getElementByLabelAndState(ge.getLabel(), "Goal", GridElement.State.MAJOR_CONFLICTING);
+			pending.addAll(this.gridElementService.getElementByLabelAndState(ge.getLabel(), "Goal", GridElement.State.MAJOR_UPDATING));
+			pending.addAll(this.gridElementService.getElementByLabelAndState(ge.getLabel(), "Goal", GridElement.State.MINOR_CONFLICTING));
+			if(pending.size()>0){
+				solvable=false;
+			}
+			if(solvable){
+				if(this.gridModificationService.isEmbeddedPending(ge)) solvable=false;
+			}
 		}
-		Grid workingGrid=this.gridService.getLatestWorkingGrid(prjId);
-		Grid newGrid=workingGrid.clone();
-		newGrid.setVersion(this.gridService.getLatestGrid(prjId).getVersion()+1);
-		newGrid.setMainGoals(mainGoalList);
-		this.gridModificationService.refreshLinks(newGrid);
-		this.gridService.addGrid(newGrid);
-		Grid gridToSolve=this.gridService.getGridById(gridToSolveId);
-		gridToSolve.setMainGoalsChanged(false);
-		this.gridService.updateGrid(gridToSolve);
+		if(solvable){
+			for(GridElement ge: mainGoalList){
+				System.out.println(ge.getLabel()+"-"+ge.getVersion()+"-"+ge.getState());
+			}
+			Grid workingGrid=this.gridService.getLatestWorkingGrid(prjId);
+			Grid newGrid=workingGrid.clone();
+			newGrid.setVersion(this.gridService.getLatestGrid(prjId).getVersion()+1);
+			newGrid.setMainGoals(mainGoalList);
+			this.gridModificationService.refreshLinks(newGrid);
+			this.gridService.addGrid(newGrid);
+			Grid gridToSolve=this.gridService.getGridById(gridToSolveId);
+			gridToSolve.setMainGoalsChanged(false);
+			this.gridService.updateGrid(gridToSolve);
+			
+			JSONObject jsonObject = new JSONObject();
+			jsonObject.put("msg", "result");
+			jsonObject.put("resp", "ok");
+			return jsonObject.toString();
+			
+		}
+		else{
+			JSONObject jsonObject = new JSONObject();
+			jsonObject.put("msg", "result");
+			jsonObject.put("resp", "error,not Solvable");
+			return jsonObject.toString();
+			
+		}
 		
-		JSONObject jsonObject = new JSONObject();
-		jsonObject.put("msg", "result");
-		jsonObject.put("resp", "ok");
-		return jsonObject.toString();
+		
+		
+		
 		
 		
 	}
