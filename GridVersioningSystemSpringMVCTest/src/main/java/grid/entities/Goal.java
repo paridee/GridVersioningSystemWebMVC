@@ -13,8 +13,12 @@ import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import grid.Utils;
 import grid.interfaces.Updatable;
+import grid.modification.grid.GridModificationService;
 
 /**
  * 
@@ -37,7 +41,7 @@ public class Goal extends GridElement{
 	private MeasurementGoal		measurementGoal	=	null;
 	
 	private List<Strategy> 		strategyList	=	new ArrayList<Strategy>();
-	
+	private static final Logger logger = LoggerFactory.getLogger(Goal.class);
 	/**
 	 * Returns a goal assumption
 	 * @return string assumption
@@ -146,7 +150,6 @@ public class Goal extends GridElement{
 		else{
 			updated		=	this;
 		}
-		System.out.println("updating Goal attribute reference");
 		if(this.measurementGoal!=null){
 			if(this.measurementGoal.getLabel().equals(ge.getLabel())){
 				System.out.println("is a MeasurementGoal, replacing");
@@ -156,6 +159,7 @@ public class Goal extends GridElement{
 		}
 		for(int i=0;i<this.strategyList.size();i++){
 			if(this.strategyList.get(i).getLabel().equals(ge.getLabel())){
+				this.logger.info("updating reference on goal "+this.getLabel()+"v"+this.getVersion()+" to "+ge.getLabel()+"v"+ge.getVersion());
 				updated.strategyList.set(i, (Strategy) ge);
 				addThis=true;
 			}
@@ -165,7 +169,7 @@ public class Goal extends GridElement{
 				Utils.mergeLists(returnList, this.measurementGoal.updateReferences(ge,autoupgrade));
 			}
 			for(int i=0;i<this.strategyList.size();i++){
-				Utils.mergeLists(returnList, this.strategyList.get(i).updateReferences(ge,autoupgrade));
+				Utils.mergeLists(returnList, this.strategyList.get(i).updateReferences(ge,autoupgrade,recursive));
 			}
 		}
 		if(addThis==true){

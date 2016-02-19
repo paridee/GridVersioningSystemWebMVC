@@ -395,9 +395,14 @@ public class GridModificationService {
 					if(!Modification.minorUpdateClass.contains(newElement.getClass())){
 						logger.info("found older element for "+newElement.getLabel()+" found in grid with Id "+latestGrid.getId()+" "+latestGrid.obtainGridState());
 						newElement.setState(GridElement.State.MAJOR_UPDATING);
+						//TODO testing
+						GridElement latestWorking	=	this.gridElementService.getLatestWorking(newElement.getLabel(), newElement.getClass().getSimpleName());
+						if(newElement.equals(latestWorking)){
+							newElement.setState(GridElement.State.WORKING);
+						}
 					}
 					olderVersion	=	this.gridElementService.getLatestVersion(newElement.getLabel(), newElement.getClass().getSimpleName());
-					newElement.setVersion(olderVersion+1);;
+					newElement.setVersion(olderVersion+1);
 				}
 			}
 		}
@@ -416,12 +421,12 @@ public class GridModificationService {
 			GridElement cloned	=	subj.clone();
 			cloned.setVersion(subj.getVersion()+1);
 			gridElementModification.apply(cloned, newVersion);
-			newVersion	=	this.gridService.updateGridElement(newVersion, cloned,false,false);
 			//if element was pending in previous version declare aborted
 			if(subj.getState()==GridElement.State.MAJOR_CONFLICTING||subj.getState()==GridElement.State.MAJOR_UPDATING||subj.getState()==GridElement.State.MINOR_CONFLICTING){
 				subj.setState(GridElement.State.ABORTED);
 				this.gridElementService.updateGridElement(subj);
 			}
+			newVersion	=	this.gridService.updateGridElement(newVersion, cloned,false,false);
 		}
 		return newVersion;
 	}
@@ -441,28 +446,39 @@ public class GridModificationService {
 		while(elements.hasNext()){
 			String key			=	elements.next();
 			GridElement current	=	embeddedEl.get(key);
-			GridElement mostUp	=	this.gridElementService.getLatestWorking(key,current.getClass().getSimpleName());
-			if(mostUp.getVersion()>=current.getVersion()){
-				List<GridElementModification> mods;
-				try {
-					mods = ObjectModificationService.getModification(current, mostUp);	//check if most updated is different from current
-					if(mods.size()>0){
-						updated.add(mostUp);
+			if(current.getState()==GridElement.State.WORKING){
+				GridElement mostUp	=	this.gridElementService.getLatestWorking(key,current.getClass().getSimpleName());
+				if(mostUp.getVersion()>=current.getVersion()){
+					this.logger.info("found for WORKING element "+mostUp.getLabel()+" version "+mostUp.getVersion());
+					/*List<GridElementModification> mods;
+					try {
+						mods = ObjectModificationService.getModification(current, mostUp);	//check if most updated is different from current
+						//if(mods.size()>0){
+						//	updated.add(mostUp);
+						//}
+					} catch (Exception e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}*/
+					if(mostUp.getIdElement()!=current.getIdElement()){
+						updated.add(mostUp);	
 					}
-				} catch (Exception e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
 				}
 			}
 		}
+		this.logger.info("updating "+updated.size()+" references");
 		for(GridElement el:updated){	//for each element in updated list
 			el	=	el.clone();
 			el.setVersion(el.getVersion()+1);
 			Iterator<String> it	=	embeddedEl.keySet().iterator();
 			while(it.hasNext()){		//restore links to current elements
-				el.updateReferences(embeddedEl.get(it.next()), false, false);
+				GridElement subj	=	embeddedEl.get(it.next());
+				if(subj.getLabel()!=el.getLabel()){//object different than me
+					el.updateReferences(subj, false, false);
+				}
 			}
-			this.gridService.updateGridElement(aGrid, el, false, false);
+			this.logger.info("updating references to an updated element "+el.getLabel()+"v"+el.getVersion());
+			aGrid	=	this.gridService.updateGridElement(aGrid, el, true, false);
 			embeddedEl	=	aGrid.obtainAllEmbeddedElements(); //updates with the current element
 		}
 		return aGrid;

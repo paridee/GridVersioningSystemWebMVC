@@ -401,7 +401,7 @@ public class GVSWebController {
 				Grid newGrid=workingGrid.clone();
 				newGrid.setVersion(this.gridService.getLatestGrid(prjId).getVersion()+1);
 				newGrid.setMainGoals(mainGoalList);
-				this.gridModificationService.refreshLinks(newGrid);
+				newGrid	=	this.gridModificationService.refreshLinks(newGrid);
 				this.gridService.addGrid(newGrid);
 				gridToSolve.setMainGoalsChanged(false);
 				this.gridService.updateGrid(gridToSolve);

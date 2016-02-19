@@ -104,7 +104,7 @@ public class Strategy extends GridElement{
 		}
 		if(recursive	==	true){
 			for(int i=0;i<this.goalList.size();i++){
-				Utils.mergeLists(returnList, this.goalList.get(i).updateReferences(ge,autoupgrade));
+				Utils.mergeLists(returnList, this.goalList.get(i).updateReferences(ge,autoupgrade,recursive));
 			}
 		}
 		if(addThis==true){
