@@ -600,9 +600,9 @@ public class GridModificationService {
 	}
 
 	/**
-	 * checks if is possible to apply a change to an element (there are not pending elements embedded)
+	 * checks for anElement if there are links to Elements in pending state
 	 * @param anElement
-	 * @return result
+	 * @return TRUE if there are link to GridElements in pending state
 	 */
 	public boolean isEmbeddedPending(GridElement anElement){
 		HashMap<String, GridElement> embedded	=	anElement.obtainEmbeddedElements();
@@ -618,6 +618,24 @@ public class GridModificationService {
 			}
 		}
 		return false;
+	}
+	
+	/**
+	 * checks for all pending elements with a given label if there are links to other pending Elements
+	 * @param anElement
+	 * @return TRUE if the element is solvable
+	 */
+	public boolean isSolvable(GridElement ge){
+		List<GridElement> pending=this.gridElementService.getElementByLabelAndState(ge.getLabel(), ge.getClass().getSimpleName() , GridElement.State.MAJOR_CONFLICTING);
+		pending.addAll(this.gridElementService.getElementByLabelAndState(ge.getLabel(), ge.getClass().getSimpleName(), GridElement.State.MAJOR_UPDATING));
+		pending.addAll(this.gridElementService.getElementByLabelAndState(ge.getLabel(), ge.getClass().getSimpleName(), GridElement.State.MINOR_CONFLICTING));
+		boolean rejected=false;
+		for(int j=0; j<pending.size()&&!rejected;j++){
+			if(this.isEmbeddedPending(pending.get(j))){
+				return false;
+			}
+		}
+		return true;
 	}
 
 		/*

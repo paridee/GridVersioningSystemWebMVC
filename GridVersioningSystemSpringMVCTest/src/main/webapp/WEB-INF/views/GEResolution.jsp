@@ -2,8 +2,10 @@
 <%@ page import =" grid.entities.GridElement" %>
 <%@ page import =" java.lang.reflect.Field" %>
 <%@ page import =" java.util.List" %>
+<%@ page import =" java.util.HashMap" %>
 <%@ page import =" com.google.gson.Gson" %>
 <%@ include file="head.jsp" %>
+
 
   <body>
 	<div class="container">
