@@ -282,54 +282,94 @@ public class GVSWebController {
 		model.addAttribute("pageTitle", "Lista Grids");
 		this.setActiveButton(2, model);
 		Grid working= this.gridService.getLatestWorkingGrid(pid);
-		if(working==null) model.addAttribute("error", "The working Grid Element is not available");
 		Grid current=this.gridService.getGridById(gid);
-		if(working==null) model.addAttribute("error", "The requested Grid Element is not available");
-		String workingMGList="['"+pid+"',";
-		List<Goal> temp=working.getMainGoals();
-		for(int i=0; i<temp.size(); i++){
-			if(i<temp.size()-1){
-				workingMGList=workingMGList+"'"+temp.get(i).getLabel()+"',";
-			}
-			else{
-				workingMGList=workingMGList+"'"+temp.get(i).getLabel()+"'";
-			}
+		if(working==null) {
+			model.addAttribute("error", "The working Grid is not available");
 		}
-		workingMGList=workingMGList+"]";
-		
-		
-		String currentMGList="['"+pid+"',";
-		temp=current.getMainGoals();
-		for(int i=0; i<temp.size(); i++){
-			if(i<temp.size()-1){
-				currentMGList=currentMGList+"'"+temp.get(i).getLabel()+"',";
-			}
-			else{
-				currentMGList=currentMGList+"'"+temp.get(i).getLabel()+"'";
-			}
+		else if(current==null) {
+			model.addAttribute("error", "The requested Grid is not available");
 		}
-		currentMGList=currentMGList+"]";
-		model.addAttribute("workingGrid", working);
-        model.addAttribute("currentGrid", current);
-        model.addAttribute("workingMGList", workingMGList);
-        model.addAttribute("currentMGList", currentMGList);
+		else if((!current.isMainGoalsChanged())){
+			model.addAttribute("error", "The requested Grid is not in pending state");
+		}
+		else{
+			String workingMGList="['"+pid+"', '"+current.getId()+"', ";
+			List<Goal> temp=working.getMainGoals();
+			for(int i=0; i<temp.size(); i++){
+				if(i<temp.size()-1){
+					workingMGList=workingMGList+"'"+temp.get(i).getLabel()+"',";
+				}
+				else{
+					workingMGList=workingMGList+"'"+temp.get(i).getLabel()+"'";
+				}
+			}
+			workingMGList=workingMGList+"]";
+			
+			
+			String currentMGList="['"+pid+"', '"+current.getId()+"', ";
+			temp=current.getMainGoals();
+			for(int i=0; i<temp.size(); i++){
+				if(i<temp.size()-1){
+					currentMGList=currentMGList+"'"+temp.get(i).getLabel()+"',";
+				}
+				else{
+					currentMGList=currentMGList+"'"+temp.get(i).getLabel()+"'";
+				}
+			}
+			currentMGList=currentMGList+"]";
+			model.addAttribute("workingGrid", working);
+	        model.addAttribute("currentGrid", current);
+	        model.addAttribute("workingMGList", workingMGList);
+	        model.addAttribute("currentMGList", currentMGList);
+		}
         return "MGResolution";
     }
 	
 	@RequestMapping(value = "/MGListUpdate", method=RequestMethod.POST)
     public @ResponseBody String updateMainGoalList(@RequestBody String jsonData) {
-		System.out.println(jsonData);
+		//System.out.println(jsonData);
+		//Array format: [projId, gridSolved, {MaingoalList}]
 		JSONArray jsonArray = new JSONArray(jsonData);
-		List<String> list = new ArrayList<String>();
+		int prjId=0;
+		int gridToSolveId=0;
+		List<Goal> mainGoalList= new ArrayList<Goal>();
 		for (int i=0; i<jsonArray.length(); i++) {
-		    list.add( jsonArray.getString(i) );
+		    if(i==0) prjId=Integer.parseInt(jsonArray.getString(i));
+		    else if (i==1){
+		    	gridToSolveId=Integer.parseInt(jsonArray.getString(i));
+		    }
+		    else {
+		    	Goal current=(Goal)this.gridElementService.getLatestWorking(jsonArray.getString(i), "Goal");
+		    	if(current!=null){
+		    		mainGoalList.add(current);
+		    	}
+		    	else{
+		    		JSONObject jsonObject = new JSONObject();
+		    		jsonObject.put("msg", "result");
+		    		jsonObject.put("resp", "error, cannot get working element with label: "+ jsonArray.getString(i));
+		    		System.out.println("error, cannot get working element with label: "+ jsonArray.getString(i));
+		    		return jsonObject.toString();
+		    		
+		    	}
+		    	
+		    }
 		}
-		for (int i=0; i<list.size(); i++) {
-		    System.out.println(list.get(i));
+		for(GridElement ge: mainGoalList){
+			System.out.println(ge.getLabel()+"-"+ge.getVersion()+"-"+ge.getState());
 		}
+		Grid workingGrid=this.gridService.getLatestWorkingGrid(prjId);
+		Grid newGrid=workingGrid.clone();
+		newGrid.setVersion(this.gridService.getLatestGrid(prjId).getVersion()+1);
+		newGrid.setMainGoals(mainGoalList);
+		this.gridModificationService.refreshLinks(newGrid);
+		this.gridService.addGrid(newGrid);
+		Grid gridToSolve=this.gridService.getGridById(gridToSolveId);
+		gridToSolve.setMainGoalsChanged(false);
+		this.gridService.updateGrid(gridToSolve);
+		
 		JSONObject jsonObject = new JSONObject();
 		jsonObject.put("msg", "result");
-		jsonObject.put("resp", "error");
+		jsonObject.put("resp", "ok");
 		return jsonObject.toString();
 		
 		

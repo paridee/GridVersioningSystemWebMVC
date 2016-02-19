@@ -433,7 +433,7 @@ public class GridModificationService {
 	 * @param aGrid grid to be updated
 	 * @return updated grid
 	 */
-	private Grid refreshLinks(Grid aGrid){
+	public Grid refreshLinks(Grid aGrid){
 		aGrid	=	aGrid.clone();
 		HashMap<String,GridElement> embeddedEl	=	aGrid.obtainAllEmbeddedElements();
 		ArrayList<GridElement> updated			=	new ArrayList<GridElement>();
