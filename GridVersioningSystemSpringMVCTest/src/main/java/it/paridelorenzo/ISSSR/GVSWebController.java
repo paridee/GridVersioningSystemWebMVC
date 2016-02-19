@@ -110,6 +110,7 @@ public class GVSWebController {
 						addedGrid=true;
 						String temp=projList.get(i).getId()+"-"+g.getId();
 						projectGridsMainGoalListChanged.put(temp, "changed");
+						gridPending.add(g);
 						
 					}
 					if(g.obtainGridState()==Grid.GridState.UPDATING){
@@ -142,7 +143,7 @@ public class GVSWebController {
 						String temp=projList.get(i).getId()+"-"+g.getId();
 						if(addedMCElement||addedMPElement||addedmCElement){
 							addedGrid=true;
-							gridPending.add(g);
+							if(!g.isMainGoalsChanged())gridPending.add(g);
 						}
 						if(addedMCElement){
 							projectGridsMajorConflictElements.put(temp, majconflElements);
@@ -328,7 +329,7 @@ public class GVSWebController {
 	
 	@RequestMapping(value = "/MGListUpdate", method=RequestMethod.POST)
     public @ResponseBody String updateMainGoalList(@RequestBody String jsonData) {
-		//System.out.println(jsonData);
+		System.out.println(jsonData);
 		//Array format: [projId, gridSolved, {MaingoalList}]
 		JSONArray jsonArray = new JSONArray(jsonData);
 		int prjId=0;

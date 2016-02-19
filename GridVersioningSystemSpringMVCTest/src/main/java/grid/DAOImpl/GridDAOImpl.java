@@ -75,7 +75,7 @@ public class GridDAOImpl implements GridDAO {
 	public Grid getGridById(int id) {
 		Session currentSession	=	this.sessionFactory.getCurrentSession();
 		Grid	g				=	(Grid) currentSession.load(Grid.class,new Integer(id));
-		logger.info(g.getClass().getName()+" loaded::"+g);
+		//logger.info(g.getClass().getName()+" loaded::"+g);
 		return g;
 	}
 

@@ -100,7 +100,7 @@
     	}
     }
     else{
-    	out.print("projPending size =0");
+    	out.print("No Projects with pending updates");
     	
     }
     
