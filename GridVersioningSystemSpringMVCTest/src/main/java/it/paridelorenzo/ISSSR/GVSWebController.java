@@ -110,7 +110,7 @@ public class GVSWebController {
 						addedGrid=true;
 						String temp=projList.get(i).getId()+"-"+g.getId();
 						projectGridsMainGoalListChanged.put(temp, "changed");
-						gridPending.add(g);
+						
 					}
 					if(g.obtainGridState()==Grid.GridState.UPDATING){
 						addedGrid=true;
@@ -164,6 +164,8 @@ public class GVSWebController {
 			
 			}
 		}
+		
+		System.out.println(projectPendingGrids.toString());
 		
 		model.addAttribute("PendingProjects", projPending);
 		model.addAttribute("PendingProjectsGrids", projectPendingGrids);
@@ -353,45 +355,68 @@ public class GVSWebController {
 		    	
 		    }
 		}
-		boolean solvable=true;
-		for(Goal ge: mainGoalList){
-			List<GridElement> pending=this.gridElementService.getElementByLabelAndState(ge.getLabel(), "Goal", GridElement.State.MAJOR_CONFLICTING);
-			pending.addAll(this.gridElementService.getElementByLabelAndState(ge.getLabel(), "Goal", GridElement.State.MAJOR_UPDATING));
-			pending.addAll(this.gridElementService.getElementByLabelAndState(ge.getLabel(), "Goal", GridElement.State.MINOR_CONFLICTING));
-			if(pending.size()>0){
-				solvable=false;
-			}
-			if(solvable){
-				if(this.gridModificationService.isEmbeddedPending(ge)) solvable=false;
-			}
-		}
-		if(solvable){
-			for(GridElement ge: mainGoalList){
-				System.out.println(ge.getLabel()+"-"+ge.getVersion()+"-"+ge.getState());
-			}
-			Grid workingGrid=this.gridService.getLatestWorkingGrid(prjId);
-			Grid newGrid=workingGrid.clone();
-			newGrid.setVersion(this.gridService.getLatestGrid(prjId).getVersion()+1);
-			newGrid.setMainGoals(mainGoalList);
-			this.gridModificationService.refreshLinks(newGrid);
-			this.gridService.addGrid(newGrid);
-			Grid gridToSolve=this.gridService.getGridById(gridToSolveId);
-			gridToSolve.setMainGoalsChanged(false);
-			this.gridService.updateGrid(gridToSolve);
-			
+		Grid workingGrid=this.gridService.getLatestWorkingGrid(prjId);
+		Grid gridToSolve=this.gridService.getGridById(gridToSolveId);
+		if(workingGrid==null){
 			JSONObject jsonObject = new JSONObject();
-			jsonObject.put("msg", "result");
-			jsonObject.put("resp", "ok");
-			return jsonObject.toString();
-			
+    		jsonObject.put("msg", "result");
+    		jsonObject.put("resp", "error, cannot get latest working grid for project: "+ prjId);
+    		System.out.println("error, cannot get latest working grid for project: "+ prjId);
+    		return jsonObject.toString();
+		}
+		else if(gridToSolve==null){
+			JSONObject jsonObject = new JSONObject();
+    		jsonObject.put("msg", "result");
+    		jsonObject.put("resp", "error, cannot get grid with id: "+ gridToSolveId);
+    		System.out.println("error, cannot get grid with id: "+ gridToSolveId);
+    		return jsonObject.toString();
 		}
 		else{
-			JSONObject jsonObject = new JSONObject();
-			jsonObject.put("msg", "result");
-			jsonObject.put("resp", "error,not Solvable");
-			return jsonObject.toString();
-			
+			boolean solvable=true;
+			for(Goal ge: mainGoalList){
+				if(solvable){
+					List<GridElement> pending=this.gridElementService.getElementByLabelAndState(ge.getLabel(), "Goal", GridElement.State.MAJOR_CONFLICTING);
+					pending.addAll(this.gridElementService.getElementByLabelAndState(ge.getLabel(), "Goal", GridElement.State.MAJOR_UPDATING));
+					pending.addAll(this.gridElementService.getElementByLabelAndState(ge.getLabel(), "Goal", GridElement.State.MINOR_CONFLICTING));
+					if(pending.size()>0){
+						solvable=false;
+					}
+					if(solvable){
+						if(this.gridModificationService.isEmbeddedPending(ge)) solvable=false;
+					}
+				}
+			}
+			if(solvable){
+				for(GridElement ge: mainGoalList){
+					System.out.println(ge.getLabel()+"-"+ge.getVersion()+"-"+ge.getState());
+				}
+				Grid newGrid=workingGrid.clone();
+				newGrid.setVersion(this.gridService.getLatestGrid(prjId).getVersion()+1);
+				newGrid.setMainGoals(mainGoalList);
+				this.gridModificationService.refreshLinks(newGrid);
+				this.gridService.addGrid(newGrid);
+				gridToSolve.setMainGoalsChanged(false);
+				this.gridService.updateGrid(gridToSolve);
+				
+				JSONObject jsonObject = new JSONObject();
+				jsonObject.put("msg", "result");
+				jsonObject.put("resp", "ok");
+				return jsonObject.toString();
+				
+			}
+			else{
+				JSONObject jsonObject = new JSONObject();
+				jsonObject.put("msg", "result");
+				jsonObject.put("resp", "error,not Solvable");
+				return jsonObject.toString();
+				
+			}
 		}
+		
+		
+		
+		
+		
 		
 		
 		
