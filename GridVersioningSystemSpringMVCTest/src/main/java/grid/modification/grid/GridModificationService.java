@@ -433,7 +433,7 @@ public class GridModificationService {
 	 * @param aGrid grid to be updated
 	 * @return updated grid
 	 */
-	private Grid refreshLinks(Grid aGrid){
+	public Grid refreshLinks(Grid aGrid){
 		aGrid	=	aGrid.clone();
 		HashMap<String,GridElement> embeddedEl	=	aGrid.obtainAllEmbeddedElements();
 		ArrayList<GridElement> updated			=	new ArrayList<GridElement>();
@@ -556,7 +556,8 @@ public class GridModificationService {
 						this.logger.info("apply modification "+aMod.toString());
 						updated	=	this.applyAModification((GridElementModification)aMod, updated, updated.obtainAllEmbeddedElements());
 					}
-				}	
+				}
+				
 				logger.info("going to update version numbers (1)");
 				this.updateVersionNumbersAndStatus(aGrid, updated);
 				GridElement updatedEl	=	updated.obtainAllEmbeddedElements().get(newGridElement.getLabel());
