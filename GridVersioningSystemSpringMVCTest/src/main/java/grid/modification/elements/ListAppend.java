@@ -5,8 +5,12 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import grid.entities.Grid;
 import grid.entities.GridElement;
+import grid.modification.grid.GridModificationService;
 
 /**
  * This class models an addition of an element to a List belonging to a GridElement
@@ -19,6 +23,7 @@ public class ListAppend extends GridElementModification {
 	private String 	listNameToBeChanged;
 	private String	appendedObjectLabel;
 	private Object  newLoadedObject;
+	private static final Logger logger = LoggerFactory.getLogger(ListAppend.class);
 	
 	public String getListNameToBeChanged() {
 		return listNameToBeChanged;
@@ -54,10 +59,12 @@ public class ListAppend extends GridElementModification {
 			List	aList						=	(List)myList;
 			HashMap<String,GridElement>	elMap	=	grid.obtainAllEmbeddedElements();
 			if(elMap.containsKey(this.appendedObjectLabel)){
+				logger.info("appending an object already existing on this grid");
 				GridElement	element	=	elMap.get(this.appendedObjectLabel);
 				aList.add(element);
 			}
 			else if(this.newLoadedObject!=null){	//i have to append a new object
+				logger.info("appending an object not existing on this grid");
 				newLoadedObject	=	((GridElement) newLoadedObject).clone();
 				HashMap<String, GridElement> elements	=	grid.obtainAllEmbeddedElements();
 				Iterator<String> it	=	elements.keySet().iterator();
@@ -77,7 +84,7 @@ public class ListAppend extends GridElementModification {
 
 	@Override
 	public String toString() {
-		return "ListAppend: append this element "+this.appendedObjectLabel+"in this list "+this.listNameToBeChanged+" in this object "+this.subjectLabel;
+		return "ListAppend: append this element "+this.appendedObjectLabel+"("+this.newLoadedObject+")in this list "+this.listNameToBeChanged+" in this object "+this.subjectLabel;
 	}
 
 }

@@ -556,7 +556,8 @@ public class GridModificationService {
 						this.logger.info("apply modification "+aMod.toString());
 						updated	=	this.applyAModification((GridElementModification)aMod, updated, updated.obtainAllEmbeddedElements());
 					}
-				}	
+				}
+				
 				logger.info("going to update version numbers (1)");
 				this.updateVersionNumbersAndStatus(aGrid, updated);
 				GridElement updatedEl	=	updated.obtainAllEmbeddedElements().get(newGridElement.getLabel());
