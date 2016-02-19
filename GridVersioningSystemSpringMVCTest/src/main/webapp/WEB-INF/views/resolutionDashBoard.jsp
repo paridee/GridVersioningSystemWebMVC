@@ -76,9 +76,16 @@
     					//check if main goals are linked to pending elements
     					List<Goal> mainGoal=g.getMainGoals();
     					boolean solvable=true;
-    					for(Goal goal: mainGoal){
+    					for(Goal ge: mainGoal){
+    						List<GridElement> pending=ges.getElementByLabelAndState(ge.getLabel(), "Goal", GridElement.State.MAJOR_CONFLICTING);
+    						pending.addAll(ges.getElementByLabelAndState(ge.getLabel(), "Goal", GridElement.State.MAJOR_UPDATING));
+    						pending.addAll(ges.getElementByLabelAndState(ge.getLabel(), "Goal", GridElement.State.MINOR_CONFLICTING));
+    						if(pending.size()>0){
+    							solvable=false;
+    						}
+    						
     						if(solvable){
-    							if(gms.isEmbeddedPending(goal)) solvable=false;
+    							if(gms.isEmbeddedPending(ge)) solvable=false;
     						}
     					}
     					if(solvable) out.print("<a href=\"/ISSSR/MGResolution/"+p.getId()+"/"+g.getId()+"\">MainGoalList changed</a><br>");
