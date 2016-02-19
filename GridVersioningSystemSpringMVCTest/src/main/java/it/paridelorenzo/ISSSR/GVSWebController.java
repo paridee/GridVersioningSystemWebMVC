@@ -225,7 +225,6 @@ public class GVSWebController {
 				for(GridElement currentGE: pending){
 					if((!withPending)&&(this.gridModificationService.isEmbeddedPending(currentGE))){
 						withPending=true;
-						
 					}
 				}
 				

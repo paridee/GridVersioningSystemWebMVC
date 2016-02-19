@@ -474,6 +474,18 @@ public class GridModificationService {
 	 * @throws Exception
 	 */
 	public void applyAModificationToASingleElement(GridElement newGridElement) throws Exception{
+		List<GridElement> pending=this.gridElementService.getElementByLabelAndState(newGridElement.getLabel(), newGridElement.getClass().getSimpleName(), GridElement.State.MAJOR_CONFLICTING);
+		pending.addAll(this.gridElementService.getElementByLabelAndState(newGridElement.getLabel(), newGridElement.getClass().getSimpleName(), GridElement.State.MAJOR_UPDATING));
+		pending.addAll(this.gridElementService.getElementByLabelAndState(newGridElement.getLabel(), newGridElement.getClass().getSimpleName(), GridElement.State.MINOR_CONFLICTING));
+		boolean withPending=false;
+		for(GridElement currentGE: pending){
+			if((!withPending)&&(this.isEmbeddedPending(currentGE))){
+				withPending=true;
+			}
+		}
+		if(withPending==true){
+			throw new HasEmbeddedPendingException("Cannot manage "+newGridElement.getLabel()+" modification, has embedded pending elements");
+		}
 		newGridElement	=	newGridElement.clone();
 		newGridElement.setIdElement(0);
 		System.out.println("test");
