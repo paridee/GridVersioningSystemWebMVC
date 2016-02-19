@@ -372,6 +372,13 @@ public class GVSWebController {
     		System.out.println("error, cannot get grid with id: "+ gridToSolveId);
     		return jsonObject.toString();
 		}
+		else if((!gridToSolve.isMainGoalsChanged())){
+			JSONObject jsonObject = new JSONObject();
+    		jsonObject.put("msg", "result");
+    		jsonObject.put("resp", "grid with id: "+ gridToSolveId+" has been already solved");
+    		System.out.println("error, cannot get grid with id: "+ gridToSolveId);
+    		return jsonObject.toString();
+		}
 		else{
 			boolean solvable=true;
 			for(Goal ge: mainGoalList){
@@ -439,8 +446,33 @@ public class GVSWebController {
 		model.addAttribute("pageTitle", "Lista Grids");
 		this.setActiveButton(1, model);
 		List<Grid> temp= this.gridService.listAllGrids();
+		Map<String, String> status=new HashMap<String,String>();
+		for(Grid g: temp){
+			String state="";
+			if(g.isMainGoalsChanged()) state=state+"MGC-";
+			Grid tempWorking= this.gridService.getLatestWorkingGrid(g.getProject().getId());
+			if(g.obtainGridState()==Grid.GridState.WORKING){
+				if (g.getVersion()<tempWorking.getVersion()){
+					state=state+"ARCHIVED";
+				}
+				else{
+					state=state+g.obtainGridState().name();
+				}
+			}
+			else{
+				state=state+g.obtainGridState().name();
+			}
+			
+			
+			
+			status.put(g.getId()+"", state);
+			
+		}
+		
+		System.out.println(status);
 		model.addAttribute("nGrids", temp.size());
         model.addAttribute("listGrids", temp);
+        model.addAttribute("status", status);
         return "grids";
     }
 	
