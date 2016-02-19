@@ -11,6 +11,9 @@ import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
 import javax.persistence.Table;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import grid.Utils;
 import grid.interfaces.Updatable;
 
@@ -28,6 +31,7 @@ public class Question extends GridElement{
 
 	private List<Metric> 	metricList	=	new ArrayList<Metric>();
 	private String 			question	=	"";
+	private static final Logger logger = LoggerFactory.getLogger(Question.class);
 	
 	@ManyToMany(cascade = CascadeType.ALL)
 	@JoinTable(name = "QuestionToMetric", joinColumns = { 
@@ -90,6 +94,7 @@ public class Question extends GridElement{
 		boolean addThis						=	false;	
 		for(int i=0;i<this.metricList.size();i++){
 			if(this.metricList.get(i).getLabel().equals(ge.getLabel())){
+				this.logger.info("updating reference on question "+this.getLabel()+"v"+this.getVersion()+" to "+ge.getLabel()+"v"+ge.getVersion());
 				updated.metricList.set(i, (Metric) ge);
 				addThis=true;
 			}

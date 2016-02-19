@@ -3,6 +3,7 @@ package it.paridelorenzo.ISSSR;
 import java.text.DateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 
@@ -145,7 +146,7 @@ public class TestController {
 		quarto.setDescription("ancora un altro");
 		ArrayList<Practitioner> authors	=	new ArrayList<Practitioner>();
 		authors.add(pm);
-		authors.add(lorenzo);
+		authors.add(lorenzo);ffffffff
 		quarto.setAuthors(authors);
 		newGrid.getMainGoals().add(quarto);
 		s2	=	(Strategy)this.gridElementService.upgradeGridElement(s2);
@@ -161,6 +162,38 @@ public class TestController {
 		aGoal.setStrategyList(strNewList);
 		System.out.print(aFactory.obtainJson(newGrid, JSONType.FIRST,refVer));*/
 		//this.gridService.addGrid(newGrid);
+		return "home";
+	}
+	
+	@RequestMapping(value = "/testLorenzo2", method = RequestMethod.GET)
+	public String homeGrifddfdf(Locale locale, Model model) {
+		Grid start	=	this.gridService.getGridById(1);
+		HashMap<String,GridElement> map	=	start.obtainAllEmbeddedElements();
+		Metric m4	=	(Metric) map.get("m4");
+		m4	=	(Metric) m4.clone();
+		m4.setDescription("modificata m4");
+		m4.setScaleType("Ordinale");
+		start	=	this.gridService.updateGridElement(start, m4, true, true);
+		map	=	start.obtainAllEmbeddedElements();
+		MeasurementGoal mg2	=	(MeasurementGoal) map.get("mg2");
+		mg2	=	(MeasurementGoal) mg2.clone();
+		mg2.setInterpretationModel("un modello interpretativo");
+		mg2.setDescription("meassssssssssss");
+		start	=	this.gridService.updateGridElement(start, mg2, true, true);
+		map	=	start.obtainAllEmbeddedElements();
+		Strategy s3	=	(Strategy) map.get("s3");
+		s3	=	(Strategy) s3.clone();
+		s3.setDescription("essetre");
+		List<Goal>s3goals	=	s3.getGoalList();
+		Goal nuovoGoal	=	new Goal();
+		nuovoGoal.setLabel("g4534");
+		nuovoGoal.setDescription("Goal rompiscatole");
+		s3goals.add(nuovoGoal);
+		start	=	this.gridService.updateGridElement(start, s3, true, true);		
+		JSONFactory aFactory	=	new JSONFactory();
+		System.out.print(aFactory.obtainJson(start, JSONType.FIRST,null));
+		this.gridService.addGrid(start);
+		
 		return "home";
 	}
 	

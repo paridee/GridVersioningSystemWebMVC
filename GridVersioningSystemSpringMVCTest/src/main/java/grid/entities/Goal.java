@@ -166,7 +166,7 @@ public class Goal extends GridElement{
 		}
 		if(recursive	==	true){
 			if(this.measurementGoal!=null){
-				Utils.mergeLists(returnList, this.measurementGoal.updateReferences(ge,autoupgrade));
+				Utils.mergeLists(returnList, this.measurementGoal.updateReferences(ge,autoupgrade,recursive));
 			}
 			for(int i=0;i<this.strategyList.size();i++){
 				Utils.mergeLists(returnList, this.strategyList.get(i).updateReferences(ge,autoupgrade,recursive));
