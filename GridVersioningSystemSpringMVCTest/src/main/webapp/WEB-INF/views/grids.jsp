@@ -39,12 +39,15 @@
 		        <th width="80">Grid ID</th>
 		        <th width="120">Grid Version</th>
 		        <th width="120">ProjectID</th>
+		        <th width="120">State</th>
 		    </tr>
 		    <c:forEach items="${listGrids}" var="listgriditem">
+		    	<c:set var="currentGridId">${listgriditem.id}</c:set>
 		        <tr>
 		            <td><a href="<c:url value='/grids/${listgriditem.id}' />" >${listgriditem.id}</a></td>
 		            <td>${listgriditem.version}</td>
 		            <td><a href="<c:url value='/projects/${listgriditem.project.id}' />" >${listgriditem.project.id}</a></td>
+		        	<td>${status[currentGridId]}</td>
 		        </tr>
 		    </c:forEach>
 		    </table>
