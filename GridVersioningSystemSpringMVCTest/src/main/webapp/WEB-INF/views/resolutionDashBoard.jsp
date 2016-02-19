@@ -81,7 +81,7 @@
     							if(gms.isEmbeddedPending(goal)) solvable=false;
     						}
     					}
-    					if(solvable) out.print("<a href=\"/ISSSR/MGResolution/"+g.getId()+"\">MainGoalList changed</a><br>");
+    					if(solvable) out.print("<a href=\"/ISSSR/MGResolution/"+p.getId()+"/"+g.getId()+"\">MainGoalList changed</a><br>");
     					else out.print("MainGoalList changed<br>");
     				}
     				

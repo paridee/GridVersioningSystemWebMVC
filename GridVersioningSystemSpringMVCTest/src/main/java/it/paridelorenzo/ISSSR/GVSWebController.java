@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.json.JSONArray;
 import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -22,7 +23,6 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.google.gson.Gson;
-import com.google.gson.JsonSyntaxException;
 
 import grid.JSONFactory;
 import grid.entities.Goal;
@@ -277,7 +277,63 @@ public class GVSWebController {
 		
     }
 	
+	@RequestMapping(value = "/MGResolution/{pid}/{gid}", method = RequestMethod.GET)
+    public String mainGoalResolution(@PathVariable("gid") int gid,@PathVariable("pid") int pid,Model model) {
+		model.addAttribute("pageTitle", "Lista Grids");
+		this.setActiveButton(2, model);
+		Grid working= this.gridService.getLatestWorkingGrid(pid);
+		if(working==null) model.addAttribute("error", "The working Grid Element is not available");
+		Grid current=this.gridService.getGridById(gid);
+		if(working==null) model.addAttribute("error", "The requested Grid Element is not available");
+		String workingMGList="['"+pid+"',";
+		List<Goal> temp=working.getMainGoals();
+		for(int i=0; i<temp.size(); i++){
+			if(i<temp.size()-1){
+				workingMGList=workingMGList+"'"+temp.get(i).getLabel()+"',";
+			}
+			else{
+				workingMGList=workingMGList+"'"+temp.get(i).getLabel()+"'";
+			}
+		}
+		workingMGList=workingMGList+"]";
+		
+		
+		String currentMGList="['"+pid+"',";
+		temp=current.getMainGoals();
+		for(int i=0; i<temp.size(); i++){
+			if(i<temp.size()-1){
+				currentMGList=currentMGList+"'"+temp.get(i).getLabel()+"',";
+			}
+			else{
+				currentMGList=currentMGList+"'"+temp.get(i).getLabel()+"'";
+			}
+		}
+		currentMGList=currentMGList+"]";
+		model.addAttribute("workingGrid", working);
+        model.addAttribute("currentGrid", current);
+        model.addAttribute("workingMGList", workingMGList);
+        model.addAttribute("currentMGList", currentMGList);
+        return "MGResolution";
+    }
 	
+	@RequestMapping(value = "/MGListUpdate", method=RequestMethod.POST)
+    public @ResponseBody String updateMainGoalList(@RequestBody String jsonData) {
+		System.out.println(jsonData);
+		JSONArray jsonArray = new JSONArray(jsonData);
+		List<String> list = new ArrayList<String>();
+		for (int i=0; i<jsonArray.length(); i++) {
+		    list.add( jsonArray.getString(i) );
+		}
+		for (int i=0; i<list.size(); i++) {
+		    System.out.println(list.get(i));
+		}
+		JSONObject jsonObject = new JSONObject();
+		jsonObject.put("msg", "result");
+		jsonObject.put("resp", "error");
+		return jsonObject.toString();
+		
+		
+	}
 	
 	
 	
