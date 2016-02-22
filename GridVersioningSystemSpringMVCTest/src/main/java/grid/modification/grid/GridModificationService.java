@@ -19,6 +19,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.transaction.annotation.Transactional;
 
 import grid.Utils;
 import grid.entities.Goal;
@@ -333,8 +334,14 @@ public class GridModificationService {
 	
 	private void sendMainGoalChangeNotification(Grid newGrid){
 		Practitioner pm	=	newGrid.getProject().getProjectManager();
-		Utils.mailSender("GQM+S Versioning alert", "Dear "+pm.getName()+", the following Project: "+newGrid.getProject().getProjectId()+" had a main Goal change and requires an action, please check at the following link "+Utils.systemURL+"/MGLCResolution/"+newGrid.getId(),pm.getEmail());//+"/"+modified.getClass().getSimpleName()+"/"+modified.getIdElement(), responsibles.get(i).getEmail());
-	}
+		if(pm!=null){
+			Utils.mailSender("GQM+S Versioning alert", "Dear "+pm.getName()+", the following Project: "+newGrid.getProject().getProjectId()+" had a main Goal change and requires an action, please check at the following link "+Utils.systemURL+"/MGLCResolution/"+newGrid.getId(),pm.getEmail());//+"/"+modified.getClass().getSimpleName()+"/"+modified.getIdElement(), responsibles.get(i).getEmail());
+			}
+		else{
+			this.logger.info("There is no PM!!! Use the default one");
+			//TODO manage PM absence
+		}
+		}
 	
 	private void sendGridElementNotification(GridElement modified,Grid aGrid) {
 		ArrayList<Practitioner> responsibles	=	new ArrayList<Practitioner>();

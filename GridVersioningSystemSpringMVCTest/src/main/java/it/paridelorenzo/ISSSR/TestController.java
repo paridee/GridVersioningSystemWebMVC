@@ -168,6 +168,7 @@ public class TestController {
 	@RequestMapping(value = "/testLorenzo2", method = RequestMethod.GET)
 	public String homeGrifddfdf(Locale locale, Model model) {
 		Grid start	=	this.gridService.getGridById(1);
+		Grid original =	start;
 		HashMap<String,GridElement> map	=	start.obtainAllEmbeddedElements();
 		Metric m4	=	(Metric) map.get("m4");
 		m4	=	(Metric) m4.clone();
@@ -191,8 +192,17 @@ public class TestController {
 		s3goals.add(nuovoGoal);
 		start	=	this.gridService.updateGridElement(start, s3, true, true);		
 		JSONFactory aFactory	=	new JSONFactory();
-		System.out.print(aFactory.obtainJson(start, JSONType.FIRST,null));
-		this.gridService.addGrid(start);
+		this.logger.info("JSON PRODOTTO "+aFactory.obtainJson(start, JSONType.FIRST,null));
+		s3.setDescription("this has to be a major conflict");
+		mg2.setDescription("this has to be a minor conflict");
+		Strategy s2	=	(Strategy) map.get("s2");
+		s2.setDescription("this has to be a major update");
+		Goal aNewMainGoal	=	new Goal();
+		aNewMainGoal.setLabel("g9843");
+		aNewMainGoal.setDescription("sono un nuovo main goal");
+		start.getMainGoals().add(aNewMainGoal);
+		this.logger.info("JSON PRODOTTO "+aFactory.obtainJson(start, JSONType.FIRST,original));
+		//this.gridService.addGrid(start);
 		
 		return "home";
 	}

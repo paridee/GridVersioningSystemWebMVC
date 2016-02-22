@@ -162,6 +162,8 @@ public class ModificationController {
 		}
 		return "home";
 	}
+	
+	
 	@RequestMapping(value = "/grids/update", method=RequestMethod.POST)
     public @ResponseBody String updateGrid(@RequestBody String jsonData) {
 		//Grid temp=JSONFactory.loadFromJson(jsonData, this.projectService);
