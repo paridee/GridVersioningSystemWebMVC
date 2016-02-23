@@ -5,3 +5,13 @@ body {
   padding: 40px 15px;
   text-align: center;
 }
+
+th{
+	font-weight: bolder;
+}
+tbody{
+	cursor: pointer;
+}
+td{
+	text-align: left;
+}

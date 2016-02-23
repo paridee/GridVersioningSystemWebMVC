@@ -5,54 +5,63 @@
     <%@ include file="navBar.jsp" %>
 
     <div class="container">
-    	
-    	<c:if test="${(gridAdded!= null)&&(grid==null)}">
-		<div class="starter-template">
-			${gridAdded} test
+    	<div style="text-align: center">
+    	<c:choose>
+	    	<c:when test="${grid!= null}">
+			<div class="table-responsive"> 
+				<table class="table table-striped table-hover">
+					<thead>
+					    <tr>
+					        <th width="80">Grid ID</th>
+					        <th width="120">Grid Version</th>
+					        <th width="120">ProjectID</th>
+					    </tr>
+				    </thead>
+				    <tbody>
+					    <tr>
+					            <td><a href="<c:url value='/grids/${grid.id}' />" >${grid.id}</a></td>
+					            <td>${grid.version}</td>
+					            <td><a href="<c:url value='/projects/${grid.project.id}' />" >${grid.project.id}</a></td>
+					    </tr>
+				    </tbody>
+			    </table>
+			</div>
+			<div id="gridChart"> </div>
+			</c:when>
+	      	<c:when test="${!empty listGrids}">
+	        <h1>Grids list <small> - grids found: ${listGrids.size()}</small></h1>
+				<div class="table-responsive"> 
+					<table class="table table-striped table-hover">
+						<thead>
+						    <tr>
+						        <th>Grid ID</th>
+						        <th>Grid Version</th>
+						        <th>Project</th>
+						        <th>State</th>
+						    </tr>
+					    </thead>
+					    <tbody>
+						    <c:forEach items="${listGrids}" var="listgriditem">
+						    	<c:set var="currentGridId">${listgriditem.id}</c:set>
+						        <tr class='clickable-row' data-href='<c:url value='/grids/${listgriditem.id}' />'>
+						            <td>${listgriditem.id}</td>
+						            <td>${listgriditem.version}</td>
+						            <td><a href="<c:url value='/projects/${listgriditem.project.id}' />" >${listgriditem.project.projectId}</a></td>
+						        	<td>${status[currentGridId]}</td>
+						        </tr>
+						    </c:forEach>
+					    </tbody>
+			    	</table>
+		    	</div>
+			</c:when>
+			<c:otherwise>
+				<div style="float: left;width: 100%; text-align: center;">
+    				<img style="max-height:100px; max-width: 100px;" alt="Alert" src="<c:url value='/resources/images/warning.png' />">
+    				<h1>No Grids available in the system</h1>
+ 		  		</div>
+			</c:otherwise>
+		</c:choose>
 		</div>
-		</c:if>
-    	<c:if test="${grid!= null}">
-		<div class="starter-template">
-			<table class="tg">
-		    <tr>
-		        <th width="80">Grid ID</th>
-		        <th width="120">Grid Version</th>
-		        <th width="120">ProjectID</th>
-		    </tr>
-		    <tr>
-		            <td><a href="<c:url value='/grids/${grid.id}' />" >${grid.id}</a></td>
-		            <td>${grid.version}</td>
-		            <td><a href="<c:url value='/projects/${grid.project.id}' />" >${grid.project.id}</a></td>
-		    </tr>
-		    </table>
-		</div>
-		<div id="gridChart"> </div>
-		    
-		</c:if>
-      	
-        <c:if test="${!empty listGrids}">
-        <div class="starter-template">
-			<h3>Lista Griglie</h3>
-			<p class="lead">Trovate: ${nGrids } griglie</p>
-		    <table class="tg">
-		    <tr>
-		        <th width="80">Grid ID</th>
-		        <th width="120">Grid Version</th>
-		        <th width="120">ProjectID</th>
-		        <th width="120">State</th>
-		    </tr>
-		    <c:forEach items="${listGrids}" var="listgriditem">
-		    	<c:set var="currentGridId">${listgriditem.id}</c:set>
-		        <tr>
-		            <td><a href="<c:url value='/grids/${listgriditem.id}' />" >${listgriditem.id}</a></td>
-		            <td>${listgriditem.version}</td>
-		            <td><a href="<c:url value='/projects/${listgriditem.project.id}' />" >${listgriditem.project.id}</a></td>
-		        	<td>${status[currentGridId]}</td>
-		        </tr>
-		    </c:forEach>
-		    </table>
-		    </div>
-		</c:if>
 		
 		
 		
@@ -78,5 +87,12 @@
     	var my_chart = new Treant(chart_config);
    	</script>
 </c:if>
+<script type="text/javascript">
+    jQuery(document).ready(function($) {
+        $(".clickable-row").click(function() {
+            window.document.location = $(this).data("href");
+        });
+    });
+    </script>
    	 
 </html>
