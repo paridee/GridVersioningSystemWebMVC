@@ -455,22 +455,12 @@ public class GVSWebController {
 				if (g.getVersion()<tempWorking.getVersion()){
 					state=state+"ARCHIVED";
 				}
-				else{
-					state=state+g.obtainGridState().name();
-				}
+				else{state=state+g.obtainGridState().name();}
 			}
-			else{
-				state=state+g.obtainGridState().name();
-			}
-			
-			
-			
+			else{state=state+g.obtainGridState().name();}
 			status.put(g.getId()+"", state);
-			
 		}
-		
 		System.out.println(status);
-		model.addAttribute("nGrids", temp.size());
         model.addAttribute("listGrids", temp);
         model.addAttribute("status", status);
         return "grids";
@@ -585,7 +575,6 @@ public class GVSWebController {
 		model.addAttribute("pageTitle", "Lista Progetti");
 		this.setActiveButton(0, model);
 		List<Project> temp = this.projectService.listProjects();
-		model.addAttribute("nProjects", temp.size());
 		model.addAttribute("listProjects", temp);
 		return "projects";
 		
@@ -598,6 +587,21 @@ public class GVSWebController {
 		List<Grid> templist= this.gridService.getGridLog(id);
 		model.addAttribute("nProjectGrids", templist.size());
         model.addAttribute("listProjectGrids", templist);
+        Map<String, String> status=new HashMap<String,String>();
+		for(Grid g: templist){
+			String state="";
+			if(g.isMainGoalsChanged()) state=state+"MGC-";
+			Grid tempWorking= this.gridService.getLatestWorkingGrid(g.getProject().getId());
+			if(g.obtainGridState()==Grid.GridState.WORKING){
+				if (g.getVersion()<tempWorking.getVersion()){
+					state=state+"ARCHIVED";
+				}
+				else{state=state+g.obtainGridState().name();}
+			}
+			else{state=state+g.obtainGridState().name();}
+			status.put(g.getId()+"", state);
+		}
+		model.addAttribute("status", status);
         return "projects";
     }
 	

@@ -42,7 +42,7 @@
             <div class="carousel-caption">
               <h1 style="color: black;">Pending Updates and conflicts</h1>
               <p style="color: black;">Manage pending updates and conflicts occurred during concurrent modifications of Grid Elements</p>
-              <p style="color: black;"><a class="btn btn-lg btn-primary" href="<c:url value='/pending'/>" role="button">Pending changes</a></p>
+              <p style="color: black;"><a class="btn btn-lg btn-primary" href="<c:url value='resolutionDashBoard'/>" role="button">Pending changes</a></p>
             </div>
           </div>
         </div>
@@ -56,10 +56,7 @@
         <span class="sr-only">Next</span>
       </a>
     </div><!-- /.carousel -->
-    
-    
-	</div><!-- /.container -->
-    
+    </div><!-- /.container -->
  </body>
 	<%@ include file="footer.jsp" %>
 

@@ -61,7 +61,7 @@ public class GridDAOImpl implements GridDAO {
 	public List<Grid> listAllGrids() {
 		Session session				=	this.sessionFactory.getCurrentSession();
 		@SuppressWarnings("unchecked")
-		List<Grid> gridElList		=	session.createQuery("from Grid").list();
+		List<Grid> gridElList		=	session.createQuery("from Grid order by version desc").list();
 		for(Grid g : gridElList){
 			logger.info("Grid::"+g);
 		}
@@ -102,7 +102,7 @@ public class GridDAOImpl implements GridDAO {
 	public List<Grid> getGridLog(int projid) {
 		Session session			=	this.sessionFactory.getCurrentSession();
 		@SuppressWarnings("unchecked")
-		List<Grid> gridElList	=	session.createQuery("from Grid G where G.project.id = "+projid).list();
+		List<Grid> gridElList	=	session.createQuery("from Grid G where G.project.id = "+projid+" order by version desc").list();
 		for(Grid g : gridElList){
 			logger.info("Grid::"+g);
 		}
