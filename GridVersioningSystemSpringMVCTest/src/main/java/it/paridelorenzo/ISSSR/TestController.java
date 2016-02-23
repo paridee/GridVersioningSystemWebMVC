@@ -13,6 +13,8 @@ import java.util.Locale;
 import java.util.Set;
 
 import org.apache.log4j.Level;
+import org.json.JSONArray;
+import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -253,8 +255,38 @@ public class TestController {
 		aNewMainGoal.setDescription("sono un nuovo main goal");
 		start.getMainGoals().add(aNewMainGoal);
 		this.logger.info("JSON PRODOTTO "+aFactory.obtainJson(start, JSONType.FIRST,original));
+		JSONObject modObj	=	new JSONObject();
+		modObj.put("projectId", start.getProject().getProjectId());
+		JSONArray anArray	=	new JSONArray();
+		anArray.put(aFactory.obtainJson(s2, JSONFactory.JSONType.FIRST));
+		anArray.put(aFactory.obtainJson(s3, JSONFactory.JSONType.FIRST));
+		modObj.put("changedObjects", anArray);
+		anArray	=	new JSONArray();
+		for(Goal g:start.getMainGoals()){
+			anArray.put(aFactory.obtainJson(g, JSONFactory.JSONType.FIRST));
+		}
+		modObj.put("mainGoalsList", anArray);
+		this.logger.info("JSON MODIFICHE NUOVE "+modObj.toString());
 		//this.gridService.addGrid(start);//*/
 		
+		return "home";
+	}
+	
+	@RequestMapping(value = "/createUser", method = RequestMethod.GET)
+	public String homeGridfffdf(Locale locale, Model model) {
+		Practitioner pm	=	new Practitioner();
+		pm.setEmail("paride.casulli@gmail.com");
+		pm.setName("Paride Casulli");
+		pm.setPassword("$2a$10$04TVADrR6/SPLBjsK0N30.Jf5fNjBugSACeGv1S69dZALR7lSov0y");
+		UserRole aRole	=	new UserRole();
+		aRole.setUser(pm);
+		aRole.setRole("ROLE_ADMIN");
+		aRole.setUser(pm);
+		aRole.setRole("ROLE_USER");
+		Set<UserRole> roles	=	new HashSet<UserRole>();
+		roles.add(aRole);
+		pm.setUserRole(roles);
+		this.practitionerService.add(pm);
 		return "home";
 	}
 	

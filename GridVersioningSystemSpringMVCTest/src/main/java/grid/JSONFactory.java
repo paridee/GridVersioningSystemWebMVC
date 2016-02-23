@@ -300,22 +300,27 @@ public class JSONFactory {
 									//label of measurement goal has changed... 
 									if(!((Goal)oldObj).getMeasurementGoal().getLabel().equals(currentObj.get(JSONname).toString())){
 										MeasurementGoal aMg	=	(MeasurementGoal)gridElements.get(currentObj.get(JSONname).toString());
-										ObjectFieldModification aModification	=	new ObjectFieldModification();
-										aModification.setFieldToBeChanged(attrName);
-										aModification.setSubjectLabel(objLabel);
-										aModification.setNewValue(aMg);
-										response.add(aModification);	
+										if(aMg!=null){
+											logger.info("cannot change reference to a non-existing object");
+											ObjectFieldModification aModification	=	new ObjectFieldModification();
+											aModification.setFieldToBeChanged(attrName);
+											aModification.setSubjectLabel(objLabel);
+											aModification.setNewValue(aMg);
+											response.add(aModification);
+										}
 									}
 								}
 							}
 							else{
-								logger.info("modification value "+currentObj.get(JSONname)+" "+aField.getName()+" "+aField.getType().isAssignableFrom(GridElement.class)+" "+aField.getType()+GridElement.class.isAssignableFrom(aField.getType()));
-								if(!(value.equals(currentObj.get(JSONname)))){
-									ObjectFieldModification aModification	=	new ObjectFieldModification();
-									aModification.setFieldToBeChanged(attrName);
-									aModification.setSubjectLabel(objLabel);
-									aModification.setNewValue(currentObj.get(JSONname));
-									response.add(aModification);
+								if(gridElements.containsKey(objLabel)){
+									logger.info("modification value "+currentObj.get(JSONname)+" "+aField.getName()+" "+aField.getType().isAssignableFrom(GridElement.class)+" "+aField.getType()+GridElement.class.isAssignableFrom(aField.getType()));
+									if(!(value.equals(currentObj.get(JSONname)))){
+										ObjectFieldModification aModification	=	new ObjectFieldModification();
+										aModification.setFieldToBeChanged(attrName);
+										aModification.setSubjectLabel(objLabel);
+										aModification.setNewValue(currentObj.get(JSONname));
+										response.add(aModification);
+									}
 								}
 							}
 						}

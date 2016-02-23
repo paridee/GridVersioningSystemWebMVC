@@ -208,6 +208,7 @@ public class GridModificationService {
 				GridElement 	subj;
 				if(aMod instanceof GridElementModification){
 					subj	=	elements.get(((GridElementModification) aMod).getSubjectLabel());
+					logger.info("Grid element modification label in mod "+((GridElementModification) aMod).getSubjectLabel()+" "+subj);
 					logger.info("Grid Element Modification: involved class "+subj.getClass()+" label "+subj.getLabel()+" label in mod "+((GridElementModification) aMod).getSubjectLabel());
 					//if is already in new grid use this one...
 					if(newVersion.obtainAllEmbeddedElements().containsKey(((GridElementModification) aMod).getSubjectLabel())){

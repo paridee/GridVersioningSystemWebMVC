@@ -119,8 +119,8 @@ public class ModificationController {
 			if(anObject.has("changedObjects")){
 				jsonData	=	anObject.getJSONArray("changedObjects");
 			}
-			if(anObject.has("mainGoalsChanged")){
-				mainGoalsJSONArray	=	anObject.getJSONArray("changedObjects");
+			if(anObject.has("mainGoalsList")){
+				mainGoalsJSONArray	=	anObject.getJSONArray("mainGoalsList");
 			}
 			Project thisProject	=	this.projectService.getProjectByProjectId(aProjectId);
 			Grid latestGrid							=	this.gridService.getLatestWorkingGrid(thisProject.getId());
@@ -139,17 +139,35 @@ public class ModificationController {
 			HashMap<String,GridElement> latestEl	=	latestGrid.obtainAllEmbeddedElements();
 			HashMap<String,Object>		modifiedEl	=	new HashMap<String,Object>();
 			ArrayList<GridElement>		loadedElem	=	new ArrayList<GridElement>();	//redundant but maps elements on json
+			logger.info("modded elements array sizev- "+jsonData.length());
 			for(int i=0;i<jsonData.length();i++){
-				loadedElem.add(JSONFactory.loadGridObj(jsonData.getString(i).toString(), modifiedEl));
+				logger.info("obj - "+jsonData.get(i).toString());
+				loadedElem.add(JSONFactory.loadGridObj(jsonData.get(i).toString(), modifiedEl));
 			}
 			ArrayList<Modification> mods	=	new ArrayList<Modification>();
 			for(int i=0;i<loadedElem.size();i++){
 				ArrayList<GridElementModification> elMods	=	ObjectModificationService.getModification(latestEl.get(loadedElem.get(i).getLabel()), loadedElem.get(i));
 				mods.addAll(elMods);
 			}
-			if(mods.size()>0){
+			if(mods.size()>0||mainGoalsJSONArray!=null){
 				logger.info("found "+mods.size()+" modifications");
 				Grid newVersion	=	this.gridModificationService.applyModifications(mods, latestGrid, modifiedObjectLabels);
+				if(mainGoalsJSONArray!=null){
+					if(newVersion==null||newVersion.obtainGridState()==Grid.GridState.WORKING){
+						newVersion	=	this.gridService.createStubUpgrade(latestGrid);
+					}
+					List<Goal> newMainGoals	=	new ArrayList<Goal>();
+					for(int r=0;r<mainGoalsJSONArray.length();r++){
+						String 	s		= 	(mainGoalsJSONArray.get(r)).toString();
+						Goal	aGoal	=	(Goal)JSONFactory.loadGridObj(s,Utils.convertHashMap(newVersion.obtainAllEmbeddedElements()));
+						newMainGoals.add(aGoal);
+					}
+					List<Modification> mgMods	=	GridModificationService.getMainGoalsModification(newVersion.getMainGoals(), newMainGoals);
+					for(int r=0;r<mgMods.size();r++){
+						GridModification mod	=	(GridModification) mgMods.get(r);
+						mod.apply(newVersion);
+					}
+				}
 				this.gridService.addGrid(newVersion);
 			}
 			else{
@@ -303,9 +321,21 @@ public class ModificationController {
 				text	=	text+line;
 				line	=	reader.readLine();
 			}
+			JSONObject 	modJson	=	new JSONObject(text);
+			String 		prjId	=	"";
+			if(modJson.has("projectId")){
+				prjId	=	modJson.getString("projectId");
+			}
+			else{
+				return	"invalid JSON, missing project";
+			}
+			Project aProject	=	this.projectService.getProjectByProjectId(prjId);
+			if(aProject	==	null){
+				return "project not found in DB";
+			}
 			ArrayList<Modification> mods;
 			//TODO change with the right project
-			Grid refGrid	=	this.gridService.getLatestGrid(1);
+			Grid refGrid	=	this.gridService.getLatestWorkingGrid(aProject.getId());
 			
 			//test
 			HashMap<String,GridElement> elements	=	refGrid.obtainAllEmbeddedElements();
@@ -315,6 +345,7 @@ public class ModificationController {
 			logger.info("JSON loaded "+text);
 			logger.info("loaded grid version "+refGrid.getVersion()+" for project "+refGrid.getProject().getProjectId());
 			mods	=	testFactory.loadModificationJson(text, refGrid);
+			this.logger.info("Final modification list:");
 			for(int i=0;i<mods.size();i++){
 				System.out.println(mods.get(i).toString());
 			}
