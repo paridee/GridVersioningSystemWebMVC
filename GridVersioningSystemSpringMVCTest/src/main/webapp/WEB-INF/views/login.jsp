@@ -48,6 +48,8 @@
 		<c:if test="${not empty msg}">
 			<div class="msg">${msg}</div>
 		</c:if>
+		
+		<iframe width="300" height="225" src="https://www.youtube.com/embed/TGpwp_pNXJQ" frameborder="0" allowfullscreen></iframe>
 
 		<form name='loginForm'
 		  action="<c:url value='j_spring_security_check' />" method='POST'>

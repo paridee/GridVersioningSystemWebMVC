@@ -53,6 +53,7 @@
         <sec:intercept-url pattern="/grids**" access="ROLE_USER,ROLE_ADMIN" />
         <sec:intercept-url pattern="/updategr**" access="ROLE_USER,ROLE_ADMIN" />
         <sec:intercept-url pattern="/add**" access="ROLE_USER,ROLE_ADMIN" />
+        <sec:intercept-url pattern="/GVShome**" access="ROLE_USER,ROLE_ADMIN" />
         <sec:form-login 
 		    login-page="/login" 
 		    default-target-url="/welcome" 
