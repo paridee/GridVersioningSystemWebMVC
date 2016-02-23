@@ -2,6 +2,7 @@ package grid.DAOImpl;
 
 import java.util.List;
 
+import org.hibernate.Query;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.slf4j.Logger;
@@ -60,9 +61,15 @@ public class PractitionerDAOImpl implements PractitionerDAO {
 	public Practitioner getPractitionerByEmail(String email) {
 		Session session				=	this.sessionFactory.getCurrentSession();
 		//should be only one
-		List<Practitioner> pElList	=	session.createQuery("from Practitioner P where P.email = "+email).list();
+		Query aQuery	=	session.createQuery("from Practitioner P where P.email = :address");
+		aQuery.setParameter("address", email);
+		List<Practitioner> pElList	=	aQuery.list();
 		for(Practitioner g : pElList){
 			logger.info("Practitioner List::"+g);
+		}
+		if(pElList.size()==0){
+			logger.info("not found");
+			return null;
 		}
 		return pElList.get(0);
 	}

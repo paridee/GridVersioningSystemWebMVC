@@ -33,7 +33,7 @@ public class GridElementDAOImpl implements GridElementDao {
 	public void addGridElement(GridElement e) {
 		Session	session	=	this.sessionFactory.getCurrentSession();
 		session.persist(e);
-		logger.info("added a new "+e.getClass().getSimpleName()+" on persistence layer");		
+		logger.info("added a new "+e.getClass().getSimpleName()+" on persistence layer id:"+e.getIdElement());		
 	}
 
 	/**

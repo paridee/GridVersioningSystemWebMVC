@@ -2,8 +2,15 @@
 <beans:beans xmlns="http://www.springframework.org/schema/beans"
 	xmlns:beans="http://www.springframework.org/schema/beans"
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:sec="http://www.springframework.org/schema/security"
+	xmlns:tx="http://www.springframework.org/schema/tx"
 	xsi:schemaLocation="http://www.springframework.org/schema/beans 
-						http://www.springframework.org/schema/beans/spring-beans.xsd">
+						http://www.springframework.org/schema/beans/spring-beans.xsd
+						http://www.springframework.org/schema/security
+      					http://www.springframework.org/schema/security/spring-security.xsd
+      					http://www.springframework.org/schema/tx 
+          				http://www.springframework.org/schema/tx/spring-tx.xsd">
+	
 	
 	<!-- Root Context: defines shared resources visible to all other web components -->
 		
@@ -28,7 +35,7 @@
                 <beans:value>grid.entities.Question</beans:value>
                 <beans:value>grid.entities.Strategy</beans:value>
                 <beans:value>grid.entities.Practitioner</beans:value>
-                <beans:value>grid.entities.ProjectManager</beans:value>
+                <beans:value>grid.entities.UserRole</beans:value>
                 <beans:value>grid.modification.grid.Conflict</beans:value>
             </beans:list>
         </beans:property>
@@ -40,4 +47,47 @@
             </beans:props>
         </beans:property>
     </beans:bean>
+    
+    <sec:http auto-config='true'>
+        <sec:intercept-url pattern="/resolution**" access="ROLE_USER,ROLE_ADMIN" />
+        <sec:intercept-url pattern="/grids**" access="ROLE_USER,ROLE_ADMIN" />
+        <sec:intercept-url pattern="/updategr**" access="ROLE_USER,ROLE_ADMIN" />
+        <sec:intercept-url pattern="/add**" access="ROLE_USER,ROLE_ADMIN" />
+        <sec:form-login 
+		    login-page="/login" 
+		    default-target-url="/welcome" 
+			authentication-failure-url="/login?error" 
+			username-parameter="username"
+			password-parameter="password" />
+		<sec:logout logout-success-url="/login?logout" />
+		<!-- enable csrf protection -->
+		<!-- <sec:csrf/> -->
+    </sec:http>	
+  
+	<sec:authentication-manager>
+		<sec:authentication-provider user-service-ref="practitionerDetailsService" >
+			<sec:password-encoder hash="bcrypt" />    
+		</sec:authentication-provider>
+	</sec:authentication-manager>
+  
+    
+    <tx:annotation-driven transaction-manager="transactionManager"/> 
+    
+    <bean id="transactionManager" class="org.springframework.orm.hibernate4.HibernateTransactionManager">
+        <property name="sessionFactory" ref="sessionFactory" />
+    </bean>
+    
+    <bean id="practitionerDetailsService" class="grid.services.PractitionerDetailsService">
+        <property name="practitionerService" ref="practitionerService" />
+    </bean>
+    
+    <bean id="practitionerService" class="grid.services.PractitionerServiceImpl">
+        <property name="practitionerDAO" ref="practitionerDAO" />
+    </bean>
+    
+    <bean id="practitionerDAO" class="grid.DAOImpl.PractitionerDAOImpl">
+        <property name="sessionFactory" ref="sessionFactory" />
+    </bean>
+    
+    
 </beans:beans>

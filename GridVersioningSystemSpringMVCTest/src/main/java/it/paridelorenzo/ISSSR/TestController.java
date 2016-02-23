@@ -1,12 +1,18 @@
 package it.paridelorenzo.ISSSR;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.text.DateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
+import java.util.Set;
 
+import org.apache.log4j.Level;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,6 +34,7 @@ import grid.entities.Practitioner;
 import grid.entities.Project;
 import grid.entities.Question;
 import grid.entities.Strategy;
+import grid.entities.UserRole;
 import grid.interfaces.services.ConflictService;
 import grid.interfaces.services.GridElementService;
 import grid.interfaces.services.GridService;
@@ -45,6 +52,12 @@ public class TestController {
 	private PractitionerService practitionerService;
 	private GridModificationService gridModificationService;
 	
+	@Autowired(required=true)
+	@Qualifier(value="practitionerService")
+	public void setPractitionerService(PractitionerService practitionerService) {
+		this.practitionerService = practitionerService;
+	}
+
 	@Autowired(required=true)
 	@Qualifier(value="gridModificationService")
 	public void setGridModificationService(GridModificationService gridModificationService) {
@@ -82,6 +95,7 @@ public class TestController {
 		Practitioner pm	=	new Practitioner();
 		pm.setEmail("paride.casulli@gmail.com");
 		pm.setName("Paride Casulli");
+		pm.setPassword("$2a$10$04TVADrR6/SPLBjsK0N30.Jf5fNjBugSACeGv1S69dZALR7lSov0y");
 		Practitioner lorenzo	=	new Practitioner();
 		lorenzo.setEmail("lorenzo.labanca@gmail.com");
 		lorenzo.setName("Lorenzo La Banca");
@@ -167,7 +181,44 @@ public class TestController {
 	
 	@RequestMapping(value = "/testLorenzo2", method = RequestMethod.GET)
 	public String homeGrifddfdf(Locale locale, Model model) {
-		Grid start	=	this.gridService.getGridById(1);
+		JSONFactory aFactory	=	new JSONFactory();
+		String json	=	null;
+		try {
+			json = new String(Files.readAllBytes(Paths.get("/home/paride/", "grid.txt")));
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		Grid aGrid	=	null;
+		try {
+			aGrid	=	aFactory.loadFromJson(json, this.projectService);
+			this.logger.info(aGrid.toString());
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		Grid start	=	aGrid;
+		try{
+			this.gridService.addGrid(start);
+		}
+		catch(Exception e){
+			e.printStackTrace();
+		}
+		Practitioner pm	=	new Practitioner();
+		pm.setEmail("paride.casulli@gmail.com");
+		pm.setName("Paride Casulli");
+		pm.setPassword("$2a$10$04TVADrR6/SPLBjsK0N30.Jf5fNjBugSACeGv1S69dZALR7lSov0y");
+		UserRole aRole	=	new UserRole();
+		aRole.setUser(pm);
+		aRole.setRole("ROLE_ADMIN");
+		aRole.setUser(pm);
+		aRole.setRole("ROLE_USER");
+		Set<UserRole> roles	=	new HashSet<UserRole>();
+		roles.add(aRole);
+		pm.setUserRole(roles);
+		this.practitionerService.add(pm);
+		start.getProject().setProjectManager(pm);
+		
 		Grid original =	start;
 		HashMap<String,GridElement> map	=	start.obtainAllEmbeddedElements();
 		Metric m4	=	(Metric) map.get("m4");
@@ -191,7 +242,7 @@ public class TestController {
 		nuovoGoal.setDescription("Goal rompiscatole");
 		s3goals.add(nuovoGoal);
 		start	=	this.gridService.updateGridElement(start, s3, true, true);		
-		JSONFactory aFactory	=	new JSONFactory();
+		
 		this.logger.info("JSON PRODOTTO "+aFactory.obtainJson(start, JSONType.FIRST,null));
 		s3.setDescription("this has to be a major conflict");
 		mg2.setDescription("this has to be a minor conflict");
@@ -202,7 +253,7 @@ public class TestController {
 		aNewMainGoal.setDescription("sono un nuovo main goal");
 		start.getMainGoals().add(aNewMainGoal);
 		this.logger.info("JSON PRODOTTO "+aFactory.obtainJson(start, JSONType.FIRST,original));
-		//this.gridService.addGrid(start);
+		//this.gridService.addGrid(start);//*/
 		
 		return "home";
 	}

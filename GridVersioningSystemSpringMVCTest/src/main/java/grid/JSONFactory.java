@@ -399,12 +399,14 @@ public class JSONFactory {
 		aProject.setCreationDate(obj.getString("creationDate"));
 		aProject.setProjectId(projectId);
 		aProject.setDescription(obj.getString("description"));
-		JSONArray meas	=	(JSONArray) obj.get("availableMeasUnits");
-		ArrayList<String>measUnits	=	new ArrayList<String>();
-		for(int i=0;i<meas.length();i++){
-			measUnits.add(meas.get(i).toString());
+		if(obj.has("availableMeasUnits")){
+			JSONArray meas	=	(JSONArray) obj.get("availableMeasUnits");
+			ArrayList<String>measUnits	=	new ArrayList<String>();
+			for(int i=0;i<meas.length();i++){
+				measUnits.add(meas.get(i).toString());
+			}
+			aProject.setAvailableMeasUnits(measUnits);
 		}
-		aProject.setAvailableMeasUnits(measUnits);
 		loaded.put(projectId, aProject);
 		return aProject;
 	}

@@ -40,8 +40,9 @@ public class GridDAOImpl implements GridDAO {
 	@Override
 	public void addGrid(Grid g) {
 		Session	session	=	this.sessionFactory.getCurrentSession();
+		logger.info("session used "+session+" added a new Grid on persistence layer");
 		session.persist(g);
-		logger.info(" added a new Grid on persistence layer");		
+		logger.info(" added a new Grid on persistence layer with id "+g.getId());		
 	}
 
 	/**

@@ -185,7 +185,12 @@ public class ModificationController {
 			Grid referenceGrid	=	null;
 			Grid latestGrid;
 			//TODO get latest grid deve tornare ultima working grid
-			referenceGrid	=	this.gridService.getLatestWorkingGrid(temp.getProject().getId());
+			String projectID	=	temp.getProject().getProjectId();
+			Project	aProject	=	this.projectService.getProjectByProjectId(projectID);
+			if(aProject==null){
+				return "project "+projectID+" not found in DB";
+			}
+			referenceGrid	=	this.gridService.getLatestWorkingGrid(aProject.getId());
 			latestGrid		=	referenceGrid;
 			//TODO carciofo nota bene:
 			/*
@@ -204,16 +209,15 @@ public class ModificationController {
 					}
 				}
 			}
-			ArrayList<String> modifiedObjectLabels	=	modifiedObjects(referenceGrid,latestGrid);
-			System.out.println("MODIFIED ELEMENTS -> "+modifiedObjectLabels.size());
-			for(int t=0;t<modifiedObjectLabels.size();t++){
-				System.out.println("MODIFIED ELEMENT -> "+modifiedObjectLabels.get(t));
-			}
-			System.out.println("###~~~~VERSIONE GRID CARICATA"+referenceGrid.getVersion());
 			if(referenceGrid	==	null){
-				return "non esiste grid per questo progetto";
+				return "no grid available for this project, please upload a first one through the phase 2 entry point";
 			}
 			else{
+				ArrayList<String> modifiedObjectLabels	=	modifiedObjects(referenceGrid,latestGrid);
+				System.out.println("MODIFIED ELEMENTS -> "+modifiedObjectLabels.size());
+				for(int t=0;t<modifiedObjectLabels.size();t++){
+					System.out.println("MODIFIED ELEMENT -> "+modifiedObjectLabels.get(t));
+				}
 				//TODO se e' update nel "nostro formato" vai a prendere la grid di riferimento e fai il check per i conflitti
 				List<Modification>	mods		=	GridModificationService.getModification(latestGrid, temp);
 				for(int i=0;i<mods.size();i++){
