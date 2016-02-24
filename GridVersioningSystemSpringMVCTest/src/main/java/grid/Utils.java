@@ -49,25 +49,25 @@ public class Utils {
 			props.put("mail.smtp.port", SMTPPORT); 
 			Session session = Session.getDefaultInstance(props,new javax.mail.Authenticator() {
 				@Override
-		        protected PasswordAuthentication getPasswordAuthentication() {
+				protected PasswordAuthentication getPasswordAuthentication() {
 					return new PasswordAuthentication(SMTPUSER,SMTPPASS);
-		            }
-		        });
-		    try {
-		    	MimeMessage message = new MimeMessage(session);
-		        message.setFrom(new InternetAddress("gqmplusstrategy@versioning.com"));
-		        message.setRecipients(Message.RecipientType.TO,InternetAddress.parse(toAddr));
-		        message.setSubject(title);
-		        message.setText(body,"utf-8","html");
-		        logger.info("email sent");
-		        Transport.send(message);
-		      } catch (MessagingException e) {
-		        e.printStackTrace();
-		      }			
+				}
+			});
+			try {
+				MimeMessage message = new MimeMessage(session);
+				message.setFrom(new InternetAddress("gqmplusstrategy@versioning.com"));
+				message.setRecipients(Message.RecipientType.TO,InternetAddress.parse(toAddr));
+				message.setSubject(title);
+				message.setText(body,"utf-8","html");
+				logger.info("email sent");
+				Transport.send(message);
+			} catch (MessagingException e) {
+				e.printStackTrace();
+			}			
 		}
-		
+
 	}
-	
+
 	private static final Logger logger		=	LoggerFactory.getLogger(Utils.class);
 	private static final String SMTPHOST	=	"smtps.aruba.it";
 	private static final String SMTPPORT	=	"465";
@@ -75,7 +75,7 @@ public class Utils {
 	protected static final String SMTPPASS	=	"fujifilm";
 	public static String systemURL			=	"http://localhost:8080/ISSSR";
 
-	
+
 	/**
 	 * Given 2 arraylists adds the non-duplicate elements in the first one
 	 * @param one first list (will be also the result of merge operation)
@@ -89,15 +89,15 @@ public class Utils {
 			}
 		}
 	}
-	
+
 	/**
 	 * Converts hashmap of <String,GridElement> to an hashmap <String,Object>
 	 * @param map input map
 	 * @return output map
 	 */
 	public static HashMap<String,Object> convertHashMap(HashMap<String,GridElement> map){
-		HashMap<String,Object> retMap	=	new HashMap<String,Object>();
-		java.util.Iterator<String> anIterator				=	map.keySet().iterator();
+		HashMap<String,Object> retMap			=	new HashMap<String,Object>();
+		java.util.Iterator<String> anIterator	=	map.keySet().iterator();
 		while(anIterator.hasNext()){
 			String key	=	anIterator.next();
 			retMap.put(key, map.get(key));
@@ -111,11 +111,11 @@ public class Utils {
 	 * @param toAddr destination addresses, divided by commas without spaces
 	 */
 	public static void mailSender(String title,String body,String toAddr){
-		MailSender	sender =	new MailSender(title,body,toAddr);
-		Thread mailSend	=	new Thread(sender);
+		MailSender	sender 	=	new MailSender(title,body,toAddr);
+		Thread mailSend		=	new Thread(sender);
 		mailSend.start();
 	}
-	
+
 	//TODO remove obsolete code
 	/*
 	public static String generateEditor(List<GridElement> elements){
@@ -183,30 +183,29 @@ public class Utils {
 		}
 		return "";
 	}*/
-	
+
 	/**
 	 * load the content of a text file on a string
 	 * @param path path of the file
 	 * @return string with text
 	 */
 	public static String loadFile(String path){
-		String everything	=	"";
-		try(BufferedReader br = new BufferedReader(new FileReader(new File(path)))) {
-		    StringBuilder sb = new StringBuilder();
-		    String line = br.readLine();
-
-		    while (line != null) {
-		        sb.append(line);
-		        sb.append(System.lineSeparator());
-		        line = br.readLine();
-		    }
-		    everything = sb.toString();
+		String everything		=	"";
+		try(BufferedReader br 	= 	new BufferedReader(new FileReader(new File(path)))) {
+			StringBuilder sb 	= 	new StringBuilder();
+			String line 		= 	br.readLine();
+			while (line != null) {
+				sb.append(line);
+				sb.append(System.lineSeparator());
+				line 	= 	br.readLine();
+			}
+			everything 	= 	sb.toString();
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
 		return everything;
 	}
-	
+
 	/**
 	 * Convert a Grid Element to an HTML visualization item
 	 * @param ge a Grid Element
@@ -259,7 +258,5 @@ public class Utils {
 		}
 		String gridElementString="<div class=\"panel-heading\">"+name+"</div><div class=\"panel-body\">"+desc+"</div>";
 		return gridElementString;
-		
-		
 	}
 }

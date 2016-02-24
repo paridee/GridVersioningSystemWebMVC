@@ -161,6 +161,9 @@ public class MeasurementGoal extends GridElement{
 		return returnString;
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	public int hashCode() {
 		final int prime = 31;
@@ -171,6 +174,9 @@ public class MeasurementGoal extends GridElement{
 		return result;
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	public boolean equals(Object obj) {
 		if (this == obj)
@@ -231,43 +237,12 @@ public class MeasurementGoal extends GridElement{
 		return returnMap;
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	public ArrayList<GridElement> updateReferences(GridElement ge, boolean autoupgrade) {
 		return this.updateReferences(ge, autoupgrade,true);
 	}
 	
-	/*
-	@Override
-	public boolean equals(Object obj) {
-		if(obj.getClass().equals(this.getClass())){
-			boolean returnValue			=	true;
-			MeasurementGoal 	check	=	(MeasurementGoal)obj;
-			if(!this.getLabel().equals(check.getLabel())){
-				returnValue	=	false;
-			}
-			if(!this.description.equals(check.getDescription())){
-				returnValue	=	false;
-			}
-			if(!this.interpretationModel.equals(check.getInterpretationModel())){
-				returnValue	=	false;
-			}
-			else{
-				//check if refer to same strategies (identified with labels)
-				ArrayList<String> questionLabels			=	new ArrayList<String>();
-				ArrayList<String> questionLabelsCheck		=	new ArrayList<String>();
-				for(int i=0;i<this.getQuestionList().size();i++){	//both have same size
-					questionLabels.add(this.getQuestionList().get(i).getLabel());
-					questionLabelsCheck.add(check.getQuestionList().get(i).getLabel());
-				}
-				for(int i=0;i<questionLabels.size();i++){
-					if(!questionLabelsCheck.contains(questionLabels.get(i))){
-						returnValue	=	false;
-					}
-				}
-			}
-			return returnValue;
-		}
-		return false;
-	} */
-
 }

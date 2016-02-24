@@ -15,34 +15,37 @@ import grid.interfaces.DAO.GridDAO;
 
 /**
  * DAO implementation for Grid Element in Hibernate
+ * 
  * @author Paride Casulli
  * @author Lorenzo La Banca
  *
  */
 
-@Repository 
+@Repository
 public class GridDAOImpl implements GridDAO {
 
-	private static final Logger logger	=	LoggerFactory.getLogger(GridDAOImpl.class);
-	private SessionFactory		sessionFactory;
-	
+	private static final Logger logger = LoggerFactory.getLogger(GridDAOImpl.class);
+	private SessionFactory sessionFactory;
+
 	/**
 	 * Sets a session factory for this DAO
-	 * @param sessionFactory session factory instance
+	 * 
+	 * @param sessionFactory
+	 *            session factory instance
 	 */
 	public void setSessionFactory(SessionFactory sessionFactory) {
 		this.sessionFactory = sessionFactory;
 	}
-	
+
 	/**
 	 * {@inheritDoc}
 	 */
 	@Override
 	public void addGrid(Grid g) {
-		Session	session	=	this.sessionFactory.getCurrentSession();
-		logger.info("session used "+session+" added a new Grid on persistence layer");
+		Session session = this.sessionFactory.getCurrentSession();
+		logger.info("session used " + session + " added a new Grid on persistence layer");
 		session.persist(g);
-		logger.info(" added a new Grid on persistence layer with id "+g.getId());		
+		logger.info(" added a new Grid on persistence layer with id " + g.getId());
 	}
 
 	/**
@@ -50,9 +53,9 @@ public class GridDAOImpl implements GridDAO {
 	 */
 	@Override
 	public void updateGrid(Grid g) {
-		Session	session	=	this.sessionFactory.getCurrentSession();
+		Session session = this.sessionFactory.getCurrentSession();
 		session.update(g);
-		logger.info("updated a "+g.getClass()+" on persistence layer");
+		logger.info("updated a " + g.getClass() + " on persistence layer");
 	}
 
 	/**
@@ -60,11 +63,11 @@ public class GridDAOImpl implements GridDAO {
 	 */
 	@Override
 	public List<Grid> listAllGrids() {
-		Session session				=	this.sessionFactory.getCurrentSession();
+		Session session = this.sessionFactory.getCurrentSession();
 		@SuppressWarnings("unchecked")
-		List<Grid> gridElList		=	session.createQuery("from Grid order by version desc").list();
-		for(Grid g : gridElList){
-			logger.info("Grid::"+g);
+		List<Grid> gridElList = session.createQuery("from Grid order by version desc").list();
+		for (Grid g : gridElList) {
+			logger.info("Grid::" + g);
 		}
 		return gridElList;
 	}
@@ -74,9 +77,9 @@ public class GridDAOImpl implements GridDAO {
 	 */
 	@Override
 	public Grid getGridById(int id) {
-		Session currentSession	=	this.sessionFactory.getCurrentSession();
-		Grid	g				=	(Grid) currentSession.load(Grid.class,new Integer(id));
-		//logger.info(g.getClass().getName()+" loaded::"+g);
+		Session currentSession = this.sessionFactory.getCurrentSession();
+		Grid g = (Grid) currentSession.load(Grid.class, new Integer(id));
+		// logger.info(g.getClass().getName()+" loaded::"+g);
 		return g;
 	}
 
@@ -85,15 +88,16 @@ public class GridDAOImpl implements GridDAO {
 	 */
 	@Override
 	public Grid getLatestGrid(int projid) {
-		Session session			=	this.sessionFactory.getCurrentSession();
+		Session session = this.sessionFactory.getCurrentSession();
 		@SuppressWarnings("unchecked")
-		List<Grid> gridElList	=	session.createQuery("from Grid G where G.project.id = "+projid+" ORDER BY version DESC").list();
-		if(gridElList.size()>0){
-			Grid latest		=	gridElList.get(0);
-			logger.info("Grid:: latest grid found"+latest+" version "+latest.getVersion());
+		List<Grid> gridElList = session
+				.createQuery("from Grid G where G.project.id = " + projid + " ORDER BY version DESC").list();
+		if (gridElList.size() > 0) {
+			Grid latest = gridElList.get(0);
+			logger.info("Grid:: latest grid found" + latest + " version " + latest.getVersion());
 			return latest;
-		}
-		else return null;
+		} else
+			return null;
 	}
 
 	/**
@@ -101,11 +105,12 @@ public class GridDAOImpl implements GridDAO {
 	 */
 	@Override
 	public List<Grid> getGridLog(int projid) {
-		Session session			=	this.sessionFactory.getCurrentSession();
+		Session session = this.sessionFactory.getCurrentSession();
 		@SuppressWarnings("unchecked")
-		List<Grid> gridElList	=	session.createQuery("from Grid G where G.project.id = "+projid+" order by version desc").list();
-		for(Grid g : gridElList){
-			logger.info("Grid::"+g);
+		List<Grid> gridElList = session
+				.createQuery("from Grid G where G.project.id = " + projid + " order by version desc").list();
+		for (Grid g : gridElList) {
+			logger.info("Grid::" + g);
 		}
 		return gridElList;
 	}
@@ -115,17 +120,18 @@ public class GridDAOImpl implements GridDAO {
 	 */
 	@Override
 	public void removeGrid(int id) {
-		logger.info("GRIDDaoImpl removing "+id);
-		Session session	=	this.sessionFactory.getCurrentSession();
-		Grid	g		=	(Grid)	session.load(Grid.class, new Integer(id));
+		logger.info("GRIDDaoImpl removing " + id);
+		Session session = this.sessionFactory.getCurrentSession();
+		Grid g = (Grid) session.load(Grid.class, new Integer(id));
 		g.setMainGoals(new ArrayList<Goal>());
-		if(g!=null){
-			logger.info("GRIDDaoImpl removing found "+id+" version "+g.getVersion()+" project "+g.getProject().getProjectId());
-			logger.info(g.getClass().getName()+" item to be deleted found");
+		if (g != null) {
+			logger.info("GRIDDaoImpl removing found " + id + " version " + g.getVersion() + " project "
+					+ g.getProject().getProjectId());
+			logger.info(g.getClass().getName() + " item to be deleted found");
 			session.delete(g);
 		}
-		logger.info("GRIDDaoImpl removed "+id);
-		logger.info(g.getClass().getName()+" deleted successfully");		
+		logger.info("GRIDDaoImpl removed " + id);
+		logger.info(g.getClass().getName() + " deleted successfully");
 	}
 
 	/**
@@ -133,16 +139,16 @@ public class GridDAOImpl implements GridDAO {
 	 */
 	@Override
 	public Grid upgradeGrid(Grid g) {
-		Grid upgraded				=	new Grid();
+		Grid upgraded = new Grid();
 		upgraded.setProject(g.getProject());
-		ArrayList<Goal> mainGoals	=	new ArrayList<Goal>();
-		List<Goal> oldGoals			=	g.getMainGoals();
-		for(int i=0;i<oldGoals.size();i++){
+		ArrayList<Goal> mainGoals = new ArrayList<Goal>();
+		List<Goal> oldGoals = g.getMainGoals();
+		for (int i = 0; i < oldGoals.size(); i++) {
 			mainGoals.add(oldGoals.get(i));
 		}
 		upgraded.setMainGoalsChanged(g.isMainGoalsChanged());
 		upgraded.setMainGoals(mainGoals);
-		upgraded.setVersion(g.getVersion()+1);
+		upgraded.setVersion(g.getVersion() + 1);
 		upgraded.setMainGoalsChanged(g.isMainGoalsChanged());
 		this.addGrid(upgraded);
 		return upgraded;

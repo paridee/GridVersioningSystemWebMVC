@@ -50,8 +50,8 @@ public class LoginController {
 	    String email = auth.getName(); //get logged in username
 	    Practitioner p	=	this.practitionerService.getPractitionerByEmail(email);
 		ModelAndView model = new ModelAndView();
-		model.addObject("title", "Spring Security Hello World");
-		model.addObject("message", "This is protected page - dear "+p.getEmail());
+		model.addObject("title", "Grid Versioning System - logout");
+		model.addObject("message", "Dear "+p.getName()+" ("+p.getEmail()+")");
 		model.setViewName("logout");
 
 		return model;

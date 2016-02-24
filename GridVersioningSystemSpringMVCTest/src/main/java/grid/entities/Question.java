@@ -150,6 +150,9 @@ public class Question extends GridElement{
 		return returnString;
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	public boolean equals(Object obj) {
 		if (this == obj)
@@ -206,6 +209,9 @@ public class Question extends GridElement{
 		return returnMap;
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	public ArrayList<GridElement> updateReferences(GridElement ge, boolean autoupgrade) {
 		return this.updateReferences(ge, autoupgrade,true);
