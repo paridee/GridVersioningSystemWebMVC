@@ -3,7 +3,6 @@ package grid.interfaces.services;
 import java.util.List;
 
 import grid.entities.GridElement;
-import grid.entities.Project;
 /**
  * Interface defining methods for a Grid element service, following CRUD operations and more
  * @author Paride Casulli

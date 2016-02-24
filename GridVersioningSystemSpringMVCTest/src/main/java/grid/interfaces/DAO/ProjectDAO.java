@@ -4,7 +4,11 @@ import java.util.List;
 
 import grid.entities.Project;
 
- 
+ /**
+  * DAO for the project entity
+  * @author Paride Casulli
+  *	@author Lorenzo La Banca
+  */
 public interface ProjectDAO {
  
 	/**

@@ -16,26 +16,27 @@ import javax.persistence.Table;
  * @author Paride Casulli
  * @author Lorenzo La Banca
  *
- * This class models a Goal entity on a GQM+S Grid
+ *         This class models a Goal entity on a GQM+S Grid
  */
 
 @Entity
-@Table(name="Metric")
-public class Metric extends GridElement{
-	@Column(name="count")
-	public int 					count				=	0;
-	@Column(name="description")
-	public String				description			=	"";
-	public List<String>	measUnits					=	new ArrayList<String>();
-	@Column(name="measurementProcess")
-	public String				measurementProcess	=	"";
-	@Column(name="metricType")
-	public String				metricType			=	"";
-	@Column(name="scaleType")
-	public String				scaleType			=	"";
-	
+@Table(name = "Metric")
+public class Metric extends GridElement {
+	@Column(name = "count")
+	public int count = 0;
+	@Column(name = "description")
+	public String description = "";
+	public List<String> measUnits = new ArrayList<String>();
+	@Column(name = "measurementProcess")
+	public String measurementProcess = "";
+	@Column(name = "metricType")
+	public String metricType = "";
+	@Column(name = "scaleType")
+	public String scaleType = "";
+
 	/**
 	 * Getter for the metric count
+	 * 
 	 * @return count of this metric
 	 */
 	public int getCount() {
@@ -44,7 +45,9 @@ public class Metric extends GridElement{
 
 	/**
 	 * Setter for the metric count
-	 * @param count count to be set for this metric
+	 * 
+	 * @param count
+	 *            count to be set for this metric
 	 */
 	public void setCount(int count) {
 		this.count = count;
@@ -52,6 +55,7 @@ public class Metric extends GridElement{
 
 	/**
 	 * Getter of metric description
+	 * 
 	 * @return description of this metric
 	 */
 	public String getDescription() {
@@ -60,7 +64,9 @@ public class Metric extends GridElement{
 
 	/**
 	 * Setter for metric description
-	 * @param description description for this metric
+	 * 
+	 * @param description
+	 *            description for this metric
 	 */
 	public void setDescription(String description) {
 		this.description = description;
@@ -68,19 +74,21 @@ public class Metric extends GridElement{
 
 	/**
 	 * Getter method for measurement units of this metric
+	 * 
 	 * @return list of measurement units
 	 */
 	@ElementCollection
-	@CollectionTable(	name		=	"MetricMeasUnits", 
-						joinColumns	=	@JoinColumn(name="metrID"))
-	@Column(name="measUnit")
+	@CollectionTable(name = "MetricMeasUnits", joinColumns = @JoinColumn(name = "metrID") )
+	@Column(name = "measUnit")
 	public List<String> getMeasUnits() {
 		return measUnits;
 	}
 
 	/**
 	 * Setter method for measurement units of this metric
-	 * @param measUnits new measurements units to be set
+	 * 
+	 * @param measUnits
+	 *            new measurements units to be set
 	 */
 	public void setMeasUnits(List<String> measUnits) {
 		this.measUnits = measUnits;
@@ -88,6 +96,7 @@ public class Metric extends GridElement{
 
 	/**
 	 * Getter method for measurement process
+	 * 
 	 * @return measurement process for this metric
 	 */
 	public String getMeasurementProcess() {
@@ -96,7 +105,9 @@ public class Metric extends GridElement{
 
 	/**
 	 * Setter of measurement process for this metric
-	 * @param measurementProcess measurement process to be set
+	 * 
+	 * @param measurementProcess
+	 *            measurement process to be set
 	 */
 	public void setMeasurementProcess(String measurementProcess) {
 		this.measurementProcess = measurementProcess;
@@ -104,6 +115,7 @@ public class Metric extends GridElement{
 
 	/**
 	 * Gets the metric type for this metric
+	 * 
 	 * @return metric type
 	 */
 	public String getMetricType() {
@@ -112,7 +124,9 @@ public class Metric extends GridElement{
 
 	/**
 	 * Setter for metric type
-	 * @param metricType metric type to be set for this metric
+	 * 
+	 * @param metricType
+	 *            metric type to be set for this metric
 	 */
 	public void setMetricType(String metricType) {
 		this.metricType = metricType;
@@ -120,6 +134,7 @@ public class Metric extends GridElement{
 
 	/**
 	 * Getter method for scale type of this object
+	 * 
 	 * @return scale type
 	 */
 	public String getScaleType() {
@@ -128,7 +143,9 @@ public class Metric extends GridElement{
 
 	/**
 	 * Setter method for scale type of this metric
-	 * @param scaleType new scale type to be set
+	 * 
+	 * @param scaleType
+	 *            new scale type to be set
 	 */
 	public void setScaleType(String scaleType) {
 		this.scaleType = scaleType;
@@ -138,7 +155,7 @@ public class Metric extends GridElement{
 	 * {@inheritDoc}
 	 */
 	@Override
-	public ArrayList<GridElement> updateReferences(GridElement ge,boolean autoupgrade) {
+	public ArrayList<GridElement> updateReferences(GridElement ge, boolean autoupgrade) {
 		return new ArrayList<GridElement>();
 	}
 
@@ -147,18 +164,18 @@ public class Metric extends GridElement{
 	 */
 	@Override
 	public GridElement clone() {
-		Metric newMetric	=	new Metric();
+		Metric newMetric = new Metric();
 		newMetric.setLabel(this.getLabel());
 		newMetric.setVersion(this.getVersion());
 		newMetric.setCount(this.count);
 		newMetric.setDescription(this.description);
-		List<Practitioner> clonedListP	=	new ArrayList<Practitioner>();
-		for(int i=0;i<this.getAuthors().size();i++){
+		List<Practitioner> clonedListP = new ArrayList<Practitioner>();
+		for (int i = 0; i < this.getAuthors().size(); i++) {
 			clonedListP.add(this.getAuthors().get(i));
 		}
 		newMetric.setAuthors(clonedListP);
-		List<String> clonedList	=	new ArrayList<String>();
-		for(int i=0;i<this.measUnits.size();i++){
+		List<String> clonedList = new ArrayList<String>();
+		for (int i = 0; i < this.measUnits.size(); i++) {
 			clonedList.add(measUnits.get(i));
 		}
 		newMetric.setMeasUnits(clonedList);
@@ -174,22 +191,26 @@ public class Metric extends GridElement{
 	 */
 	@Override
 	public String toString(String prefix, String divider) {
-		String returnString	=	prefix+"Metric "+divider;
-		returnString	=	returnString+prefix+"state: "+this.state+divider;
-		returnString	=	returnString+prefix+"label: "+this.label+divider;
-		returnString	=	returnString+prefix+"version: "+this.version+divider;
-		returnString	=	returnString+prefix+"id: "+this.idElement+divider;
-		returnString	=	returnString+prefix+"description: "+this.label+divider;
-		returnString	=	returnString+prefix+"count: "+this.count+divider;
-		returnString	=	returnString+prefix+"measurement process: "+this.measurementProcess+divider;
-		returnString	=	returnString+prefix+"metric type: "+this.metricType+divider;
-		returnString	=	returnString+prefix+"scale type: "+this.scaleType+divider;
-		for(int i=0;i<this.measUnits.size();i++){
-			returnString	=	returnString+prefix+"measurement unit "+i+": "+this.measUnits.get(i).toString()+divider;
+		String returnString = prefix + "Metric " + divider;
+		returnString = returnString + prefix + "state: " + this.state + divider;
+		returnString = returnString + prefix + "label: " + this.label + divider;
+		returnString = returnString + prefix + "version: " + this.version + divider;
+		returnString = returnString + prefix + "id: " + this.idElement + divider;
+		returnString = returnString + prefix + "description: " + this.label + divider;
+		returnString = returnString + prefix + "count: " + this.count + divider;
+		returnString = returnString + prefix + "measurement process: " + this.measurementProcess + divider;
+		returnString = returnString + prefix + "metric type: " + this.metricType + divider;
+		returnString = returnString + prefix + "scale type: " + this.scaleType + divider;
+		for (int i = 0; i < this.measUnits.size(); i++) {
+			returnString = returnString + prefix + "measurement unit " + i + ": " + this.measUnits.get(i).toString()
+					+ divider;
 		}
 		return returnString;
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	public boolean equals(Object obj) {
 		if (this == obj)
@@ -199,7 +220,7 @@ public class Metric extends GridElement{
 		if (getClass() != obj.getClass())
 			return false;
 		Metric other = (Metric) obj;
-		if (this.label == null) {	//manually added
+		if (this.label == null) { // manually added
 			if (other.getLabel() != null)
 				return false;
 		} else if (!label.equals(other.getLabel()))
@@ -214,19 +235,20 @@ public class Metric extends GridElement{
 		if (measUnits == null) {
 			if (other.measUnits != null)
 				return false;
-		} else{
-			if(this.getMeasUnits().size()!=other.getMeasUnits().size()){
+		} else {
+			if (this.getMeasUnits().size() != other.getMeasUnits().size()) {
 				return false;
 			}
-			ArrayList<String> meas			=	new ArrayList<String>();
-			ArrayList<String> measCheck		=	new ArrayList<String>();
-			for(int i=0;i<this.getMeasUnits().size();i++){	//both have same size
+			ArrayList<String> meas = new ArrayList<String>();
+			ArrayList<String> measCheck = new ArrayList<String>();
+			for (int i = 0; i < this.getMeasUnits().size(); i++) { // both have
+																	// same size
 				meas.add(this.getMeasUnits().get(i));
 				measCheck.add(other.getMeasUnits().get(i));
 			}
-			for(int i=0;i<meas.size();i++){
-				if(!measCheck.contains(meas.get(i))){
-					return	false;
+			for (int i = 0; i < meas.size(); i++) {
+				if (!measCheck.contains(meas.get(i))) {
+					return false;
 				}
 			}
 		}
@@ -253,11 +275,14 @@ public class Metric extends GridElement{
 	 */
 	@Override
 	public HashMap<String, GridElement> obtainEmbeddedElements() {
-		HashMap<String, GridElement> returnMap	=	new HashMap<String, GridElement>();
+		HashMap<String, GridElement> returnMap = new HashMap<String, GridElement>();
 		returnMap.put(this.label, this);
 		return returnMap;
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	public ArrayList<GridElement> updateReferences(GridElement ge, boolean autoupgrade, boolean recursive) {
 		return this.updateReferences(ge, autoupgrade);

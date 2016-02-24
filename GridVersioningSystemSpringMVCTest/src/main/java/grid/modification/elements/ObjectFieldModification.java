@@ -25,16 +25,34 @@ public class ObjectFieldModification extends GridElementModification {
 	public String getFieldToBeChanged() {
 		return fieldToBeChanged;
 	}
+	
+	/**
+	 * Sets the name of the field to be changed
+	 * @param fieldToBeChanged name of the field
+	 */
 	public void setFieldToBeChanged(String fieldToBeChanged) {
 		this.fieldToBeChanged = fieldToBeChanged;
 	}
+	
+	/**
+	 * Gets the new value to be set on a field
+	 * @return new value
+	 */
 	public Object getNewValue() {
 		return newValue;
 	}
+	
+	/**
+	 * Set a new value to be set
+	 * @param newValue new value to be set
+	 */
 	public void setNewValue(Object newValue) {
 		this.newValue = newValue;
 	}
 	
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	public void apply(GridElement anElement,Grid aGrid) throws Exception{
 		//check if is a superclass field
@@ -81,6 +99,10 @@ public class ObjectFieldModification extends GridElementModification {
 			}
 		}
 	}
+	
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	public String toString() {
 		return "ObjectFieldModification on label "+this.subjectLabel+" field "+this.fieldToBeChanged+" new value "+this.newValue;

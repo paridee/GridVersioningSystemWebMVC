@@ -30,31 +30,50 @@ public class Strategy extends GridElement{
 	private String			strategicProjectId	=	"";
 	private List<Goal>		goalList	=	new ArrayList<Goal>();
 	
-	
+	/**
+	 * Get the description of this strategy
+	 * @return strategy description
+	 */
 	public String getDescription() {
 		return description;
 	}
 
-
+	/**
+	 * Set a description for this strategy
+	 * @param description description to be set
+	 */
 	public void setDescription(String description) {
 		this.description = description;
 	}
 
+	/**
+	 * Get the strategy type
+	 * @return string with a strategy type
+	 */
 	public String getStrategyType() {
 		return strategyType;
 	}
 
-
+	/**
+	 * Set the type of the strategy
+	 * @param strategyType type of the strategy
+	 */
 	public void setStrategyType(String strategyType) {
 		this.strategyType = strategyType;
 	}
 
-
+	/**
+	 * Get the id of the strategic project
+	 * @return strategic project id
+	 */
 	public String getStrategicProjectId() {
 		return strategicProjectId;
 	}
 
-
+	/**
+	 * Set the id of the strategic project
+	 * @param strategicProjectId strategic project id
+	 */
 	public void setStrategicProjectId(String strategicProjectId) {
 		this.strategicProjectId = strategicProjectId;
 	}
@@ -71,11 +90,19 @@ public class Strategy extends GridElement{
 										nullable 	= 	false, 
 										updatable 	= 	false) 
 							})
+	
+	/**
+	 * Get the goal list implementing this strategy
+	 * @return goal list
+	 */
 	public List<Goal> getGoalList() {
 		return goalList;
 	}
 
-
+	/**
+	 * Set a goal list for this strategy
+	 * @param goalList goal strategy to be set
+	 */
 	public void setGoalList(List<Goal> goalList) {
 		this.goalList = goalList;
 	}
@@ -137,7 +164,9 @@ public class Strategy extends GridElement{
 		return cloned;		
 	}
 
-
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	public String toString(String prefix, String divider) {
 		String returnString	=	prefix+"Strategy "+divider;
@@ -154,7 +183,9 @@ public class Strategy extends GridElement{
 		return returnString;
 	}
 
-
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	public boolean equals(Object obj) {
 		if (this == obj)
@@ -213,7 +244,9 @@ public class Strategy extends GridElement{
 		return returnMap;
 	}
 
-
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	public ArrayList<GridElement> updateReferences(GridElement ge, boolean autoupgrade) {
 		return this.updateReferences(ge, autoupgrade, true);

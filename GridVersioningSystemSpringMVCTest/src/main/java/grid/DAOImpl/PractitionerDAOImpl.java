@@ -69,7 +69,7 @@ public class PractitionerDAOImpl implements PractitionerDAO {
 		//should be only one
 		Query aQuery	=	session.createQuery("from Practitioner P where P.email = :address");
 		aQuery.setParameter("address", email);
-		List<Practitioner> pElList	=	aQuery.list();
+		List<Practitioner> pElList	=	aQuery.list();		
 		for(Practitioner g : pElList){
 			logger.info("Practitioner List::"+g);
 		}

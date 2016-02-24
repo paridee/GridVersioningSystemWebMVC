@@ -24,31 +24,57 @@ public class ListAppend extends GridElementModification {
 	private Object  newLoadedObject;
 	private static final Logger logger = LoggerFactory.getLogger(ListAppend.class);
 	
+	/**
+	 * Get the name of the list involved in this list append
+	 * @return name of the list
+	 */
 	public String getListNameToBeChanged() {
 		return listNameToBeChanged;
 	}
 
+	/**
+	 * Set the name of the list in which the element will be added
+	 * @param listNameToBeChanged name of the list
+	 */
 	public void setListNameToBeChanged(String listNameToBeChanged) {
 		this.listNameToBeChanged = listNameToBeChanged;
 	}
 
+	/**
+	 * Get the label of the appended object
+	 * @return label of the appended object
+	 */
 	public String getAppendedObjectLabel() {
 		return appendedObjectLabel;
 	}
 
+	/**
+	 * Set the label of the appended object
+	 * @param appendedObjectLabel label of the appended object
+	 */
 	public void setAppendedObjectLabel(String appendedObjectLabel) {
 		this.appendedObjectLabel = appendedObjectLabel;
 	}
 
-	
+	/**
+	 * Get the appended object (if is a new element on the grid)
+	 * @return new appened object
+	 */
 	public Object getNewLoadedObject() {
 		return newLoadedObject;
 	}
 
+	/**
+	 * Set the new loaded object
+	 * @param newLoadedObject object loaded
+	 */
 	public void setNewLoadedObject(Object newLoadedObject) {
 		this.newLoadedObject = newLoadedObject;
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	@SuppressWarnings({ "rawtypes", "unchecked" })
 	@Override
 	public void apply(GridElement anElement, Grid grid) throws Exception {
@@ -82,6 +108,9 @@ public class ListAppend extends GridElementModification {
 		}
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	public String toString() {
 		return "ListAppend: append this element "+this.appendedObjectLabel+"("+this.newLoadedObject+")in this list "+this.listNameToBeChanged+" in this object "+this.subjectLabel;

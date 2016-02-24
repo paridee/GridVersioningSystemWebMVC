@@ -1,13 +1,8 @@
 package grid.modification.elements;
 
 import java.util.ArrayList;
-import java.util.List;
-
-import org.javers.common.collections.Arrays;
-
 import grid.entities.MeasurementGoal;
 import grid.entities.Metric;
-import grid.entities.Practitioner;
 import grid.entities.Question;
 
 /**
@@ -29,14 +24,5 @@ public abstract class Modification {
 		add(Question.class);
 		add(Metric.class);
 	}};
-
-	private List<Practitioner> 	responsibles;
-	public List<Practitioner> getResponsibles() {
-		return responsibles;
-	}
-	public void setResponsibles(List<Practitioner> responsibles) {
-		this.responsibles = responsibles;
-	}
-
 	
 }
