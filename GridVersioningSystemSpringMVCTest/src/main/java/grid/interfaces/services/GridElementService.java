@@ -92,12 +92,6 @@ public interface GridElementService {
 	 */
 	public List<GridElement> getAllLatestWorking();
 	
-	/**
-	 * Returns the list of latest working elements
-	 * @return list of latest working elements
-	 */
-	public List<GridElement> getLatestWorkingElements();
-	
 	
 	
 }

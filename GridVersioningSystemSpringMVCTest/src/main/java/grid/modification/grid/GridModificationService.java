@@ -1,6 +1,5 @@
 package grid.modification.grid;
 
-import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -19,17 +18,14 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.transaction.annotation.Transactional;
 
 import grid.Utils;
 import grid.entities.Goal;
 import grid.entities.Grid;
 import grid.entities.GridElement;
 import grid.entities.GridElement.State;
-import grid.entities.MeasurementGoal;
 import grid.entities.Practitioner;
 import grid.entities.Project;
-import grid.interfaces.services.ConflictService;
 import grid.interfaces.services.GridElementService;
 import grid.interfaces.services.GridService;
 import grid.interfaces.services.ProjectService;
@@ -47,7 +43,6 @@ public class GridModificationService {
 	private static final Logger logger = LoggerFactory.getLogger(GridModificationService.class);
 	private GridElementService 	gridElementService;
 	private GridService			gridService;
-	private ConflictService		conflictService;
 	private ProjectService		projectService;
 	
 	
@@ -68,13 +63,7 @@ public class GridModificationService {
 	public void setGridService(GridService gridService) {
 		this.gridService = gridService;
 	}
-	
-	@Autowired(required=true)
-	@Qualifier(value="conflictService")
-	public void setConflictService(ConflictService conflictService) {
-		this.conflictService = conflictService;
-	}
-	
+		
 	/**
 	 * Get modification on main goals list
 	 * @param oldMainGoals older list
@@ -242,7 +231,7 @@ public class GridModificationService {
 				for(int i=0;i<mods.size();i++){
 					HashMap<String,GridElement> elements	=	newVersion.obtainAllEmbeddedElements();
 					Modification 	aMod	=	mods.get(i);
-					this.logger.info(aMod.toString());
+					logger.info(aMod.toString());
 					if(aMod instanceof GridElementModification){
 						GridElement 	subj;
 						String subjLabel	=	((GridElementModification) aMod).getSubjectLabel();

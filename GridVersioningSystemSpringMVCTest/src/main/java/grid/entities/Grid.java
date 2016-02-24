@@ -18,6 +18,9 @@ import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import grid.entities.GridElement.State;
 import grid.interfaces.Updatable;
 
@@ -30,14 +33,20 @@ import grid.interfaces.Updatable;
 @Entity
 @Table(name="Grid")
 public class Grid implements Updatable{
+	/**
+	 * Enumeration of possible grid states
+	 * @author Paride Casulli
+	 * @author Lorenzo La Banca	
+	 */
 	public enum GridState{
 		WORKING,UPDATING,FINAL_KO
 	}
 	private int 		id;
-	private	int 		version=1; //TODO make String Version
+	private	int 		version=1; 
 	private List<Goal> 	mainGoals				=	null;
 	private Project		project;
 	private boolean		mainGoalsChanged		=	false;
+	private static final Logger logger = LoggerFactory.getLogger(Grid.class);
 	//TODO mancano attributi della grid di Serena e Marco
 	
 	/**
@@ -142,7 +151,9 @@ public class Grid implements Updatable{
 	 */
 	@Override
 	public ArrayList<GridElement> updateReferences(GridElement ge,boolean autoupgrade) {
-		// TODO Auto-generated method stub
+		// nothing to do
+		
+		logger.info("do not update references from here, use main goal list");
 		return null;
 	}
 	
@@ -191,7 +202,7 @@ public class Grid implements Updatable{
 	 * Calls Grid Element custom toString
 	 * @param prefix row prefix
 	 * @param divider row divider
-	 * @return
+	 * @return string representation of the objecr
 	 */
 	public String toString(String prefix, String divider) {
 		String returnString	=	prefix+"Grid "+divider;
@@ -202,6 +213,7 @@ public class Grid implements Updatable{
 	}
 	/**
 	 * Clone method
+	 * @return cloned object
 	 */
 	public Grid clone(){
 		Grid cloned	=	new Grid();

@@ -55,8 +55,4 @@ public interface GridElementDao {
 	 * @param c class of the element to be removed
 	 */
 	public void removeElement(int id,Class<?> c);
-
-	public List<GridElement> getElementByState(String state);
-
-	public List<GridElement> getLatestWorkingElements();
 }

@@ -17,8 +17,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import grid.Utils;
-import grid.interfaces.Updatable;
-import grid.modification.grid.GridModificationService;
 
 /**
  * 
@@ -159,7 +157,7 @@ public class Goal extends GridElement{
 		}
 		for(int i=0;i<this.strategyList.size();i++){
 			if(this.strategyList.get(i).getLabel().equals(ge.getLabel())){
-				this.logger.info("updating reference on goal "+this.getLabel()+"v"+this.getVersion()+" to "+ge.getLabel()+"v"+ge.getVersion());
+				logger.info("updating reference on goal "+this.getLabel()+"v"+this.getVersion()+" to "+ge.getLabel()+"v"+ge.getVersion());
 				updated.strategyList.set(i, (Strategy) ge);
 				addThis=true;
 			}
@@ -183,7 +181,6 @@ public class Goal extends GridElement{
 	 */
 	@Override
 	public GridElement clone() {
-		// TODO Auto-generated method stub
 		Goal newGoal	=	new Goal();
 		newGoal.setLabel(this.label);
 		newGoal.setVersion(this.version);
@@ -289,7 +286,7 @@ public class Goal extends GridElement{
 		return true;
 	}
 
-	/**
+	/**TODO Auto-generated method stub
 	 * {@inheritDoc}
 	 */
 	@Override

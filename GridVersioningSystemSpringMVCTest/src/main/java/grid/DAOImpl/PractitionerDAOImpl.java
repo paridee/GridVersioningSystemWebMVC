@@ -11,6 +11,12 @@ import org.springframework.stereotype.Repository;
 import grid.entities.Practitioner;
 import grid.interfaces.DAO.PractitionerDAO;
 
+/**
+ * Practitioner DAO implementation in Hibernate
+ * @author Paride Casulli
+ * @author Lorenzo La Banca
+ */
+
 @Repository
 public class PractitionerDAOImpl implements PractitionerDAO {
 

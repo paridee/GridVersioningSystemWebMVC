@@ -24,7 +24,6 @@ import grid.entities.Practitioner;
 import grid.entities.Project;
 import grid.entities.Question;
 import grid.entities.Strategy;
-import grid.interfaces.DAO.PractitionerDAO;
 import grid.interfaces.services.ProjectService;
 import grid.modification.elements.Modification;
 import grid.modification.elements.ObjectFieldModification;
@@ -49,8 +48,6 @@ public class JSONFactory {
 	public enum JSONType{
 		FIRST,SECOND
 	}
-	
-
 	private static PractitionerServiceImpl practitionerService;
 	private static final Logger logger	=	LoggerFactory.getLogger(JSONFactory.class);
 	@SuppressWarnings("rawtypes")
@@ -685,7 +682,6 @@ public class JSONFactory {
 					}
 					//if the attrubute is a list select a behaviour for creating a JSON
 					if(fieldValue instanceof List){
-						@SuppressWarnings("rawtypes")
 						List list	=	(List) fieldValue;
 						JSONArray	array	=	new JSONArray();
 						for(int j=0;j<list.size();j++){
@@ -723,7 +719,9 @@ public class JSONFactory {
 						else{
 							innerObj	=	fieldValue;
 						}
-						returnObject.put(fieldName, innerObj);
+						if(!fieldName.equals("logger")){
+							returnObject.put(fieldName, innerObj);
+						}
 					}
 				}
 			} catch (IllegalArgumentException e) {
@@ -753,7 +751,6 @@ public class JSONFactory {
 	 * @param refGrid (optional)
 	 * @return JSON
 	 */
-	@SuppressWarnings("rawtypes")
 	public JSONObject obtainJson(Grid aGrid,JSONType type,Grid refGrid){
 		JSONObject 	returnObject	=	new JSONObject();
 		List<Goal> 	mainGoal		=	aGrid.getMainGoals();
@@ -800,9 +797,9 @@ public class JSONFactory {
 		returnObject.put("project", project);
 		returnObject.put("questionList", questionList);
 		returnObject.put("strategyList", strategyList);
-		this.logger.info("reference grid "+refGrid);
+		logger.info("reference grid "+refGrid);
 		if (refGrid!=null){
-			this.logger.info("exists reference grid "+refGrid);
+			logger.info("exists reference grid "+refGrid);
 			JSONObject shell	=	new JSONObject();
 			shell.put("refVersion", refGrid.getVersion());
 			shell.put("newGrid", returnObject);

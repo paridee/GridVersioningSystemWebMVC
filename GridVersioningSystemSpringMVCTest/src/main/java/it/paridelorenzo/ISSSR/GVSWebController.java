@@ -30,7 +30,6 @@ import grid.entities.Grid;
 import grid.entities.GridElement;
 import grid.entities.GridElement.State;
 import grid.entities.Project;
-import grid.interfaces.services.ConflictService;
 import grid.interfaces.services.GridElementService;
 import grid.interfaces.services.GridService;
 import grid.interfaces.services.ProjectService;
@@ -45,14 +44,7 @@ public class GVSWebController {
 	private GridService			gridService;
 	private ProjectService		projectService;
 	private JSONFactory 		jFact;
-	private ConflictService		conflictService;
 	private int nMenuButtons=3;
-	
-	@Autowired(required=true)
-	@Qualifier(value="conflictService")
-	public void setConflictService(ConflictService	conflictService) {
-		this.conflictService = conflictService;
-	}
 	
 	@Autowired(required=true)
 	@Qualifier(value="gridElementService")
@@ -514,7 +506,7 @@ public class GVSWebController {
 			GridElement ge=(GridElement)stack.get(i);
 			name=stack.get(i).getClass().getSimpleName()+" "+ge.getLabel()+" - <i>v"+ge.getVersion()+"</i>";
 			desc="<div class='txtElement'><i>"+ge.getState().name()+"</i></div>";
-			
+			//TODO this part is not the same in utils?? (obtain HTML)
 			Field[] fields=ge.getClass().getDeclaredFields();
 			for(int j=0; j<fields.length;j++){
 				Field tempField=fields[j];
@@ -537,11 +529,13 @@ public class GVSWebController {
 					else{
 						//desc=desc+"<div style='float:left;min-width: 200px;'>"+tempField.getName()+": "+fieldValueStr+"</div>";
 						if(fieldValue!=null){
+							if(!tempField.getName().equals("logger")){
 							String fieldValueStr	=	(String)fieldValue.toString();
 							String txt=tempField.getName()+": </i> "+fieldValueStr;
 							int maxLength=60;
 							if(txt.length()>maxLength) txt=txt.substring(0, maxLength)+"...";
 							desc=desc+"<div class='txtElement'><i>"+txt+"</div>";
+							}
 						}
 					}
 				} catch (IllegalArgumentException e) {

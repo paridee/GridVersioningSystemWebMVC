@@ -13,7 +13,6 @@ import javax.persistence.ManyToMany;
 import javax.persistence.Table;
 
 import grid.Utils;
-import grid.interfaces.Updatable;
 /**
  * Class modeling a Measurement goal element on GQM+S Grid
  * @author Paride Casulli

@@ -32,7 +32,6 @@ import grid.entities.Goal;
 import grid.entities.Grid;
 import grid.entities.GridElement;
 import grid.entities.Project;
-import grid.interfaces.services.ConflictService;
 import grid.interfaces.services.GridElementService;
 import grid.interfaces.services.GridService;
 import grid.interfaces.services.ProjectService;
@@ -40,7 +39,6 @@ import grid.modification.elements.GridElementModification;
 import grid.modification.elements.Modification;
 import grid.modification.elements.ObjectFieldModification;
 import grid.modification.elements.ObjectModificationService;
-import grid.modification.grid.Conflict;
 import grid.modification.grid.GridElementAdd;
 import grid.modification.grid.GridElementRemove;
 import grid.modification.grid.GridModification;
@@ -53,13 +51,6 @@ public class ModificationController {
 	private ProjectService			projectService;
 	private GridModificationService gridModificationService;
 	private static final Logger logger = LoggerFactory.getLogger(ModificationController.class);
-	private ConflictService			conflictService;
-	
-	@Autowired(required=true)
-	@Qualifier(value="conflictService")
-	public void setConflictService(ConflictService	conflictService) {
-		this.conflictService = conflictService;
-	}
 	
 	@Autowired(required=true)
 	@Qualifier(value="gridElementService")

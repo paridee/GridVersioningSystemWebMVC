@@ -37,7 +37,6 @@ import grid.entities.Project;
 import grid.entities.Question;
 import grid.entities.Strategy;
 import grid.entities.UserRole;
-import grid.interfaces.services.ConflictService;
 import grid.interfaces.services.GridElementService;
 import grid.interfaces.services.GridService;
 import grid.interfaces.services.PractitionerService;
@@ -50,7 +49,6 @@ public class TestController {
 	private GridService			gridService;
 	private ProjectService		projectService;
 	private JSONFactory 		jFact;
-	private ConflictService		conflictService;
 	private PractitionerService practitionerService;
 	private GridModificationService gridModificationService;
 	
@@ -64,12 +62,6 @@ public class TestController {
 	@Qualifier(value="gridModificationService")
 	public void setGridModificationService(GridModificationService gridModificationService) {
 		this.gridModificationService = gridModificationService;
-	}
-	
-	@Autowired(required=true)
-	@Qualifier(value="conflictService")
-	public void setConflictService(ConflictService	conflictService) {
-		this.conflictService = conflictService;
 	}
 	
 	@Autowired(required=true)
@@ -488,8 +480,9 @@ public class TestController {
 		}
 		ArrayList<GridElement> parameter	=	new ArrayList<GridElement>();
 		parameter.addAll(strategies);
-		String pad	=	Utils.generateEditor(parameter);
-		model.addAttribute("pad", pad);
+		//TODO to use this uncomment on Utils
+		//String pad	=	Utils.generateEditor(parameter);
+		//model.addAttribute("pad", pad);
 		return "firepadtest";
 	}
 	

@@ -13,8 +13,6 @@ import org.javers.core.diff.Change;
 import org.javers.core.diff.Diff;
 import org.javers.core.diff.changetype.ValueChange;
 import org.javers.core.diff.changetype.container.ListChange;
-import org.json.JSONArray;
-import org.json.JSONObject;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -22,8 +20,6 @@ import grid.entities.Goal;
 import grid.entities.GridElement;
 import grid.entities.MeasurementGoal;
 import grid.entities.Metric;
-import grid.entities.Practitioner;
-import grid.entities.Project;
 import grid.entities.Question;
 import grid.entities.Strategy;
 import grid.interfaces.DAO.GridElementDao;
@@ -234,6 +230,7 @@ public class GridElementServiceImpl implements GridElementService {
 	 */
 	@Override
 	public List<GridElement> getAllLatestWorking() {
+		@SuppressWarnings("rawtypes")
 		HashMap <String,Class> 	labelsClass	=	new HashMap<String,Class>();
 		List<GridElement>	all		=	new ArrayList<GridElement>();
 		List<GridElement>	latest	=	new ArrayList<GridElement>();
@@ -257,16 +254,5 @@ public class GridElementServiceImpl implements GridElementService {
 		}
 		return latest;
 	}
-	
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	public List<GridElement> getLatestWorkingElements() {
-		List<GridElement>	allWorking	=	this.gridElementDao.getLatestWorkingElements();
-		return allWorking;
-	}
-	
-
-	
+		
 }

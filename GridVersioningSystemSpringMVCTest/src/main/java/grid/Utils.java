@@ -59,6 +59,7 @@ public class Utils {
 		        message.setRecipients(Message.RecipientType.TO,InternetAddress.parse(toAddr));
 		        message.setSubject(title);
 		        message.setText(body,"utf-8","html");
+		        logger.info("email sent");
 		        Transport.send(message);
 		      } catch (MessagingException e) {
 		        e.printStackTrace();
@@ -115,6 +116,8 @@ public class Utils {
 		mailSend.start();
 	}
 	
+	//TODO remove obsolete code
+	/*
 	public static String generateEditor(List<GridElement> elements){
 		if(elements.size()>0){
 			String top	=	"";
@@ -179,8 +182,13 @@ public class Utils {
 			return top;
 		}
 		return "";
-	}
+	}*/
 	
+	/**
+	 * load the content of a text file on a string
+	 * @param path path of the file
+	 * @return string with text
+	 */
 	public static String loadFile(String path){
 		String everything	=	"";
 		try(BufferedReader br = new BufferedReader(new FileReader(new File(path)))) {
@@ -194,12 +202,16 @@ public class Utils {
 		    }
 		    everything = sb.toString();
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		return everything;
 	}
 	
+	/**
+	 * Convert a Grid Element to an HTML visualization item
+	 * @param ge a Grid Element
+	 * @return html string to be embedded
+	 */
 	public static String gridElementToHTMLString(GridElement ge){
 		String name=ge.getClass().getSimpleName()+" "+ge.getLabel()+" - <i>v"+ge.getVersion()+"</i><br>";
 		String desc="";
@@ -214,6 +226,7 @@ public class Utils {
 					desc=desc+tempField.getName()+":  "+fieldValueGE.getLabel()+"_v"+fieldValueGE.getVersion()+"<br>";
 				}
 				else if(fieldValue instanceof List){
+					@SuppressWarnings("rawtypes")
 					List myList 	=	(List)fieldValue;
 					if(myList.size()>0){
 						desc=desc+tempField.getName()+": ";
@@ -229,18 +242,18 @@ public class Utils {
 				else{
 					//desc=desc+"<div style='float:left;min-width: 200px;'>"+tempField.getName()+": "+fieldValueStr+"</div>";
 					if(fieldValue!=null){
-						String fieldValueStr	=	(String)fieldValue.toString();
-						String txt=tempField.getName()+": "+fieldValueStr;
-						int maxLength=60;
-						if(txt.length()>maxLength) txt=txt.substring(0, maxLength)+"...";
-						desc=desc+txt+"<br>";
+						if(!tempField.getName().equals("logger")){
+							String fieldValueStr	=	(String)fieldValue.toString();
+							String txt=tempField.getName()+": "+fieldValueStr;
+							int maxLength=60;
+							if(txt.length()>maxLength) txt=txt.substring(0, maxLength)+"...";
+							desc=desc+txt+"<br>";
+						}
 					}
 				}
 			} catch (IllegalArgumentException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			} catch (IllegalAccessException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 		}

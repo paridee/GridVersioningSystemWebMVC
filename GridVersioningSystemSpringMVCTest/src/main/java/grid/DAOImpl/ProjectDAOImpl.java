@@ -9,6 +9,11 @@ import org.slf4j.LoggerFactory;
 import grid.entities.Project;
 import grid.interfaces.DAO.ProjectDAO;
 
+/**
+ * DAO Project implementation in Hibernate
+ * @author Paride Casulli
+ * @author Lorenzo La Banca
+ */
 
 public class ProjectDAOImpl implements ProjectDAO{
 	

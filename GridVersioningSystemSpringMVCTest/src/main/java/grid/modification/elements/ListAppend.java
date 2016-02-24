@@ -10,12 +10,11 @@ import org.slf4j.LoggerFactory;
 
 import grid.entities.Grid;
 import grid.entities.GridElement;
-import grid.modification.grid.GridModificationService;
 
 /**
  * This class models an addition of an element to a List belonging to a GridElement
  * @author Paride Casulli
- * @author Lorenzo La Banza
+ * @author Lorenzo La Banca
  *
  */
 public class ListAppend extends GridElementModification {
@@ -50,6 +49,7 @@ public class ListAppend extends GridElementModification {
 		this.newLoadedObject = newLoadedObject;
 	}
 
+	@SuppressWarnings({ "rawtypes", "unchecked" })
 	@Override
 	public void apply(GridElement anElement, Grid grid) throws Exception {
 		Field aField	=	anElement.getClass().getDeclaredField(this.listNameToBeChanged);

@@ -11,8 +11,6 @@ import javax.persistence.JoinColumn;
 import javax.persistence.Entity;
 import javax.persistence.Table;
 
-import grid.interfaces.Updatable;
-
 /**
  * 
  * @author Paride Casulli
