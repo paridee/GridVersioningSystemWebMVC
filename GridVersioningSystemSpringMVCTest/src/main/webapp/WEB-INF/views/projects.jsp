@@ -6,42 +6,39 @@
     <div class="container">
     	<c:choose>
 	    	<c:when test="${reqproject!=null}">
-	    		<div>
-		    		<table class="tg">
-				    <tr>
-				        <th width="80">id</th>
-				        <th width="120">ProjectID</th>
-				        <th width="120">description</th>
-				        <th width="120">creationDate</th>
-				    </tr>
-				    <tr>
-				            <td><a href="<c:url value='/projects/${project.id}' />">${project.id}</a></td>
-				            <td>${reqproject.projectId}</td>
-				            <td>${reqproject.description}</td>
-				            <td>${reqproject.creationDate}</td>
-				       </tr>
-				    </table>
-			    </div>
-			    <c:if test="${!empty listProjectGrids}">
+	    		<div style="width: 100%; float: left; text-align: left;"  class="page-header">
+					<h1><b>Project</b> ${reqproject.projectId}<small> - <b>creation date</b> ${reqproject.creationDate}</small></h1>
+					<h3><small><b>Description:</b> ${reqproject.description}</small></h3>
+					<h3><small><b>Project Manager:</b> ${reqproject.projectManager.name}</small></h3>
+				</div>
+	    	
+	    		<c:if test="${!empty listProjectGrids}">
 			        
-						<h3>Grids list   <small>number of grids found: ${nProjectGrids }</small></h3>
+						<div style="text-align: center"><h3><b>Grids list</b>   <small>number of grids found: ${nProjectGrids }</small></h3></div>
 						<div class="table-responsive"> 
 							<table class="table table-striped table-hover">
 								<thead>
 								    <tr>
 								        <th>Grid ID</th>
 								        <th>Grid Version</th>
-								        <th>ProjectID</th>
+								        <th>Project</th>
 								        <th>State</th>
 								    </tr>
 							    </thead>
 							    <tbody>
-								    <c:forEach items="${listProjectGrids}" var="listprojectgriditem">
-								    <c:set var="currentGridId">${listprojectgriditem.id}</c:set>
-								        <tr>
-								            <td class='clickable-row' data-href='<c:url value='/grids/${listprojectgriditem.id}' />'>${listprojectgriditem.id}</td>
-								            <td>${listprojectgriditem.version}</td>
-								            <td><a href="<c:url value='/projects/${listprojectgriditem.project.id}' />" >${listprojectgriditem.project.id}</a></td>
+								    <c:forEach items="${listProjectGrids}" var="listgriditem">
+								    <c:set var="currentGridId">${listgriditem.id}</c:set>
+								        <c:choose>
+								    		<c:when test="${status[currentGridId]=='UPDATING'||status[currentGridId]=='MGC-UPDATING'}">
+								    			<tr class='clickable-row danger' data-href='<c:url value='/grids/${listgriditem.id}' />' >
+								    		</c:when>
+								    		<c:otherwise>
+								    			<tr class='clickable-row' data-href='<c:url value='/grids/${listgriditem.id}' />' >
+								    		</c:otherwise>
+								    	</c:choose>
+								            <td>${listgriditem.id}</td>
+								            <td>${listgriditem.version}</td>
+								            <td><a href="<c:url value='/projects/${listgriditem.project.id}' />" >${listgriditem.project.projectId}</a></td>
 								        	<td>${status[currentGridId]}</td>
 								        </tr>
 								    </c:forEach>

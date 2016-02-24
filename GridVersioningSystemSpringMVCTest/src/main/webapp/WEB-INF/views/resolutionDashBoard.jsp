@@ -42,39 +42,40 @@
     					<b>GridID: <a href="/ISSSR/grids/<%out.print(g.getId());%>" ><%out.print(g.getId()); %></a> </b>
     				</div>
     				<div class="panel-body">
+    				<ul class="list-group">
     				<%
     				if(projectGridsMajorPendingElements.containsKey(p.getId()+"-"+g.getId())){
     					List<GridElement> geList=projectGridsMajorPendingElements.get(p.getId()+"-"+g.getId());
-    					%><div style="float:left;">MajorUpdates</div> <div class="badge" style="float:left; margin-left:5px; margin-right: 5px;"><%out.print(geList.size()); %></div> <%
+    					%><li class="list-group-item"><div style="float:left;">MajorUpdates</div> <div class="badge" style="float:left; margin-left:5px; margin-right: 5px;"><%out.print(geList.size()); %></div> <%
     					for(GridElement ge:geList){
     						if (gms.isSolvable(ge)){
     							out.print("<a style=\"text-decoration:none\" href=\"/ISSSR/GEResolution/"+ge.getClass().getSimpleName()+"/"+ge.getLabel()+"\">"+"<span class=\"label label-success\" >"+ge.getLabel()+"</span>"+"</a> ");
 					        }
     						else out.print("<span style=\"cursor: pointer\" class=\"label label-warning\" data-toggle=\"tooltip\" data-placement=\"auto right\" title=\"You have to solve other pending Grid Elements before\">"+ge.getLabel()+"</span>");
     					}
-    					out.print("<br>");
+    					out.print("</li>");
     				}
     				if(projectGridsMajorConflictElements.containsKey(p.getId()+"-"+g.getId())){
     					List<GridElement> geList=projectGridsMajorConflictElements.get(p.getId()+"-"+g.getId());
-    					%><div style="float:left;">MajorConflicts</div> <div class="badge" style="float:left; margin-left:5px; margin-right: 5px;"><%out.print(geList.size()); %></div> <%
+    					%><li class="list-group-item"><div style="float:left;">MajorConflicts</div> <div class="badge" style="float:left; margin-left:5px; margin-right: 5px;"><%out.print(geList.size()); %></div> <%
     					for(GridElement ge:geList){
     						if (gms.isSolvable(ge)){
     							out.print("<a style=\"text-decoration:none\" href=\"/ISSSR/GEResolution/"+ge.getClass().getSimpleName()+"/"+ge.getLabel()+"\">"+"<span class=\"label label-success\">"+ge.getLabel()+"</span>"+"</a> ");
 					        }
     						else out.print("<span style=\"cursor: pointer\" class=\"label label-warning\" data-toggle=\"tooltip\" data-placement=\"auto right\" title=\"You have to solve other pending Grid Elements before\">"+ge.getLabel()+"</span>");
     					}
-    					out.print("<br>");
+    					out.print("</li>");
     				}
     				if(projectGridsMinorConflictElements.containsKey(p.getId()+"-"+g.getId())){
     					List<GridElement> geList=projectGridsMinorConflictElements.get(p.getId()+"-"+g.getId());
-    					%><div style="float:left;">MinorConflicts</div> <div class="badge" style="float:left; margin-left:5px; margin-right: 5px;"><%out.print(geList.size()); %></div> <%
+    					%><li class="list-group-item"><div style="float:left;">MinorConflicts</div> <div class="badge" style="float:left; margin-left:5px; margin-right: 5px;"><%out.print(geList.size()); %></div> <%
     					for(GridElement ge:geList){
     						if (gms.isSolvable(ge)){
     							out.print("<a style=\"text-decoration:none\" href=\"/ISSSR/GEResolution/"+ge.getClass().getSimpleName()+"/"+ge.getLabel()+"\">"+"<span class=\"label label-success\">"+ge.getLabel()+"</span>"+"</a> ");
 					        }
     						else out.print("<span style=\"cursor: pointer\" class=\"label label-warning\" data-toggle=\"tooltip\" data-placement=\"auto right\" title=\"You have to solve other pending Grid Elements before\">"+ge.getLabel()+"</span>");
     					}
-    					out.print("<br>");
+    					out.print("</li>");
     				}
     				if(projectGridsMainGoalListChanged.containsKey(p.getId()+"-"+g.getId())){
     					//get grid main goals
@@ -93,12 +94,14 @@
     							if(gms.isEmbeddedPending(ge)) solvable=false;
     						}
     					}
+    					out.print("<li class=\"list-group-item\">");
     					if(solvable) out.print("<a style=\"text-decoration:none\" href=\"/ISSSR/MGResolution/"+p.getId()+"/"+g.getId()+"\"><span class=\"label label-success\">Main Goal List changed</span></a><br>");
     					else out.print("<span  style=\"cursor: pointer\" class=\"label label-danger\" data-toggle=\"tooltip\" data-placement=\"auto right\" title=\"You have to solve other pending Grid Elements before\">MainGoalList changed</span><br>");
+    					out.print("</li>");
     				}
     				
     				
-    				%></div>
+    				%></ul></div>
     				</div>
     				<%
     				

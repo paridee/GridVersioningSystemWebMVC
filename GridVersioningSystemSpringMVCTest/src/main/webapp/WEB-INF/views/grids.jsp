@@ -8,25 +8,11 @@
     	<div style="text-align: center">
     	<c:choose>
 	    	<c:when test="${grid!= null}">
-			<div class="table-responsive"> 
-				<table class="table table-striped table-hover">
-					<thead>
-					    <tr>
-					        <th width="80">Grid ID</th>
-					        <th width="120">Grid Version</th>
-					        <th width="120">ProjectID</th>
-					    </tr>
-				    </thead>
-				    <tbody>
-					    <tr>
-					            <td><a href="<c:url value='/grids/${grid.id}' />" >${grid.id}</a></td>
-					            <td>${grid.version}</td>
-					            <td><a href="<c:url value='/projects/${grid.project.id}' />" >${grid.project.id}</a></td>
-					    </tr>
-				    </tbody>
-			    </table>
-			</div>
-			<div id="gridChart"> </div>
+	    		<div style="width: 100%; float: left; text-align: left;"  class="page-header">
+					<h1><b>Grid ID</b> ${grid.id}<small> - <b>project</b> <a href="<c:url value='/projects/${grid.project.id}' />" >${grid.project.projectId}</a></small></h1>
+					<h3><b>creation date:</b> </h3>
+				</div>
+				<div id="gridChart"> </div>
 			</c:when>
 	      	<c:when test="${!empty listGrids}">
 	        <h1>Grids list <small> - grids found: ${listGrids.size()}</small></h1>
@@ -43,7 +29,15 @@
 					    <tbody>
 						    <c:forEach items="${listGrids}" var="listgriditem">
 						    	<c:set var="currentGridId">${listgriditem.id}</c:set>
-						        <tr class='clickable-row' data-href='<c:url value='/grids/${listgriditem.id}' />'>
+						    	<c:choose>
+						    		<c:when test="${status[currentGridId]=='UPDATING'||status[currentGridId]=='MGC-UPDATING'}">
+						    			<tr class='clickable-row danger' data-href='<c:url value='/grids/${listgriditem.id}' />' >
+						    		</c:when>
+						    		<c:otherwise>
+						    			<tr class='clickable-row' data-href='<c:url value='/grids/${listgriditem.id}' />' >
+						    		</c:otherwise>
+						    	</c:choose>
+						    	
 						            <td>${listgriditem.id}</td>
 						            <td>${listgriditem.version}</td>
 						            <td><a href="<c:url value='/projects/${listgriditem.project.id}' />" >${listgriditem.project.projectId}</a></td>
