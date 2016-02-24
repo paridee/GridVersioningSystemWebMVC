@@ -1,5 +1,5 @@
 <nav class="navbar navbar-inverse navbar-fixed-top">
-      <a class="navbar-brand" href="<c:url value='/GVShome'/>"><img id="headim" alt="" src="resources/gqmlogo.png"></a>
+      <a class="navbar-brand" href="<c:url value='/GVShome'/>"><img id="headim" alt="" src="<c:url value='/resources/gqmlogo.png'/>"></a>
       <div class="container">
 	    <div class="navbar-header">
           <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">

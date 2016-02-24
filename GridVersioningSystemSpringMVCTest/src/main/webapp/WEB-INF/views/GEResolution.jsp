@@ -46,7 +46,7 @@
 						<div class="panel-heading"><span style="font-size: 22px;">New versions available</span></div>
 					  	<div class="panel-body">
 							<div style="width: 50%; float: left;">
-								<div class="panel panel-default">
+								<div class="panel panel-primary">
   									<div class="panel-heading"><b>Current Version</b></div>
 									<div class="panel-body">
 										<div class="panel panel-default">
@@ -66,7 +66,7 @@
 								</div>
 							</div>
 							<div style="width: 50%; float: left;">
-								<div class="panel panel-default">
+								<div class="panel panel-danger">
   									<div class="panel-heading"><b>Updates to approve</b></div>
   									<div class="panel-body">
 										<%
@@ -95,7 +95,10 @@
             			
     </c:when>    
     <c:otherwise>
-        ERRORE: ${error}
+    	<div style="float: left;width: 100%; text-align: center;">
+			<img style="max-height:100px; max-width: 100px;" alt="Alert" src="<c:url value='/resources/images/warning.png' />">
+			<h1>${error}</h1>
+		</div>
     </c:otherwise>
 </c:choose>
     
