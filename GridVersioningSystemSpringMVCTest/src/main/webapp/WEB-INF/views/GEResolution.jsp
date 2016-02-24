@@ -31,6 +31,7 @@
 			    });
 			};
 		</script>
+		
         <%
         	
         	GridElement we=(GridElement)request.getAttribute("workingGE");
@@ -41,41 +42,56 @@
         	List <GridElement> pendinglist=(List<GridElement>)request.getAttribute("updatingElements");
         	
         		%>
-        			
-        		<h1>New versions available</h1><br>
-       			<div style="width: 100%; float: left;">
-       				<div style="width: 50%; float: left;">
-       					<h2>Current version:</h2><br>
-      						<% out.println(Utils.gridElementToHTMLString(we));%><br>
-      						<input type="button" value="Accept" onclick="acceptGE('<%
-      								String s=gson.toJson(we); 
-      								s=s.replaceAll("\"", "#"); 
-      								String type=we.getClass().toString();
-      								type=type.substring(6, type.length());
-      								out.print(type+","+pendinglist.size()+s);%>')"/>
-       				</div>
-       				<%
-       				for(GridElement ge: pendinglist){
-       				%>
-       				
-	       				<div style="width: 50%; float: left;">
-	       					<h2>Update to approve:</h2><br>
-	       					<%out.println(Utils.gridElementToHTMLString(ge)); %>
-	       					<div style="width: 100%; float: left; text-align: left; margin-top: 40px;">
-								<input type="button" value="Accept" onclick="acceptGE('<%
-										s=gson.toJson(ge); 
-										s=s.replaceAll("\"", "#"); 
-										type=ge.getClass().toString();
-	      								type=type.substring(6, type.length());
-	      								out.print(type+","+pendinglist.size()+s);%>')"/>
-				   			</div>
-	       				</div>
-       				<%
-       				}
-       				%>
-       				
-       				
-       			</div>
+       				<div class="panel panel-default">
+						<div class="panel-heading"><span style="font-size: 22px;">New versions available</span></div>
+					  	<div class="panel-body">
+							<div style="width: 50%; float: left;">
+								<div class="panel panel-default">
+  									<div class="panel-heading"><b>Current Version</b></div>
+									<div class="panel-body">
+										<div class="panel panel-default">
+											<% out.println(Utils.gridElementToHTMLString(we));%>
+											<div class="panel-footer">
+												<input type="button" value="Accept" onclick="acceptGE('<%
+				      								String s=gson.toJson(we); 
+				      								s=s.replaceAll("\"", "#"); 
+				      								String type=we.getClass().toString();
+				      								type=type.substring(6, type.length());
+				      								out.print(type+","+pendinglist.size()+s);%>')"/>
+											</div>
+										</div>
+										
+									</div>
+									
+								</div>
+							</div>
+							<div style="width: 50%; float: left;">
+								<div class="panel panel-default">
+  									<div class="panel-heading"><b>Updates to approve</b></div>
+  									<div class="panel-body">
+										<%
+					       				for(GridElement ge: pendinglist){
+					       				%><div class="panel panel-default">
+					       				<%out.println(Utils.gridElementToHTMLString(ge)); %>
+					       					<div class="panel-footer">
+												<input type="button" value="Accept" onclick="acceptGE('<%
+														s=gson.toJson(ge); 
+														s=s.replaceAll("\"", "#"); 
+														type=ge.getClass().toString();
+					      								type=type.substring(6, type.length());
+					      								out.print(type+","+pendinglist.size()+s);%>')"/>
+											</div>
+					       				</div>
+						       			<%
+					       				}
+					       				%>
+
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+        		
             			
     </c:when>    
     <c:otherwise>

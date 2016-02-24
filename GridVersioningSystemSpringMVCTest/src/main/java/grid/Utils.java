@@ -257,7 +257,8 @@ public class Utils {
 				e.printStackTrace();
 			}
 		}
-		return name+desc;
+		String gridElementString="<div class=\"panel-heading\">"+name+"</div><div class=\"panel-body\">"+desc+"</div>";
+		return gridElementString;
 		
 		
 	}
