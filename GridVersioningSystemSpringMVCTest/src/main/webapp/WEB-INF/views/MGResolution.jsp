@@ -39,7 +39,8 @@
     			$("#newGoalList").html( txt );
     		}
     		function addMG(label){
-    			if(!(label in newMainGoalList)){
+    			var index = newMainGoalList.indexOf(label);
+    			if (index == -1) {
     				newMainGoalList.push(label);
     			}
     			drawMGList();
