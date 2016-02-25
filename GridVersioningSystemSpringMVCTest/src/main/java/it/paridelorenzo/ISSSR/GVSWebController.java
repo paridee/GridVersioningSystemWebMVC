@@ -655,8 +655,10 @@ public class GVSWebController {
 		List <GridElement> tempList=this.gridElementService.getElementLog(label, type);
 		model.addAttribute("nGridElements", tempList.size());
         model.addAttribute("listGridElements", tempList);
+        model.addAttribute("type", type);
+        model.addAttribute("label", label);
         //System.out.println(tempList.toString());
-		return "element";
+		return "elementhistory";
     }
 	
 	@RequestMapping(value = "/element/{type}/{id}")
