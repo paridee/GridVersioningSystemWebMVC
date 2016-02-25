@@ -121,10 +121,29 @@ public class Utils {
 	public static String generateEditor(List<GridElement> elements, ArrayList<Practitioner> authorsL, Practitioner currentUser){
 		if(elements.size()>0){
 			ArrayList<String> editorsVar	=	new ArrayList<String>();
-			String top	=	"<h2>Authors list</h2>";
+			ArrayList<String> fieldNames	=	new ArrayList<String>();
+			ArrayList<String> firepads		=	new ArrayList<String>();
+			String top	=	"<h2>Authors list</h2><div id=\"status\"> </div>";
 			for(int i=0;i<authorsL.size();i++){
-				top=top+"<p>"+authorsL.get(i).getName()+"</p>";
+				top=top+"<p>"+authorsL.get(i).getName()+"</p><div id=\"approval"+authorsL.get(i).getId()+"\"> </div>";
+				top=top+"<script>"+
+				"var approval"+elements.get(0).getLabel()+authorsL.get(i).getId()+" = new Firebase('fiery-torch-6050.firebaseio.com/"+elements.get(0).getLabel()+"approval"+authorsL.get(i).getId()+"');"+
+				"var approval"+elements.get(0).getLabel()+authorsL.get(i).getId()+"state;"+
+				"approval"+elements.get(0).getLabel()+authorsL.get(i).getId()+".child(\"value\").on(\"value\", function(snapshot) {"+
+					 //"alert(snapshot.val());"+  // Alerts "San Francisco"
+					 "document.getElementById(\"approval"+authorsL.get(i).getId()+"\").innerHTML = snapshot.val();"+
+					 "approval"+elements.get(0).getLabel()+authorsL.get(i).getId()+"state=snapshot.val();"+
+					 "var allOK	=	allApproved();"+
+					 "if(allOK==true){document.getElementById(\"status\").innerHTML = generateString();}"+
+					 "});"+
+				"</script>";
 			}
+			top	=	top+"<script>"+
+			"function allApproved(){";
+			for(int i=0;i<authorsL.size();i++){
+				top=top+"if(approval"+elements.get(0).getLabel()+authorsL.get(i).getId()+"state!=\"approved\"){return false;}";
+			}
+			top	=	top+"return true;}</script>";
 			top	=	top+
 					"<input type=\"button\" name=\"lockBtn\" value=\"Lock\" onclick=\"btnLock()\"><input type=\"button\" name=\"approveBtn\" value=\"Approve\" onclick=\"btnApprove()\" disabled><input type=\"button\" name=\"rejectBtn\" value=\"Reject\" onclick=\"btnReject()\" disabled>";
 			for(int k=0;k<elements.size();k++){;
@@ -157,6 +176,8 @@ public class Utils {
 												"</script>"+
 												"</div>";
 							editorsVar.add("codeMirror"+editingElement.getLabel()+fieldName+editingElement.getVersion());
+							firepads.add("firepadRef"+editingElement.getIdElement()+fieldName);
+							fieldNames.add(fieldName);
 						}
 						else if(value instanceof GridElement){
 							top				=	top+"</br>"+  
@@ -193,7 +214,8 @@ public class Utils {
 					"lock"+elements.get(0).getLabel()+".child(\"lock\").on(\"value\", function(snapshot) {"+
 					"var result = snapshot.val();"+
 					//"alert(\"cambio!!!\".concat(result));"+
-					"if(snapshot.val()==\"false\"){";
+					"if(snapshot.val()==\"false\"){"+
+						"approval"+elements.get(0).getLabel()+currentUser.getId()+".set({value:\"not approved\"});";
 						for(int e=0;e<editorsVar.size();e++){
 							top	=	top+editorsVar.get(e)+".setOption(\"readOnly\",false);";
 						}
@@ -215,12 +237,15 @@ public class Utils {
 				     "}"+
 				     "function btnApprove(){"+
 				     	//"alert(\"btnapprove\");"+
-				     	"lock"+elements.get(0).getLabel()+".set({lock:\"false\"});"+
+				     	"approval"+elements.get(0).getLabel()+currentUser.getId()+".set({value:\"approved\"});"+
+				     	//"lock"+elements.get(0).getLabel()+".set({lock:\"false\"});"+
 				     "}"+
 				     "function btnReject(){"+
 				     	//"alert(\"btnreject\");"+
 				     	"lock"+elements.get(0).getLabel()+".set({lock:\"false\"});"+
 				     "}"+
+				     "function generateString(){ var obj = \"{id~"+elements.get(0).getIdElement()+"#class~"+elements.get(0).getClass().getSimpleName()+"}\"; return obj;";
+				     top=top+";}"+
 					 "</script>";
 			return top;
 		}
