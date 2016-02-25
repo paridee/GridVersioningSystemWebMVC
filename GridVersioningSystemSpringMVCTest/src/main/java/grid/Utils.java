@@ -22,6 +22,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import grid.entities.GridElement;
+import grid.entities.Practitioner;
 
 /**
  * Utilities class with singletons methods
@@ -116,11 +117,35 @@ public class Utils {
 		mailSend.start();
 	}
 
-	//TODO remove obsolete code
-	/*
-	public static String generateEditor(List<GridElement> elements){
+
+	public static String generateEditor(List<GridElement> elements, ArrayList<Practitioner> authorsL, Practitioner currentUser){
 		if(elements.size()>0){
-			String top	=	"";
+			ArrayList<String> editorsVar	=	new ArrayList<String>();
+			ArrayList<String> fieldNames	=	new ArrayList<String>();
+			ArrayList<String> firepads		=	new ArrayList<String>();
+			String top	=	"<h2>Authors list</h2><div id=\"status\"> </div>";
+			for(int i=0;i<authorsL.size();i++){
+				top=top+"<p>"+authorsL.get(i).getName()+"</p><div id=\"approval"+authorsL.get(i).getId()+"\"> </div>";
+				top=top+"<script>"+
+				"var approval"+elements.get(0).getLabel()+authorsL.get(i).getId()+" = new Firebase('fiery-torch-6050.firebaseio.com/"+elements.get(0).getLabel()+"approval"+authorsL.get(i).getId()+"');"+
+				"var approval"+elements.get(0).getLabel()+authorsL.get(i).getId()+"state;"+
+				"approval"+elements.get(0).getLabel()+authorsL.get(i).getId()+".child(\"value\").on(\"value\", function(snapshot) {"+
+					 //"alert(snapshot.val());"+  // Alerts "San Francisco"
+					 "document.getElementById(\"approval"+authorsL.get(i).getId()+"\").innerHTML = snapshot.val();"+
+					 "approval"+elements.get(0).getLabel()+authorsL.get(i).getId()+"state=snapshot.val();"+
+					 "var allOK	=	allApproved();"+
+					 "if(allOK==true){document.getElementById(\"status\").innerHTML = generateString();}"+
+					 "});"+
+				"</script>";
+			}
+			top	=	top+"<script>"+
+			"function allApproved(){";
+			for(int i=0;i<authorsL.size();i++){
+				top=top+"if(approval"+elements.get(0).getLabel()+authorsL.get(i).getId()+"state!=\"approved\"){return false;}";
+			}
+			top	=	top+"return true;}</script>";
+			top	=	top+
+					"<input type=\"button\" name=\"lockBtn\" value=\"Lock\" onclick=\"btnLock()\"><input type=\"button\" name=\"approveBtn\" value=\"Approve\" onclick=\"btnApprove()\" disabled><input type=\"button\" name=\"rejectBtn\" value=\"Reject\" onclick=\"btnReject()\" disabled>";
 			for(int k=0;k<elements.size();k++){;
 				GridElement editingElement	=	elements.get(k);
 				top					=	top+"<div id=\""+editingElement.getLabel()+"\"><h2>"+editingElement.getClass().getSimpleName()+": "+editingElement.getLabel()+" v"+editingElement.getVersion()+"</h2></br>";
@@ -135,19 +160,24 @@ public class Utils {
 												"<h3>"+fieldName+"</h3>"+
 												"<div id=\""+editingElement.getIdElement()+fieldName+"\" class=\"firepad-container\">"+
 												"<script>"+
+												"var codeMirror"+editingElement.getLabel()+fieldName+editingElement.getVersion()+";"+
 												"function init() {"+
 												"var firepadRef"+editingElement.getIdElement()+fieldName+" = new Firebase('fiery-torch-6050.firebaseio.com/"+editingElement.getIdElement()+fieldName+"');"+
-												"var codeMirror = CodeMirror(document.getElementById('"+editingElement.getIdElement()+fieldName+"'), {"+
+												"codeMirror"+editingElement.getLabel()+fieldName+editingElement.getVersion()+" = CodeMirror(document.getElementById('"+editingElement.getIdElement()+fieldName+"'), {"+
 												"lineNumbers: true,"+
 												"mode: 'javascript'"+
 												"});"+
-												"var firepad"+editingElement.getIdElement()+fieldName+" = Firepad.fromCodeMirror(firepadRef"+editingElement.getIdElement()+fieldName+", codeMirror, {"+
+												//"codeMirror"+editingElement.getLabel()+fieldName+editingElement.getVersion()+""+".setOption(\"readOnly\",true);"+
+												"var firepad"+editingElement.getIdElement()+fieldName+" = Firepad.fromCodeMirror(firepadRef"+editingElement.getIdElement()+fieldName+", codeMirror"+editingElement.getLabel()+fieldName+editingElement.getVersion()+", {"+
 												"defaultText: '"+value.toString()+"'"+
 												"});"+
 												"}"+
 												"init();"+
 												"</script>"+
-												"</div>";	
+												"</div>";
+							editorsVar.add("codeMirror"+editingElement.getLabel()+fieldName+editingElement.getVersion());
+							firepads.add("firepadRef"+editingElement.getIdElement()+fieldName);
+							fieldNames.add(fieldName);
 						}
 						else if(value instanceof GridElement){
 							top				=	top+"</br>"+  
@@ -179,10 +209,48 @@ public class Utils {
 				top=top+"</div>";
 				top	=	top+"<hr>";
 			}
+			top	=	top+"<script>"+
+					"var lock"+elements.get(0).getLabel()+" = new Firebase('fiery-torch-6050.firebaseio.com/"+elements.get(0).getLabel()+"state');"+
+					"lock"+elements.get(0).getLabel()+".child(\"lock\").on(\"value\", function(snapshot) {"+
+					"var result = snapshot.val();"+
+					//"alert(\"cambio!!!\".concat(result));"+
+					"if(snapshot.val()==\"false\"){"+
+						"approval"+elements.get(0).getLabel()+currentUser.getId()+".set({value:\"not approved\"});";
+						for(int e=0;e<editorsVar.size();e++){
+							top	=	top+editorsVar.get(e)+".setOption(\"readOnly\",false);";
+						}
+				    	top=top+"document.getElementsByName(\"lockBtn\")[0].disabled=false;"+
+				    	"document.getElementsByName(\"approveBtn\")[0].disabled=true;"+
+				    	"document.getElementsByName(\"rejectBtn\")[0].disabled=true;"+
+				     "}"+
+					"else{";
+						for(int e=0;e<editorsVar.size();e++){
+							top	=	top+editorsVar.get(e)+".setOption(\"readOnly\",true);";
+						}
+				    	top	=	top+"document.getElementsByName(\"lockBtn\")[0].disabled=true;"+
+				    	"document.getElementsByName(\"approveBtn\")[0].disabled=false;"+
+				    	"document.getElementsByName(\"rejectBtn\")[0].disabled=false;"+
+				     "}});"+ 
+					"function btnLock(){"+
+				     	//"alert(\"btnlock\");"+
+				     	"lock"+elements.get(0).getLabel()+".set({lock:\"true\"});"+
+				     "}"+
+				     "function btnApprove(){"+
+				     	//"alert(\"btnapprove\");"+
+				     	"approval"+elements.get(0).getLabel()+currentUser.getId()+".set({value:\"approved\"});"+
+				     	//"lock"+elements.get(0).getLabel()+".set({lock:\"false\"});"+
+				     "}"+
+				     "function btnReject(){"+
+				     	//"alert(\"btnreject\");"+
+				     	"lock"+elements.get(0).getLabel()+".set({lock:\"false\"});"+
+				     "}"+
+				     "function generateString(){ var obj = \"{id~"+elements.get(0).getIdElement()+"#class~"+elements.get(0).getClass().getSimpleName()+"}\"; return obj;";
+				     top=top+";}"+
+					 "</script>";
 			return top;
 		}
 		return "";
-	}*/
+	}
 
 	/**
 	 * load the content of a text file on a string

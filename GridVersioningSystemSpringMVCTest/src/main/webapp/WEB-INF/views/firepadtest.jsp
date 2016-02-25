@@ -28,6 +28,7 @@
 </head>
 
 <body>
+<h2>User:${name}</h2><br>
 ${pad}
 </body>
 </html>
