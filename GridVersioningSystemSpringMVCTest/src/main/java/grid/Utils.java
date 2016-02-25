@@ -259,4 +259,14 @@ public class Utils {
 		String gridElementString="<div class=\"panel-heading\">"+name+"</div><div class=\"panel-body\">"+desc+"</div>";
 		return gridElementString;
 	}
+	
+	public static int getPendingNumber(List<Integer> projectIds){
+		List<Integer> list = new ArrayList<>();
+		for(int i:list){
+			System.out.println(i);
+		}
+		return 1;
+	}
+	
+	
 }

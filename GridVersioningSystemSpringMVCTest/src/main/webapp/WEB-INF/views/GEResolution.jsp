@@ -24,7 +24,7 @@
 				   	data: newjson,
 				  	success: function (msg) { 
 				  		alert(JSON.stringify(msg));
-				  		window.location.href = "/ISSSR/resolutionDashBoard.php";
+				  		window.location.href = "/ISSSR/resolutionDashBoard";
 				  		<%//TODO msg parser per vedere se è success o errore%>
 			  		},
 					error: function (err){

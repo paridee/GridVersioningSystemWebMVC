@@ -85,6 +85,8 @@ public class GVSWebController {
     public String resolutionDashBoardView(Model model) {
 		model.addAttribute("pageTitle", "Grids Versioning System");
 		this.setActiveButton(2, model);
+		List<String> pendingLabels=new ArrayList<String>();
+		int nPendingChanges=0;
 		List<Project> projList=this.projectService.listProjects();
 		List<Project> projPending=new ArrayList<Project>();
 		Map <String, List<Grid>> projectPendingGrids=new HashMap<>();	//map projid, list pending grids
@@ -535,6 +537,8 @@ public class GVSWebController {
 		
 	}
 	
+	
+	
 	private String updateChart(List<Object> stack){
 		String chart="";
 		for(int i=0; i<stack.size(); i++){
@@ -657,9 +661,20 @@ public class GVSWebController {
 	
 	@RequestMapping(value = "/element/{type}/{id}")
     public String getElementVers(@PathVariable("id") int id, @PathVariable("type") String type,Model model) {
-		GridElement  ge=this.gridElementService.getElementById(id, type);
-		model.addAttribute("element", ge);
-		//System.out.println(this.gridElementToFormattedString(ge));
+		GridElement ge=this.gridElementService.getElementById(id, type);
+		if(ge!=null){
+			model.addAttribute("element", ge);
+			List<Object> newStack=new ArrayList<Object>();
+			newStack.add(ge);
+			String chart="chart_config = {chart: { connectors: {type: \"bCurve\",style: {\"stroke-width\": 2}}, container: \"#gridChart\", siblingSeparation:70, rootOrientation:'WEST',  subTeeSeparation:70, animateOnInit: true,node: {collapsable: true},animation: {nodeAnimation: \"easeInSine\",nodeSpeed: 500,connectorsAnimation: \"linear\",connectorsSpeed: 500}},";		
+			chart=chart+"nodeStructure: "+updateChart(newStack)+"};";
+			System.out.println(chart);
+			model.addAttribute("gridTreeString",chart);
+		}
+		else{
+			model.addAttribute("error","The requested Grid Element is not available");
+		}
+		
 		return "element";
     }
 	

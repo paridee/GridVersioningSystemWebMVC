@@ -1,3 +1,9 @@
+<%@ page import="grid.Utils"%>
+<%@ page import ="grid.entities.GridElement" %>
+<%@ page import ="grid.entities.Project" %>
+<%@ page import ="java.util.*" %>
+<%@ page import ="grid.services.ProjectServiceImpl" %>
+
 <nav class="navbar navbar-inverse navbar-fixed-top">
       <a class="navbar-brand" href="<c:url value='/GVShome'/>"><img id="headim" alt="" src="<c:url value='/resources/gqmlogo.png'/>"></a>
       <div class="container">
