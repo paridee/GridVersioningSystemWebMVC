@@ -24,9 +24,12 @@
 				   	data: newjson,
 				  	success: function (msg) { 
 				  		alert(JSON.stringify(msg));
+				  		window.location.href = "/ISSSR/resolutionDashBoard.php";
+				  		<%//TODO msg parser per vedere se è success o errore%>
 			  		},
 					error: function (err){
 						alert(err.responseText);
+						location.reload(); 
 					}
 			    });
 			};

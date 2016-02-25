@@ -249,12 +249,25 @@ public class GVSWebController {
 				return jsonObject.toString();
 				
 			}
-			else{
+			else if(pending.size()>nconflict){
 				JSONObject jsonObject = new JSONObject();
 				jsonObject.put("msg", "result");
 				jsonObject.put("resp", "error, other incoming updates to solve");
 				return jsonObject.toString();
 				
+			}
+			else if(pending.size()==0){
+				JSONObject jsonObject = new JSONObject();
+				jsonObject.put("msg", "result");
+				jsonObject.put("resp", "error, no pending elements to solve");
+				return jsonObject.toString();
+				
+			}
+			else{
+				JSONObject jsonObject = new JSONObject();
+				jsonObject.put("msg", "result");
+				jsonObject.put("resp", "ControllerSolveUpdate error");
+				return jsonObject.toString();
 			}
 			
 			
@@ -277,6 +290,7 @@ public class GVSWebController {
 		this.setActiveButton(2, model);
 		Grid working= this.gridService.getLatestWorkingGrid(pid);
 		Grid current=this.gridService.getGridById(gid);
+		List<String> mergedGoalLabels=new ArrayList<String>();
 		if(working==null) {
 			model.addAttribute("error", "The working Grid is not available");
 		}
@@ -290,6 +304,9 @@ public class GVSWebController {
 			String workingMGList="['"+pid+"', '"+current.getId()+"', ";
 			List<Goal> temp=working.getMainGoals();
 			for(int i=0; i<temp.size(); i++){
+				if(!mergedGoalLabels.contains(temp.get(i).getLabel())){
+					mergedGoalLabels.add(temp.get(i).getLabel());
+				}
 				if(i<temp.size()-1){
 					workingMGList=workingMGList+"'"+temp.get(i).getLabel()+"',";
 				}
@@ -303,6 +320,9 @@ public class GVSWebController {
 			String currentMGList="['"+pid+"', '"+current.getId()+"', ";
 			temp=current.getMainGoals();
 			for(int i=0; i<temp.size(); i++){
+				if(!mergedGoalLabels.contains(temp.get(i).getLabel())){
+					mergedGoalLabels.add(temp.get(i).getLabel());
+				}
 				if(i<temp.size()-1){
 					currentMGList=currentMGList+"'"+temp.get(i).getLabel()+"',";
 				}
@@ -311,6 +331,7 @@ public class GVSWebController {
 				}
 			}
 			currentMGList=currentMGList+"]";
+			model.addAttribute("mergedGoalLabels", mergedGoalLabels);
 			model.addAttribute("workingGrid", working);
 	        model.addAttribute("currentGrid", current);
 	        model.addAttribute("workingMGList", workingMGList);
@@ -334,10 +355,10 @@ public class GVSWebController {
 		    }
 		    else {
 		    	Goal current=(Goal)this.gridElementService.getLatestWorking(jsonArray.getString(i), "Goal");
-		    	if(current!=null){
+		    	if(current!=null&&!mainGoalList.contains(current)){
 		    		mainGoalList.add(current);
 		    	}
-		    	else{
+		    	else if(current==null){
 		    		JSONObject jsonObject = new JSONObject();
 		    		jsonObject.put("msg", "result");
 		    		jsonObject.put("resp", "error, cannot get working element with label: "+ jsonArray.getString(i));
@@ -369,6 +390,13 @@ public class GVSWebController {
     		jsonObject.put("msg", "result");
     		jsonObject.put("resp", "grid with id: "+ gridToSolveId+" has been already solved");
     		System.out.println("error, cannot get grid with id: "+ gridToSolveId);
+    		return jsonObject.toString();
+		}
+		else if(mainGoalList.size()==0){
+			JSONObject jsonObject = new JSONObject();
+    		jsonObject.put("msg", "result");
+    		jsonObject.put("resp", "Main goal list can't be empty");
+    		System.out.println("error, Main goal list can't be empty");
     		return jsonObject.toString();
 		}
 		else{
@@ -440,16 +468,27 @@ public class GVSWebController {
 		List<Grid> temp= this.gridService.listAllGrids();
 		Map<String, String> status=new HashMap<String,String>();
 		for(Grid g: temp){
-			String state="";
-			if(g.isMainGoalsChanged()) state=state+"MGC-";
 			Grid tempWorking= this.gridService.getLatestWorkingGrid(g.getProject().getId());
-			if(g.obtainGridState()==Grid.GridState.WORKING){
-				if (g.getVersion()<tempWorking.getVersion()){
-					state=state+"ARCHIVED";
+			String state="";
+			if(g.isMainGoalsChanged()) {
+				state=state+"MGC";
+				if(g.obtainGridState()==Grid.GridState.UPDATING){
+					state=state+"-UPDATING";
+				}
+			}
+			else{
+				if(g.obtainGridState()==Grid.GridState.WORKING){
+					if (g.getVersion()<tempWorking.getVersion()){
+						state=state+"ARCHIVED";
+					}
+					else{state=state+g.obtainGridState().name();}
 				}
 				else{state=state+g.obtainGridState().name();}
 			}
-			else{state=state+g.obtainGridState().name();}
+			
+			
+			
+			
 			status.put(g.getId()+"", state);
 		}
 		System.out.println(status);
@@ -582,16 +621,23 @@ public class GVSWebController {
         model.addAttribute("listProjectGrids", templist);
         Map<String, String> status=new HashMap<String,String>();
 		for(Grid g: templist){
-			String state="";
-			if(g.isMainGoalsChanged()) state=state+"MGC-";
 			Grid tempWorking= this.gridService.getLatestWorkingGrid(g.getProject().getId());
-			if(g.obtainGridState()==Grid.GridState.WORKING){
-				if (g.getVersion()<tempWorking.getVersion()){
-					state=state+"ARCHIVED";
+			String state="";
+			if(g.isMainGoalsChanged()) {
+				state=state+"MGC";
+				if(g.obtainGridState()==Grid.GridState.UPDATING){
+					state=state+"-UPDATING";
+				}
+			}
+			else{
+				if(g.obtainGridState()==Grid.GridState.WORKING){
+					if (g.getVersion()<tempWorking.getVersion()){
+						state=state+"ARCHIVED";
+					}
+					else{state=state+g.obtainGridState().name();}
 				}
 				else{state=state+g.obtainGridState().name();}
 			}
-			else{state=state+g.obtainGridState().name();}
 			status.put(g.getId()+"", state);
 		}
 		model.addAttribute("status", status);

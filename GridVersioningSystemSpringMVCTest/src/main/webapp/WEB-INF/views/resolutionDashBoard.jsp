@@ -49,9 +49,9 @@
     					%><li class="list-group-item"><div style="float:left;">MajorUpdates</div> <div class="badge" style="float:left; margin-left:5px; margin-right: 5px;"><%out.print(geList.size()); %></div> <%
     					for(GridElement ge:geList){
     						if (gms.isSolvable(ge)){
-    							out.print("<a style=\"text-decoration:none\" href=\"/ISSSR/GEResolution/"+ge.getClass().getSimpleName()+"/"+ge.getLabel()+"\">"+"<span class=\"label label-success\" >"+ge.getLabel()+"</span>"+"</a> ");
+    							out.print("<a style=\"text-decoration:none\" href=\"/ISSSR/GEResolution/"+ge.getClass().getSimpleName()+"/"+ge.getLabel()+"\">"+"<span class=\"label label-success\"  style=\"margin-left: 5px;\">"+ge.getLabel()+"</span>"+"</a> ");
 					        }
-    						else out.print("<span style=\"cursor: pointer\" class=\"label label-warning\" data-toggle=\"tooltip\" data-placement=\"auto right\" title=\"You have to solve other pending Grid Elements before\">"+ge.getLabel()+"</span>");
+    						else out.print("<span style=\"cursor: pointer\" class=\"label label-warning\" style=\"margin-left: 5px;\" data-toggle=\"tooltip\" data-placement=\"auto right\" title=\"You have to solve other pending Grid Elements before\">"+ge.getLabel()+"</span>");
     					}
     					out.print("</li>");
     				}
@@ -60,9 +60,9 @@
     					%><li class="list-group-item"><div style="float:left;">MajorConflicts</div> <div class="badge" style="float:left; margin-left:5px; margin-right: 5px;"><%out.print(geList.size()); %></div> <%
     					for(GridElement ge:geList){
     						if (gms.isSolvable(ge)){
-    							out.print("<a style=\"text-decoration:none\" href=\"/ISSSR/GEResolution/"+ge.getClass().getSimpleName()+"/"+ge.getLabel()+"\">"+"<span class=\"label label-success\">"+ge.getLabel()+"</span>"+"</a> ");
+    							out.print("<a style=\"text-decoration:none\" href=\"/ISSSR/GEResolution/"+ge.getClass().getSimpleName()+"/"+ge.getLabel()+"\">"+"<span class=\"label label-success\" style=\"margin-left: 5px;\">"+ge.getLabel()+"</span>"+"</a> ");
 					        }
-    						else out.print("<span style=\"cursor: pointer\" class=\"label label-warning\" data-toggle=\"tooltip\" data-placement=\"auto right\" title=\"You have to solve other pending Grid Elements before\">"+ge.getLabel()+"</span>");
+    						else out.print("<span style=\"cursor: pointer\" class=\"label label-warning\" style=\"margin-left: 5px;\" data-toggle=\"tooltip\" data-placement=\"auto right\" title=\"You have to solve other pending Grid Elements before\">"+ge.getLabel()+"</span>");
     					}
     					out.print("</li>");
     				}
@@ -71,9 +71,9 @@
     					%><li class="list-group-item"><div style="float:left;">MinorConflicts</div> <div class="badge" style="float:left; margin-left:5px; margin-right: 5px;"><%out.print(geList.size()); %></div> <%
     					for(GridElement ge:geList){
     						if (gms.isSolvable(ge)){
-    							out.print("<a style=\"text-decoration:none\" href=\"/ISSSR/GEResolution/"+ge.getClass().getSimpleName()+"/"+ge.getLabel()+"\">"+"<span class=\"label label-success\">"+ge.getLabel()+"</span>"+"</a> ");
+    							out.print("<a style=\"text-decoration:none\" href=\"/ISSSR/GEResolution/"+ge.getClass().getSimpleName()+"/"+ge.getLabel()+"\">"+"<span class=\"label label-success\" style=\"margin-left: 5px;\">"+ge.getLabel()+"</span>"+"</a> ");
 					        }
-    						else out.print("<span style=\"cursor: pointer\" class=\"label label-warning\" data-toggle=\"tooltip\" data-placement=\"auto right\" title=\"You have to solve other pending Grid Elements before\">"+ge.getLabel()+"</span>");
+    						else out.print("<span style=\"cursor: pointer\" class=\"label label-warning\" style=\"margin-left: 5px;\" data-toggle=\"tooltip\" data-placement=\"auto right\" title=\"You have to solve other pending Grid Elements before\">"+ge.getLabel()+"</span>");
     					}
     					out.print("</li>");
     				}

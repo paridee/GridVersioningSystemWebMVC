@@ -30,7 +30,7 @@
 						    <c:forEach items="${listGrids}" var="listgriditem">
 						    	<c:set var="currentGridId">${listgriditem.id}</c:set>
 						    	<c:choose>
-						    		<c:when test="${status[currentGridId]=='UPDATING'||status[currentGridId]=='MGC-UPDATING'}">
+						    		<c:when test="${status[currentGridId]=='UPDATING'||status[currentGridId]=='MGC-UPDATING'||status[currentGridId]=='MGC'}">
 						    			<tr class='clickable-row danger' data-href='<c:url value='/grids/${listgriditem.id}' />' >
 						    		</c:when>
 						    		<c:otherwise>
