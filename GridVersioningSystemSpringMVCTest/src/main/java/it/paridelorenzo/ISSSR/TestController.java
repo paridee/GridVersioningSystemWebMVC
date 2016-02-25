@@ -19,6 +19,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -419,9 +421,8 @@ public class TestController {
 	public String homeGridpad2(Locale locale, Model model) { 
 		Grid aGrid		=	new Grid();
 		Goal example	=	new Goal();
-		Practitioner paride	=	new Practitioner();
-		paride.setEmail("paride.casulli@gmail.com");
-		paride.setName("Paride");
+		Practitioner paride	=	this.practitionerService.getPractitionerByEmail("paride.casulli@gmail.com");
+		Practitioner lorenzo=	this.practitionerService.getPractitionerByEmail("lorenzo.labanca@gmail.com");
 		Project aProject	=	new Project();
 		aProject.setDescription("prova");
 		aProject.setProjectId("prj1");
@@ -433,7 +434,7 @@ public class TestController {
 		ArrayList<Goal> mainG	=	new ArrayList<Goal>();
 		mainG.add(example);
 		aGrid.setMainGoals(mainG);
-		this.gridService.addGrid(aGrid);
+		//this.gridService.addGrid(aGrid);
 		Grid prev	=	aGrid;
 		aGrid	=	this.gridService.createStubUpgrade(aGrid);
 		aGrid.setVersion(prev.getVersion());
@@ -475,14 +476,23 @@ public class TestController {
 				e.printStackTrace();
 			}
 			System.out.println(secondGoal.getDescription());
-			Goal sameElement	=	(Goal)this.gridElementService.getElementById(secondGoal.getIdElement(), secondGoal.getClass().getSimpleName());
-			System.out.println(sameElement.getDescription());
+			//Goal sameElement	=	(Goal)this.gridElementService.getElementById(secondGoal.getIdElement(), secondGoal.getClass().getSimpleName());
+			//System.out.println(sameElement.getDescription());
 		}
+		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+	    String email = auth.getName(); //get logged in username
+	    Practitioner p	=	this.practitionerService.getPractitionerByEmail(email);
+	    model.addAttribute("email", p.getEmail());
+	    model.addAttribute("name", p.getName());
 		ArrayList<GridElement> parameter	=	new ArrayList<GridElement>();
 		parameter.addAll(strategies);
+		ArrayList<Practitioner>	authorsL =	new ArrayList<Practitioner>();
+		authorsL.add(paride);
+		authorsL.add(lorenzo);
 		//TODO to use this uncomment on Utils
-		//String pad	=	Utils.generateEditor(parameter);
-		//model.addAttribute("pad", pad);
+		String pad	=	Utils.generateEditor(parameter,authorsL,p);
+		model.addAttribute("pad", pad);
+		
 		return "firepadtest";
 	}
 	
