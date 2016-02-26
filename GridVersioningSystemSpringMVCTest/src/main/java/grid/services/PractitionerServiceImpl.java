@@ -19,31 +19,51 @@ public class PractitionerServiceImpl implements PractitionerService {
 		this.practitionerDAO = practitionerDAO;
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	public List<Practitioner> getAllPractitioners() {
 		return this.practitionerDAO.getAllPractitioners();
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	public List<Practitioner> getPractitionersByName(String name) {
 		return this.practitionerDAO.getPractitionersByName(name);
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	public Practitioner getPractitionerByEmail(String email) {
 		return this.practitionerDAO.getPractitionerByEmail(email);
 	}
 	
+	/**
+	 * {@inheritDoc}
+	 */
 	@Transactional
 	@Override
 	public void updatePractitioner(Practitioner p) {
 		this.practitionerDAO.updatePractitioner(p);		
 	}
+	
+	/**
+	 * {@inheritDoc}
+	 */
 	@Transactional
 	@Override
 	public void delete(Practitioner p) {
 		this.practitionerDAO.delete(p);
 	}
+	
+	/**
+	 * {@inheritDoc}
+	 */
 	@Transactional
 	@Override
 	public void add(Practitioner p) {

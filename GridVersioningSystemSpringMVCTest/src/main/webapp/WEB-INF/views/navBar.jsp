@@ -21,10 +21,10 @@
             <li ${navClass1}><a href="<c:url value='/grids'/>">Grids</a></li>
             <li ${navClass2}><a href="<c:url value='/resolutionDashBoard'/>">Pending changes</a></li>
             <c:if test="${pageContext.request.userPrincipal.name == null}">
-				<li ${navClass3}><a href="<c:url value='login'/>">Login</a></li>
+				<li ${navClass3}><a href="<c:url value='/login'/>">Login</a></li>
 			</c:if>
 			<c:if test="${pageContext.request.userPrincipal.name != null}">
-		  		<li ${navClass4}><a href="<c:url value='logout'/>">Logout</a></li>
+		  		<li ${navClass4}><a href="<c:url value='/j_spring_security_logout'/>">Logout</a></li>
 		  	</c:if>
 		  </ul>
         </div><!--/.nav-collapse -->

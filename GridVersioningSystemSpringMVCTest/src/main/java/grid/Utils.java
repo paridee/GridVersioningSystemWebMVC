@@ -121,12 +121,15 @@ public class Utils {
 
 	public static String generateEditor(List<GridElement> elements, ArrayList<Practitioner> authorsL, Practitioner currentUser){
 		if(elements.size()>0){
-			ArrayList<String> editorsVar	=	new ArrayList<String>();
-			ArrayList<String> fieldNames	=	new ArrayList<String>();
-			ArrayList<String> firepads		=	new ArrayList<String>();
+			ArrayList<String> editorsVar		=	new ArrayList<String>();
+			ArrayList<String> fieldNames		=	new ArrayList<String>();
+			ArrayList<String> firepads			=	new ArrayList<String>();
+			ArrayList<String> buttonsId			=	new ArrayList<String>();	
+			ArrayList<String> listVar			=	new ArrayList<String>();
+			ArrayList<String> listFieldNames	=	new ArrayList<String>();
 			String top	=	"<h2>Authors list</h2><div id=\"status\"> </div>";
 			for(int i=0;i<authorsL.size();i++){
-				top=top+"<p>"+authorsL.get(i).getName()+"</p><div id=\"approval"+authorsL.get(i).getId()+"\"> </div>";
+				top=top+"<h3>"+authorsL.get(i).getName()+" approval status: <div id=\"approval"+authorsL.get(i).getId()+"\"> </div></h3><hr>";
 				top=top+"<script>"+
 				"var approval"+elements.get(0).getLabel()+authorsL.get(i).getId()+" = new Firebase('fiery-torch-6050.firebaseio.com/"+elements.get(0).getLabel()+"approval"+authorsL.get(i).getId()+"');"+
 				"var approval"+elements.get(0).getLabel()+authorsL.get(i).getId()+"state;"+
@@ -146,10 +149,11 @@ public class Utils {
 			}
 			top	=	top+"return true;}</script>";
 			top	=	top+
-					"<input type=\"button\" name=\"lockBtn\" value=\"Lock\" onclick=\"btnLock()\"><input type=\"button\" name=\"approveBtn\" value=\"Approve\" onclick=\"btnApprove()\" disabled><input type=\"button\" name=\"rejectBtn\" value=\"Reject\" onclick=\"btnReject()\" disabled>";
+					"		<div class=\"panel panel-info\">"+
+			"<div class=\"panel-heading\"><p><input type=\"button\" name=\"lockBtn\" class=\"btn btn-lg btn-primary btn-block\" value=\"Lock\" onclick=\"btnLock()\"><input type=\"button\" class=\"btn btn-lg btn-primary btn-block\" name=\"approveBtn\" value=\"Approve\" onclick=\"btnApprove()\" disabled><input type=\"button\" class=\"btn btn-lg btn-primary btn-block\" name=\"rejectBtn\" value=\"Reject\" onclick=\"btnReject()\" disabled></p>";
 			for(int k=0;k<elements.size();k++){;
 				GridElement editingElement	=	elements.get(k);
-				top					=	top+"<div id=\""+editingElement.getLabel()+"\"><h2>"+editingElement.getClass().getSimpleName()+": "+editingElement.getLabel()+" v"+editingElement.getVersion()+"</h2></br>";
+				top					=	top+"<div id=\""+editingElement.getLabel()+"\"><b>"+editingElement.getClass().getSimpleName()+": "+editingElement.getLabel()+" v"+editingElement.getVersion()+"</b></div></div></br>";
 				Field[] fields				=	editingElement.getClass().getDeclaredFields();
 				for(int i=0;i<fields.length;i++){
 					fields[i].setAccessible(true);
@@ -162,14 +166,16 @@ public class Utils {
 												"<div id=\""+editingElement.getIdElement()+fieldName+"\" class=\"firepad-container\">"+
 												"<script>"+
 												"var codeMirror"+editingElement.getLabel()+fieldName+editingElement.getVersion()+";"+
+												"var firepadRef"+editingElement.getIdElement()+fieldName+";"+
+												"var firepad"+editingElement.getIdElement()+fieldName+";"+
 												"function init() {"+
-												"var firepadRef"+editingElement.getIdElement()+fieldName+" = new Firebase('fiery-torch-6050.firebaseio.com/"+editingElement.getIdElement()+fieldName+"');"+
+												"firepadRef"+editingElement.getIdElement()+fieldName+" = new Firebase('fiery-torch-6050.firebaseio.com/"+editingElement.getIdElement()+fieldName+"');"+
 												"codeMirror"+editingElement.getLabel()+fieldName+editingElement.getVersion()+" = CodeMirror(document.getElementById('"+editingElement.getIdElement()+fieldName+"'), {"+
 												"lineNumbers: true,"+
 												"mode: 'javascript'"+
 												"});"+
 												//"codeMirror"+editingElement.getLabel()+fieldName+editingElement.getVersion()+""+".setOption(\"readOnly\",true);"+
-												"var firepad"+editingElement.getIdElement()+fieldName+" = Firepad.fromCodeMirror(firepadRef"+editingElement.getIdElement()+fieldName+", codeMirror"+editingElement.getLabel()+fieldName+editingElement.getVersion()+", {"+
+												"firepad"+editingElement.getIdElement()+fieldName+" = Firepad.fromCodeMirror(firepadRef"+editingElement.getIdElement()+fieldName+", codeMirror"+editingElement.getLabel()+fieldName+editingElement.getVersion()+", {"+
 												"defaultText: '"+value.toString()+"'"+
 												"});"+
 												"}"+
@@ -177,27 +183,34 @@ public class Utils {
 												"</script>"+
 												"</div>";
 							editorsVar.add("codeMirror"+editingElement.getLabel()+fieldName+editingElement.getVersion());
-							firepads.add("firepadRef"+editingElement.getIdElement()+fieldName);
+							firepads.add("firepad"+editingElement.getIdElement()+fieldName);
 							fieldNames.add(fieldName);
 						}
 						else if(value instanceof GridElement){
 							top				=	top+"</br>"+  
 												"<h3>"+fieldName+"</h3></br><p>"+((GridElement)value).getLabel()+"</p>";
 						}
-						else if(value instanceof List){
+						else if(value instanceof List){						
 							List aList	=	(List)value;
+							listFieldNames.add(fieldName);
+							listVar.add(fieldName+"List");
 							top				=	top+"</br>"+  
 									"<h3>"+fieldName+"</h3></br>";
-							top	=	top+"<p>";
+							top	=	top+"";
 							for(int j=0;j<aList.size();j++){
 								if(aList.get(j) instanceof GridElement){
-									top	=	top+((GridElement)aList.get(j)).getLabel();
+									ArrayList<String> labels	=	new ArrayList<String>();
+									for(Object o:aList){
+										labels.add(((GridElement)o).getLabel());
+									}
+									//top	=	top+((GridElement)aList.get(j)).getLabel();
+									top	=	top+generateListViewer(fieldName,labels,labels,elements.get(k),buttonsId);
 								}
 								else{
 									top = top+aList.get(j).toString();
 								}
 							}
-							top	=	top+"</p>";
+							top	=	top+"";
 						}
 						else{
 							top				=	top+  
@@ -220,6 +233,9 @@ public class Utils {
 						for(int e=0;e<editorsVar.size();e++){
 							top	=	top+editorsVar.get(e)+".setOption(\"readOnly\",false);";
 						}
+						for(int e=0;e<buttonsId.size();e++){
+							top=top+"document.getElementById(\""+buttonsId.get(e)+"\").disabled=false;";
+						}
 				    	top=top+"document.getElementsByName(\"lockBtn\")[0].disabled=false;"+
 				    	"document.getElementsByName(\"approveBtn\")[0].disabled=true;"+
 				    	"document.getElementsByName(\"rejectBtn\")[0].disabled=true;"+
@@ -227,6 +243,9 @@ public class Utils {
 					"else{";
 						for(int e=0;e<editorsVar.size();e++){
 							top	=	top+editorsVar.get(e)+".setOption(\"readOnly\",true);";
+						}
+						for(int e=0;e<buttonsId.size();e++){
+							top=top+"document.getElementById(\""+buttonsId.get(e)+"\").disabled=true;";
 						}
 				    	top	=	top+"document.getElementsByName(\"lockBtn\")[0].disabled=true;"+
 				    	"document.getElementsByName(\"approveBtn\")[0].disabled=false;"+
@@ -245,14 +264,92 @@ public class Utils {
 				     	//"alert(\"btnreject\");"+
 				     	"lock"+elements.get(0).getLabel()+".set({lock:\"false\"});"+
 				     "}"+
-				     "function generateString(){ var obj = \"{id~"+elements.get(0).getIdElement()+"#class~"+elements.get(0).getClass().getSimpleName()+"}\"; return obj;";
-				     top=top+";}"+
+				     "function generateString(){ var obj = \"{id~"+elements.get(0).getIdElement()+"#class~"+elements.get(0).getClass().getSimpleName();
+						for(int e=0;e<editorsVar.size();e++){
+							top	=	top+"#"+fieldNames.get(e)+"~\"+"+firepads.get(e)+".getText()+\"";
+						}
+						for(int e=0;e<listVar.size();e++){
+							top	=	top+"#"+listFieldNames.get(e)+"~\"+"+listVar.get(e)+".join()+\"";
+						}
+				      top=top+"}\"; return obj;"+"}"+
 					 "</script>";
 			return top;
 		}
 		return "";
 	}
 
+	public static String generateListViewer(String name,List<String> merged,List<String> actual,GridElement element, ArrayList<String> buttonsId){
+		String addL	=	"";
+		String remL	=	"";
+		for(int i=0;i<merged.size();i++){
+			addL	=	addL+"<li><a href=\"#\" onclick=\"addMG"+name+"('"+merged.get(i)+"');\">"+merged.get(i)+"</a></li>";
+			remL	=	remL+"<li><a href=\"#\" onclick=\"removeMG"+name+"('"+merged.get(i)+"');\">"+merged.get(i)+"</a></li>";
+		}
+		String act	=	"[";
+		for(int i=0;i<actual.size();i++){
+			act	=	act+"\""+actual.get(i)+"\"";
+			if(i<actual.size()-1){
+				act	=	act+",";
+			}
+		}
+		act	=	act+"]";
+		buttonsId.add("dropdown"+name+"rem");
+		buttonsId.add("dropdown"+name+"add");
+		String str	=	"<div class=\"panel-heading\"><div class=\"dropdown\" style=\"display: inline-block;\">"
+						+"<button class=\"btn btn-default dropdown-toggle\" type=\"button\" id=\"dropdown"+name+"add\" data-toggle=\"dropdown\" aria-haspopup=\"true\" aria-expanded=\"true\">"
+						+"Add"+
+						"<span class=\"caret\"></span></button>"+
+						"<ul class=\"dropdown-menu\" aria-labelledby=\"dropdownMenu"+name+"add\">"+
+						addL+
+						"</ul>"+
+						"</div>"
+						+"<div class=\"dropdown\" style=\"display: inline-block;\">"
+						+"<button class=\"btn btn-default dropdown-toggle\" type=\"button\" id=\"dropdown"+name+"rem\" data-toggle=\"dropdown\" aria-haspopup=\"true\" aria-expanded=\"true\">"
+						+"Remove"+
+						"<span class=\"caret\"></span></button>"+
+						"<ul class=\"dropdown-menu\" aria-labelledby=\"dropdownMenu"+name+"remove\">"+
+						remL+
+						"</ul>"+
+						"</div>"+
+						"<div id=\""+name+"ListDiv\"></div></div>"
+						+ "<script>var "+name+"List = [];"+
+						"var list"+element.getLabel()+name+" = new Firebase('fiery-torch-6050.firebaseio.com/"+element.getLabel()+name+element.getIdElement()+"list');"+
+						"function drawMGList"+name+"(){"+
+						"var txt=\"\";"+
+						"for (var i = 0; i < "+name+"List.length; i++) {"+
+							"txt=txt+\"<span class=\'label label-success\'  style=\'margin-left: 5px;\'>\"+"+name+"List[i]+\"</span>\";"+
+		    			"}"+
+		    			"document.getElementById(\""+name+"ListDiv\").innerHTML	=	txt ;"+
+		    			"}"+
+		    			"list"+element.getLabel()+name+".child(\"value\").on(\"value\", function(snapshot) {"+
+		    			"var temp	=	snapshot.val();"+
+		    			//"alert(temp);"+
+		    			"if(temp!=null){"+
+		    			name+"List = snapshot.val().split(\",\");}"+
+		    			"drawMGList"+name+"();"+
+		    			"});"+
+		    			"function addMG"+name+"(label){"+
+		    			"var index = "+name+"List.indexOf(label);"+
+		    			"if (index == -1) {"+
+		    				name+"List.push(label);"+
+		    			"}"+
+		    			"var tempstr	=	"+name+"List.join();"+
+		    			//"alert(tempstr+\"INT\");"+
+		    			"list"+element.getLabel()+name+".set({value:tempstr});"+
+		    			"drawMGList"+name+"();}"+
+		    			"function removeMG"+name+"(label){"+
+		    				"var index = "+name+"List.indexOf(label);"+
+		    			"if (index > -1) {"+
+		    			name+"List.splice(index, 1);"+
+		    			"}"+		    			
+		    			"var tempstr	=	"+name+"List.join();"+
+		    			//"alert(tempstr+\"INT\");"+
+		    			"list"+element.getLabel()+name+".set({value:tempstr});"+
+		    			"drawMGList"+name+"();}"+
+		    			"drawMGList"+name+"();"+
+		    			"</script>";
+		return str;
+	}
 	/**
 	 * load the content of a text file on a string
 	 * @param path path of the file

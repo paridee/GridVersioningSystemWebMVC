@@ -3,7 +3,7 @@
 -- http://www.phpmyadmin.net
 --
 -- Host: localhost
--- Creato il: Feb 23, 2016 alle 12:11
+-- Creato il: Feb 26, 2016 alle 21:03
 -- Versione del server: 5.6.27-0ubuntu1
 -- Versione PHP: 5.6.11-1ubuntu3.1
 
@@ -67,15 +67,16 @@ CREATE TABLE IF NOT EXISTS `Goal` (
 INSERT INTO `Goal` (`assumption`, `description`, `context`, `id`, `label`, `version`, `measurementGoal`, `state`) VALUES
 ('', 'goal1', 'context1', 1, 'g1', 1, 2, 0),
 ('', 'goal2', 'context2', 9, 'g2', 1, 10, 0),
-('', 'goal1', 'context1', 15, 'g1', 2, 2, 0),
-('', 'goal2', 'context2', 17, 'g2', 2, 18, 0),
-('', 'Goal rompiscatole', '', 23, 'g4534', 1, NULL, 0),
-('', 'goal1', 'context1', 24, 'g1', 3, 2, 0),
-('', 'goal2', 'context2', 26, 'g2', 3, 18, 0),
-('', 'Goal rompiscatole', '', 30, 'g4534', 2, NULL, 0),
-('', 'goal1', 'context1', 31, 'g1', 4, 2, 0),
-('', 'goal2', 'context2', 33, 'g2', 4, 34, 0),
-('', 'sono un nuovo main goal', '', 35, 'g9843', 1, NULL, 0);
+('', 'Goal rompiscatole', '', 18, 'g4534', 1, NULL, 0),
+('', 'goal1', 'context1', 19, 'g1', 2, 2, 0),
+('', 'goal2', 'context2', 21, 'g2', 2, 10, 0),
+('', 'sono un nuovo main goal', '', 22, 'g9843', 1, NULL, 0),
+('assunzione', 'pippo', '', 65536, 'unGoal', 1, NULL, 0),
+('', 'Goal rompiscatole', '', 131073, 'g4534', 2, NULL, 0),
+('', 'goal1', 'context1', 131074, 'g1', 3, 2, 0),
+('', 'goal2', 'context2', 131076, 'g2', 3, 10, 0),
+('', 'goal1', 'context1', 131078, 'g1', 4, 2, 0),
+('', 'goal2', 'context2', 131080, 'g2', 4, 10, 0);
 
 -- --------------------------------------------------------
 
@@ -96,15 +97,15 @@ INSERT INTO `GoalToStrategyList` (`goalID`, `strID`) VALUES
 (1, 8),
 (9, 13),
 (9, 14),
-(15, 16),
-(17, 13),
-(17, 14),
-(24, 25),
-(26, 22),
-(26, 14),
-(31, 32),
-(33, 29),
-(33, 27);
+(19, 20),
+(21, 17),
+(21, 15),
+(131074, 131075),
+(131076, 131072),
+(131076, 14),
+(131078, 131079),
+(131080, 131072),
+(131080, 131077);
 
 -- --------------------------------------------------------
 
@@ -125,9 +126,10 @@ CREATE TABLE IF NOT EXISTS `Grid` (
 
 INSERT INTO `Grid` (`id`, `version`, `projID`, `mainGoalsChanged`) VALUES
 (1, 1, 1, 0),
-(2, 2, 1, 0),
-(3, 3, 1, 0),
-(4, 4, 1, 1);
+(2, 2, 1, 1),
+(65536, 1, 65536, 0),
+(131072, 3, 1, 0),
+(131073, 4, 1, 0);
 
 -- --------------------------------------------------------
 
@@ -158,13 +160,14 @@ CREATE TABLE IF NOT EXISTS `GridToRootGoal` (
 INSERT INTO `GridToRootGoal` (`gridID`, `goalID`) VALUES
 (1, 1),
 (1, 9),
-(2, 15),
-(2, 17),
-(3, 24),
-(3, 26),
-(4, 31),
-(4, 33),
-(4, 35);
+(2, 19),
+(2, 21),
+(2, 22),
+(65536, 65536),
+(131072, 131074),
+(131072, 131076),
+(131073, 131078),
+(131073, 131080);
 
 -- --------------------------------------------------------
 
@@ -182,10 +185,10 @@ CREATE TABLE IF NOT EXISTS `hibernate_sequences` (
 --
 
 INSERT INTO `hibernate_sequences` (`sequence_name`, `sequence_next_hi_value`) VALUES
-('Grid', 1),
-('Project', 1),
-('GridElement', 1),
-('Practitioner', 1);
+('Grid', 5),
+('Project', 4),
+('GridElement', 5),
+('Practitioner', 3);
 
 -- --------------------------------------------------------
 
@@ -208,9 +211,7 @@ CREATE TABLE IF NOT EXISTS `MeasurementGoal` (
 
 INSERT INTO `MeasurementGoal` (`id`, `label`, `version`, `description`, `interpretationModel`, `state`) VALUES
 (2, 'mg1', 1, 'meas goal 1', 'interpr1', 0),
-(10, 'mg2', 1, 'meas goal 2', 'interpr2', 0),
-(18, 'mg2', 2, 'meassssssssssss', 'un modello interpretativo', 0),
-(34, 'mg2', 3, 'this has to be a minor conflict', 'un modello interpretativo', 3);
+(10, 'mg2', 1, 'meas goal 2', 'interpr2', 0);
 
 -- --------------------------------------------------------
 
@@ -230,9 +231,7 @@ CREATE TABLE IF NOT EXISTS `MeasurementGoalToQuestion` (
 INSERT INTO `MeasurementGoalToQuestion` (`goalID`, `quesID`) VALUES
 (2, 3),
 (2, 5),
-(10, 11),
-(18, 19),
-(34, 19);
+(10, 11);
 
 -- --------------------------------------------------------
 
@@ -260,8 +259,7 @@ INSERT INTO `Metric` (`count`, `description`, `measurementProcess`, `metricType`
 (0, 'm3 descr', 'm3 mProcess', 'BASE', 'm3 stype', 'm3', 4, 1, 0),
 (0, 'm2 descr', 'm2 mProcess', 'BASE', 'm2 stype', 'm2', 6, 1, 0),
 (0, 'm1 descr', 'm1 mProcess', 'BASE', 'm1 stype', 'm1', 7, 1, 0),
-(0, 'm4 descr', 'm4 mProcess', 'BASE', 'm4 stype', 'm4', 12, 1, 0),
-(0, 'modificata m4', 'm4 mProcess', 'BASE', 'Ordinale', 'm4', 20, 2, 0);
+(0, 'm4 descr', 'm4 mProcess', 'BASE', 'm4 stype', 'm4', 12, 1, 0);
 
 -- --------------------------------------------------------
 
@@ -292,7 +290,8 @@ CREATE TABLE IF NOT EXISTS `Practitioner` (
 --
 
 INSERT INTO `Practitioner` (`id`, `name`, `email`, `password`) VALUES
-(1, 'Paride Casulli', 'paride.casulli@gmail.com', '$2a$10$04TVADrR6/SPLBjsK0N30.Jf5fNjBugSACeGv1S69dZALR7lSov0y');
+(1, 'Paride Casulli', 'paride.casulli@gmail.com', '$2a$10$04TVADrR6/SPLBjsK0N30.Jf5fNjBugSACeGv1S69dZALR7lSov0y'),
+(0, 'Lorenzo La Banca', 'lorenzo.labanca@gmail.com', '$2a$10$04TVADrR6/SPLBjsK0N30.Jf5fNjBugSACeGv1S69dZALR7lSov0y');
 
 -- --------------------------------------------------------
 
@@ -313,7 +312,8 @@ CREATE TABLE IF NOT EXISTS `Project` (
 --
 
 INSERT INTO `Project` (`id`, `projectId`, `description`, `creationDate`, `projectManager`) VALUES
-(1, 'progetto di prova', 'descrizione progetto', '18/02/2015 11:51', 1);
+(1, 'progetto di prova', 'descrizione progetto', '18/02/2015 11:51', 1),
+(65536, 'prj1', 'prova', NULL, 1);
 
 -- --------------------------------------------------------
 
@@ -347,8 +347,7 @@ CREATE TABLE IF NOT EXISTS `Question` (
 INSERT INTO `Question` (`id`, `label`, `version`, `question`, `state`) VALUES
 (3, 'q2', 1, 'question 2', 0),
 (5, 'q1', 1, 'question 1', 0),
-(11, 'q3', 1, 'question 3', 0),
-(19, 'q3', 2, 'question 3', 0);
+(11, 'q3', 1, 'question 3', 0);
 
 -- --------------------------------------------------------
 
@@ -369,8 +368,7 @@ INSERT INTO `QuestionToMetric` (`quesID`, `metrID`) VALUES
 (3, 4),
 (5, 6),
 (5, 7),
-(11, 12),
-(19, 20);
+(11, 12);
 
 -- --------------------------------------------------------
 
@@ -396,14 +394,14 @@ INSERT INTO `Strategy` (`id`, `version`, `label`, `description`, `strategyType`,
 (8, 1, 's1', 'strat1', 'NONTERMINAL', '0', 0),
 (13, 1, 's3', 'strat3', 'TERMINAL', '0', 0),
 (14, 1, 's2', 'strat2', 'TERMINAL', '0', 0),
-(16, 2, 's1', 'strat1', 'NONTERMINAL', '0', 0),
-(21, 2, 's3', 'essetre', 'TERMINAL', '0', 5),
-(22, 4, 's3', 'essetre', 'TERMINAL', '0', 2),
-(25, 3, 's1', 'strat1', 'NONTERMINAL', '0', 0),
-(27, 2, 's2', 'this has to be a major update', 'TERMINAL', '0', 1),
-(28, 2, 's3', 'this has to be a major conflict', 'TERMINAL', '0', 5),
-(29, 5, 's3', 'this has to be a major conflict', 'TERMINAL', '0', 2),
-(32, 4, 's1', 'strat1', 'NONTERMINAL', '0', 0);
+(15, 2, 's2', 'this has to be a major update', 'TERMINAL', '0', 6),
+(16, 2, 's3', 'this has to be a major conflict', 'TERMINAL', '0', 5),
+(17, 4, 's3', 'this has to be a major conflict', 'TERMINAL', '0', 6),
+(20, 2, 's1', 'strat1', 'NONTERMINAL', '0', 0),
+(131072, 5, 's3', 'this has to be a major conflict', 'TERMINAL', '0', 0),
+(131075, 3, 's1', 'strat1', 'NONTERMINAL', '0', 0),
+(131077, 2, 's2', 'this has to be a major update', 'TERMINAL', '0', 0),
+(131079, 4, 's1', 'strat1', 'NONTERMINAL', '0', 0);
 
 -- --------------------------------------------------------
 
@@ -422,11 +420,24 @@ CREATE TABLE IF NOT EXISTS `StrategyToGoalList` (
 
 INSERT INTO `StrategyToGoalList` (`strID`, `goalID`) VALUES
 (8, 9),
-(16, 17),
-(22, 23),
-(25, 26),
-(29, 30),
-(32, 33);
+(17, 18),
+(20, 21),
+(131072, 131073),
+(131075, 131076),
+(131079, 131080);
+
+-- --------------------------------------------------------
+
+--
+-- Struttura della tabella `SubscriberPhase`
+--
+
+CREATE TABLE IF NOT EXISTS `SubscriberPhase` (
+  `id` int(11) NOT NULL,
+  `phase` int(11) NOT NULL,
+  `url` text NOT NULL,
+  `aProject` int(11) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 -- --------------------------------------------------------
 
@@ -498,6 +509,12 @@ ALTER TABLE `Question`
 -- Indici per le tabelle `Strategy`
 --
 ALTER TABLE `Strategy`
+  ADD PRIMARY KEY (`id`);
+
+--
+-- Indici per le tabelle `SubscriberPhase`
+--
+ALTER TABLE `SubscriberPhase`
   ADD PRIMARY KEY (`id`);
 
 --

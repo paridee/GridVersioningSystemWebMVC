@@ -44,10 +44,10 @@
 
 	<h1>Grid Versioning System - login</h1>
 	<h2>Welcome</h2>
-
+<div class="container">
 	<div id="login-box">
 		<div id="inner">
-			<h2>Insert your email and your password</h2>
+			<h2>Insert your email and password</h2>
 	
 			<c:if test="${not empty error}">
 				<div class="error">${error}</div>
@@ -57,28 +57,17 @@
 			</c:if>
 			
 			<img id="headim" alt="" src="resources/gqmlogo.png">
-				<form name='loginForm'
-				  action="<c:url value='j_spring_security_check' />" method='POST'>
-		
-				  <table>
-					<tr>
-						<td>Email:</td>
-						<td><input type='text' name='username' value='paride.casulli@gmail.com'></td>
-					</tr>
-					<tr>
-						<td>Password:</td>
-						<td><input type='password' name='password' value='123456' /></td>
-					</tr>
-					<tr>
-						<td colspan='2'><input name="submit" type="submit"
-							value="Login" /></td>
-					</tr>
-				  </table>
-		
-				  <input type="hidden" name="${_csrf.parameterName}"
+			      <form class="form-signin" action="<c:url value='j_spring_security_check' />" method='POST'>
+			        <h2 class="form-signin-heading">Please sign in</h2>
+			        <label for="inputEmail" class="sr-only">Email address</label>
+			        <input type="email" name="username" class="form-control" placeholder="Email address" required autofocus>
+			        <label for="inputPassword" class="sr-only">Password</label>
+			        <input type="password" name ="password" class="form-control" placeholder="Password" required>
+			        <input type="hidden" name="${_csrf.parameterName}"
 					value="${_csrf.token}" />
-		
-				</form>
+			        <button class="btn btn-lg btn-primary btn-block" type="submit">Sign in</button>
+			      </form>
+			      </div>
 		</div>
 	</div>
 
