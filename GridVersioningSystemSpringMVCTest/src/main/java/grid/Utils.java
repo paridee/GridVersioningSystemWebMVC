@@ -23,6 +23,7 @@ import org.slf4j.LoggerFactory;
 
 import grid.entities.GridElement;
 import grid.entities.Practitioner;
+import grid.interfaces.services.GridElementService;
 
 /**
  * Utilities class with singletons methods
@@ -279,29 +280,44 @@ public class Utils {
 	 * @param ge a Grid Element
 	 * @return html string to be embedded
 	 */
-	public static String gridElementToHTMLString(GridElement ge){
+	public static String gridElementToHTMLString(GridElement ge, GridElementService geservice, boolean updated){
 		String name=ge.getClass().getSimpleName()+" "+ge.getLabel()+" - <i>v"+ge.getVersion()+"</i><br>";
 		String desc="";
 		Field[] fields=ge.getClass().getDeclaredFields();
 		for(int j=0; j<fields.length;j++){
+			desc=desc+"<div style=\"width:100%; float: left;margin-bottom: 3px;\">";
 			Field tempField=fields[j];
 			tempField.setAccessible(true);
 			try {
 				Object fieldValue=tempField.get(ge);
 				if(fieldValue instanceof GridElement){
 					GridElement fieldValueGE=(GridElement)fieldValue;
-					desc=desc+tempField.getName()+":  "+fieldValueGE.getLabel()+"_v"+fieldValueGE.getVersion()+"<br>";
+					int id;
+					if(updated){
+						id=geservice.getLatestWorking(fieldValueGE.getLabel(), fieldValueGE.getClass().getSimpleName()).getIdElement();
+					}
+					else{
+						id=fieldValueGE.getIdElement();
+					}
+					desc=desc+"<b>"+tempField.getName()+":</b>  <a style=\"text-decoration:none;\" href=\"/ISSSR/element/"+fieldValueGE.getClass().getSimpleName()+"/"+id+"\"><span class=\"label label-success\" style=\"margin-left: 5px;\">"+fieldValueGE.getLabel()+"</span></a>";
 				}
 				else if(fieldValue instanceof List){
 					@SuppressWarnings("rawtypes")
 					List myList 	=	(List)fieldValue;
 					if(myList.size()>0){
-						desc=desc+tempField.getName()+": ";
+						desc=desc+"<b>"+tempField.getName()+":</b> ";
 						for(int i=0; i<myList.size();i++){
 							Object	current	=	 myList.get(i);
 							if(current instanceof GridElement){
 								GridElement fieldValueGE=(GridElement)current;
-								desc=desc+" "+fieldValueGE.getLabel()+"_v"+fieldValueGE.getVersion()+"<br>";
+								int id;
+								if(updated){
+									id=geservice.getLatestWorking(fieldValueGE.getLabel(), fieldValueGE.getClass().getSimpleName()).getIdElement();
+								}
+								else{
+									id=fieldValueGE.getIdElement();
+								}
+								desc=desc+"<a style=\"text-decoration:none;\" href=\"/ISSSR/element/"+fieldValueGE.getClass().getSimpleName()+"/"+id+"\"><span class=\"label label-success\" style=\"margin-left: 5px;\">"+fieldValueGE.getLabel()+"</span></a>";
 							}
 						}
 					}
@@ -311,10 +327,10 @@ public class Utils {
 					if(fieldValue!=null){
 						if(!tempField.getName().equals("logger")){
 							String fieldValueStr	=	(String)fieldValue.toString();
-							String txt=tempField.getName()+": "+fieldValueStr;
+							String txt="<b>"+tempField.getName()+":</b> "+fieldValueStr;
 							int maxLength=60;
 							if(txt.length()>maxLength) txt=txt.substring(0, maxLength)+"...";
-							desc=desc+txt+"<br>";
+							desc=desc+txt;
 						}
 					}
 				}
@@ -323,6 +339,7 @@ public class Utils {
 			} catch (IllegalAccessException e) {
 				e.printStackTrace();
 			}
+			desc=desc+"</div>";
 		}
 		String gridElementString="<div class=\"panel-heading\">"+name+"</div><div class=\"panel-body\">"+desc+"</div>";
 		return gridElementString;

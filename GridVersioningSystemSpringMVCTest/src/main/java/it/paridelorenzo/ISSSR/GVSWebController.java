@@ -193,6 +193,7 @@ public class GVSWebController {
 		else{
 			model.addAttribute("error", "The requested Grid Element is not available");
 		}
+		model.addAttribute("GEService", this.gridElementService);
 		return "GEResolution";
 	}
 	
@@ -672,6 +673,7 @@ public class GVSWebController {
 			chart=chart+"nodeStructure: "+updateChart(newStack)+"};";
 			System.out.println(chart);
 			model.addAttribute("gridTreeString",chart);
+			model.addAttribute("GEService", this.gridElementService);
 		}
 		else{
 			model.addAttribute("error","The requested Grid Element is not available");

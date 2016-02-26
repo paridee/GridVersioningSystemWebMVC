@@ -11,8 +11,14 @@
 	    		<div style="width: 100%; float: left; text-align: left;"  class="page-header">
 					<h1><b>Grid ID</b> ${grid.id}<small> - <b>project</b> <a href="<c:url value='/projects/${grid.project.id}' />" >${grid.project.projectId}</a></small></h1>
 					<h3><b>creation date:</b> </h3>
+					<div class="panel panel-default">
+					<div class="panel-heading"><b>Grid Chart</b></div>
+					<div class="panel-body">
+						<div id="gridChart"> </div>
+					</div>
 				</div>
-				<div id="gridChart"> </div>
+				</div>
+				
 			</c:when>
 	      	<c:when test="${!empty listGrids}">
 	        <h1>Grids list <small> - grids found: ${listGrids.size()}</small></h1>

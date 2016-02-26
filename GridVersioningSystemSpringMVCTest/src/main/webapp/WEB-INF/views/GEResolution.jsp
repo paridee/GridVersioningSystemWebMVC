@@ -1,5 +1,6 @@
 <%@ page import="grid.Utils"%>
 <%@ page import =" grid.entities.GridElement" %>
+<%@ page import =" grid.interfaces.services.*" %>
 <%@ page import =" java.lang.reflect.Field" %>
 <%@ page import =" java.util.List" %>
 <%@ page import =" java.util.HashMap" %>
@@ -53,7 +54,10 @@
   									<div class="panel-heading"><b>Current Version</b></div>
 									<div class="panel-body">
 										<div class="panel panel-default">
-											<% out.println(Utils.gridElementToHTMLString(we));%>
+											<% 
+												GridElementService ges=(GridElementService)request.getAttribute("GEService");
+												String geString=Utils.gridElementToHTMLString(we,ges,true);
+												out.println(geString);%>
 											<div class="panel-footer">
 												<input type="button" value="Accept" onclick="acceptGE('<%
 				      								String s=gson.toJson(we); 
@@ -75,7 +79,7 @@
 										<%
 					       				for(GridElement ge: pendinglist){
 					       				%><div class="panel panel-default">
-					       				<%out.println(Utils.gridElementToHTMLString(ge)); %>
+					       				<%out.println(Utils.gridElementToHTMLString(ge,ges,true)); %>
 					       					<div class="panel-footer">
 												<input type="button" value="Accept" onclick="acceptGE('<%
 														s=gson.toJson(ge); 

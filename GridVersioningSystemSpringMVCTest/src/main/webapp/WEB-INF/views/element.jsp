@@ -1,3 +1,5 @@
+
+<%@ page import =" grid.interfaces.services.*" %>
 <%@ include file="head.jsp" %>
 
 
@@ -8,7 +10,10 @@
     		<c:when test="${error==NULL}">
 	    		<div class="panel panel-primary">
 					<% GridElement ge=(GridElement)request.getAttribute("element");
-					out.println(Utils.gridElementToHTMLString(ge));%>
+					GridElementService ges=(GridElementService)request.getAttribute("GEService");
+					String geString=Utils.gridElementToHTMLString(ge,ges,false);
+					out.println(geString);
+					%>
 					
 				</div>
 				<div class="panel panel-default">
