@@ -119,7 +119,9 @@ public class Utils {
 	}
 
 
-	public static String generateEditor(List<GridElement> elements, ArrayList<Practitioner> authorsL, Practitioner currentUser){
+	public static String generateEditor(List<GridElement> collElements, ArrayList<Practitioner> authorsL, Practitioner currentUser){
+		ArrayList<GridElement> elements	=	new ArrayList<GridElement>();	//ADDED
+		elements.add(collElements.get(0));									//ADDED
 		if(elements.size()>0){
 			ArrayList<String> editorsVar		=	new ArrayList<String>();
 			ArrayList<String> fieldNames		=	new ArrayList<String>();
@@ -138,7 +140,10 @@ public class Utils {
 					 "document.getElementById(\"approval"+authorsL.get(i).getId()+"\").innerHTML = snapshot.val();"+
 					 "approval"+elements.get(0).getLabel()+authorsL.get(i).getId()+"state=snapshot.val();"+
 					 "var allOK	=	allApproved();"+
-					 "if(allOK==true){document.getElementById(\"status\").innerHTML = generateString();}"+
+					 "if(allOK==true){document.getElementById(\"status\").innerHTML = generateString();"+
+					 "$.post(\"getMinorResolution\", generateString());"+
+					 "location.href = 'resolutionDashBoard';"+
+					  "}"+
 					 "});"+
 				"</script>";
 			}
@@ -200,11 +205,21 @@ public class Utils {
 							for(int j=0;j<aList.size();j++){
 								if(aList.get(j) instanceof GridElement){
 									ArrayList<String> labels	=	new ArrayList<String>();
+									ArrayList<String> allLabels	=	new ArrayList<String>();
 									for(Object o:aList){
 										labels.add(((GridElement)o).getLabel());
 									}
+									for(GridElement el:collElements){
+										List links	=(List)	fields[i].get(el);
+										for(Object obj:links){
+											String aLabel	=	((GridElement)obj).getLabel();
+											if(!allLabels.contains(aLabel)){
+												allLabels.add(aLabel);
+											}
+										}
+									}
 									//top	=	top+((GridElement)aList.get(j)).getLabel();
-									top	=	top+generateListViewer(fieldName,labels,labels,elements.get(k),buttonsId);
+									top	=	top+generateListViewer(fieldName,allLabels,labels,elements.get(k),buttonsId);
 								}
 								else{
 									top = top+aList.get(j).toString();
@@ -264,14 +279,14 @@ public class Utils {
 				     	//"alert(\"btnreject\");"+
 				     	"lock"+elements.get(0).getLabel()+".set({lock:\"false\"});"+
 				     "}"+
-				     "function generateString(){ var obj = \"{id~"+elements.get(0).getIdElement()+"#class~"+elements.get(0).getClass().getSimpleName();
+				     "function generateString(){ var obj = \"label~"+elements.get(0).getLabel()+"#id~"+elements.get(0).getIdElement()+"#class~"+elements.get(0).getClass().getSimpleName();
 						for(int e=0;e<editorsVar.size();e++){
 							top	=	top+"#"+fieldNames.get(e)+"~\"+"+firepads.get(e)+".getText()+\"";
 						}
 						for(int e=0;e<listVar.size();e++){
 							top	=	top+"#"+listFieldNames.get(e)+"~\"+"+listVar.get(e)+".join()+\"";
 						}
-				      top=top+"}\"; return obj;"+"}"+
+				      top=top+"\"; return obj;"+"}"+
 					 "</script>";
 			return top;
 		}

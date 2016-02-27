@@ -5,6 +5,8 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
+import java.net.URLDecoder;
 import java.text.DateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -13,14 +15,18 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
 
+import org.apache.commons.lang3.StringEscapeUtils;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -31,9 +37,11 @@ import grid.Utils;
 import grid.entities.Goal;
 import grid.entities.Grid;
 import grid.entities.GridElement;
+import grid.entities.Practitioner;
 import grid.entities.Project;
 import grid.interfaces.services.GridElementService;
 import grid.interfaces.services.GridService;
+import grid.interfaces.services.PractitionerService;
 import grid.interfaces.services.ProjectService;
 import grid.modification.elements.GridElementModification;
 import grid.modification.elements.Modification;
@@ -50,8 +58,15 @@ public class ModificationController {
 	private GridService				gridService;
 	private ProjectService			projectService;
 	private GridModificationService gridModificationService;
+	private PractitionerService		practitionerService;
 	private static final Logger logger = LoggerFactory.getLogger(ModificationController.class);
 	
+	@Autowired(required=true)
+	@Qualifier(value="practitionerService")
+	public void setPractitionerService(PractitionerService practitionerService) {
+		this.practitionerService = practitionerService;
+	}
+
 	@Autowired(required=true)
 	@Qualifier(value="gridElementService")
 	public void setGridElementService(GridElementService gridElementService) {
@@ -75,8 +90,7 @@ public class ModificationController {
 	public void setGridModificationService(GridModificationService gridModificationService) {
 		this.gridModificationService = gridModificationService;
 	}
-	
-	
+
 	@RequestMapping(value = "/modifications_new", method = RequestMethod.GET)
 	public String modNew(Locale locale, Model model) {
 		
@@ -172,6 +186,59 @@ public class ModificationController {
 		return "home";
 	}
 	
+
+	@RequestMapping(value = "/minorConfEditor/{className}/{label}")
+    public String minorConfEditor(@PathVariable String className,@PathVariable String label,Model model) {
+		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+	    String email = auth.getName(); //get logged in username
+	    Practitioner p	=	this.practitionerService.getPractitionerByEmail(email);
+	    logger.info("classname "+className+" label "+label);
+	    model.addAttribute("email", p.getEmail());
+	    model.addAttribute("name", p.getName());
+	    List<GridElement> 	confElements	=	this.gridElementService.getElementByLabelAndState(label, className, GridElement.State.MINOR_CONFLICTING);
+		GridElement 		working			=	this.gridElementService.getLatestWorking(label, className);
+		confElements.add(working);
+		if(working==null){
+			return "home";
+		}
+		if(confElements.size()==0){
+			return "home";
+		}
+		ArrayList<Practitioner> authorsL	=	new ArrayList<Practitioner>();
+		for(GridElement ge : confElements){
+			List<Practitioner> authElement	=	ge.getAuthors();
+			for(Practitioner pr: authElement){
+				if(!authorsL.contains(pr)){
+					authorsL.add(pr);
+				}
+			}
+		}
+		if(authorsL.size()>0){
+			if(!authorsL.contains(p)){
+				return "home";
+			}
+		}
+		else{
+			//TODO authors list is empty, check if this is a default user for that class
+		}
+		String pad	=	Utils.generateEditor(confElements,authorsL,p);
+		model.addAttribute("pad", pad);
+		return "firepadtest";
+	}
+	
+	@RequestMapping(value = "/getMinorResolution", method=RequestMethod.POST)
+    public void minorRes(@RequestBody String data){
+		logger.info("arrived a minor resolution request");
+		logger.info("data "+data);
+		String escaped;
+		try {
+			escaped = URLDecoder.decode(StringEscapeUtils.unescapeHtml4(data),"UTF-8");
+			logger.info("data escaped "+escaped);
+		} catch (UnsupportedEncodingException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
 	
 	@RequestMapping(value = "/grids/update", method=RequestMethod.POST)
     public @ResponseBody String updateGrid(@RequestBody String jsonData) {

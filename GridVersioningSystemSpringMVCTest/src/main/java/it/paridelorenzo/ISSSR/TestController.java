@@ -209,9 +209,21 @@ public class TestController {
 		aRole.setRole("ROLE_ADMIN");
 		aRole.setUser(pm);
 		aRole.setRole("ROLE_USER");
+		Practitioner lorenzo	=	 new Practitioner();
+		lorenzo.setEmail("lorenzo.labanca@gmail.com");
+		lorenzo.setName("Lorenzo La Banca");
+		lorenzo.setPassword("$2a$10$04TVADrR6/SPLBjsK0N30.Jf5fNjBugSACeGv1S69dZALR7lSov0y");
+		UserRole aRole2	=	new UserRole();
+		aRole2.setUser(lorenzo);
+		aRole2.setRole("ROLE_USER");
+		aRole2.setUser(lorenzo);
 		Set<UserRole> roles	=	new HashSet<UserRole>();
 		roles.add(aRole);
 		pm.setUserRole(roles);
+		Set<UserRole> roles2 =	new HashSet<UserRole>();
+		roles2.add(aRole2);
+		lorenzo.setUserRole(roles2);
+		this.practitionerService.add(lorenzo);
 		this.practitionerService.add(pm);
 		start.getProject().setProjectManager(pm);
 		
@@ -456,9 +468,16 @@ public class TestController {
 		secondGoal.setLabel("secondgoallabel");
 		secondGoal.setDescription("descrizione prima");
 		secondGoal.setAuthors(authors);
+		Goal thirdGoal	=	new Goal();
+		thirdGoal.setLabel("another label");
+		thirdGoal.setDescription("second description");
+		thirdGoal.setAuthors(authors);
 		ArrayList<Goal> someGoals	=	new ArrayList<Goal>();
 		someGoals.add(secondGoal);
 		aStrategy.setGoalList(someGoals);
+		ArrayList<Goal> someOtherG	=	new ArrayList<Goal>();
+		someOtherG.add(thirdGoal);
+		strategy2.setGoalList(someOtherG);
 		try {
 			Grid updated	=	this.gridModificationService.applyAModificationToASingleElement(prev, example);
 		} catch (Exception e) {
