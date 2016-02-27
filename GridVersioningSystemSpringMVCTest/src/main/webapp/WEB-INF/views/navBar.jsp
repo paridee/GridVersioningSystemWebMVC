@@ -23,10 +23,12 @@
             <c:if test="${pageContext.request.userPrincipal.name == null}">
 				<li ${navClass3}><a href="<c:url value='/login'/>">Login</a></li>
 			</c:if>
-			<c:if test="${pageContext.request.userPrincipal.name != null}">
-		  		<li ${navClass4}><a href="<c:url value='/j_spring_security_logout'/>">Logout</a></li>
-		  	</c:if>
+			
 		  </ul>
+		  <c:if test="${pageContext.request.userPrincipal.name != null}">
+		  		<p ${navClass4} style="float: right; margin-top: 15px;"><a href="<c:url value='/j_spring_security_logout'/>">Logout</a></p>
+		  	</c:if>
+		  
         </div><!--/.nav-collapse -->
       </div>
     </nav>

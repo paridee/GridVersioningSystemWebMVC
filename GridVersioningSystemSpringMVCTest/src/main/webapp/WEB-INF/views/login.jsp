@@ -22,14 +22,16 @@
 }
 
 #login-box {
-	width: 80%;
+	max-width: 400px;
 	padding: 20px;
-	margin: 100px auto;
+	margin: auto;
+	margin-top: 30px;
 	text-align: center;
 	background: #fff;
-	-webkit-border-radius: 2px;
-	-moz-border-radius: 2px;
-	border: 1px solid #000;
+	-webkit-border-radius: 10px;
+    -moz-border-radius: 10px;
+    border-radius: 10px;
+    border: 1px solid grey;
 }
 
 #inner{
@@ -38,16 +40,14 @@
 </style>
   <body>
 
-    <%@ include file="navBar.jsp" %>
 
     <body onload='document.loginForm.username.focus();'>
 
-	<h1>Grid Versioning System - login</h1>
-	<h2>Welcome</h2>
+	
 <div class="container">
 	<div id="login-box">
 		<div id="inner">
-			<h2>Insert your email and password</h2>
+			
 	
 			<c:if test="${not empty error}">
 				<div class="error">${error}</div>
@@ -56,13 +56,14 @@
 				<div class="msg">${msg}</div>
 			</c:if>
 			
-			<img id="headim" alt="" src="resources/gqmlogo.png">
+			<img style="max-width:100%" id="headim" alt="" src="resources/gqmlogo.png">
+			<h2>Grid Versioning System</h2>
 			      <form class="form-signin" action="<c:url value='j_spring_security_check' />" method='POST'>
-			        <h2 class="form-signin-heading">Please sign in</h2>
+			        <h2 class="form-signin-heading"><small>Please sign in</small></h2>
 			        <label for="inputEmail" class="sr-only">Email address</label>
-			        <input type="email" name="username" class="form-control" placeholder="Email address" required autofocus>
+			        <input style="margin-bottom: 5px;" type="email" name="username" class="form-control" placeholder="Email address" required autofocus>
 			        <label for="inputPassword" class="sr-only">Password</label>
-			        <input type="password" name ="password" class="form-control" placeholder="Password" required>
+			        <input style="margin-bottom: 5px;" type="password" name ="password" class="form-control" placeholder="Password" required>
 			        <input type="hidden" name="${_csrf.parameterName}"
 					value="${_csrf.token}" />
 			        <button class="btn btn-lg btn-primary btn-block" type="submit">Sign in</button>
@@ -75,22 +76,6 @@
 
 
 <%@ include file="footer.jsp" %>
-<c:if test="${gridTreeString!=null}">
-<!-- Treant javascript -->
-    <script src="<c:url value='/resources/Treant/vendor/raphael.js' />"></script>
-    <script src="<c:url value='/resources/Treant/Treant.min.js' />"></script>
-    <script src="<c:url value='/resources/Treant/vendor/jquery.easing.js' />"></script>
-	<script src="<c:url value='/resources/Treant/vendor/perfect-scrollbar/jquery.mousewheel.js' />"></script>
-	<script src="<c:url value='/resources/Treant/vendor/perfect-scrollbar/perfect-scrollbar.js' />"></script><script>${gridTreeString};
-    	var my_chart = new Treant(chart_config);
-   	</script>
-</c:if>
-<script type="text/javascript">
-    jQuery(document).ready(function($) {
-        $(".clickable-row").click(function() {
-            window.document.location = $(this).data("href");
-        });
-    });
-    </script>
+
    	 
 </html>
