@@ -6,6 +6,9 @@ import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
+import java.lang.reflect.Field;
+import java.lang.reflect.ParameterizedType;
+import java.lang.reflect.Type;
 import java.net.URLDecoder;
 import java.text.DateFormat;
 import java.util.ArrayList;
@@ -187,8 +190,8 @@ public class ModificationController {
 	}
 	
 
-	@RequestMapping(value = "/minorConfEditor/{className}/{label}")
-    public String minorConfEditor(@PathVariable String className,@PathVariable String label,Model model) {
+	@RequestMapping(value = "/confEditor/{className}/{label}")
+    public String getConfEditor(@PathVariable String className,@PathVariable String label,Model model) {
 		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
 	    String email = auth.getName(); //get logged in username
 	    Practitioner p	=	this.practitionerService.getPractitionerByEmail(email);
@@ -196,6 +199,21 @@ public class ModificationController {
 	    model.addAttribute("email", p.getEmail());
 	    model.addAttribute("name", p.getName());
 	    List<GridElement> 	confElements	=	this.gridElementService.getElementByLabelAndState(label, className, GridElement.State.MINOR_CONFLICTING);
+	    Class classByName;
+		try {
+			classByName = Class.forName("grid.entities."+className);
+		} catch (ClassNotFoundException e) {
+			e.printStackTrace();
+			logger.info("class not found "+"grid.entities."+className);
+			return "home";
+		}
+	    if(!Modification.minorUpdateClass.contains(classByName)){
+	    	logger.info("major class");
+	    	confElements	=	this.gridElementService.getElementByLabelAndState(label, className, GridElement.State.MAJOR_CONFLICTING);
+	    }
+	    else{
+	    	logger.info("minor class");
+	    }
 		GridElement 		working			=	this.gridElementService.getLatestWorking(label, className);
 		confElements.add(working);
 		if(working==null){
@@ -219,6 +237,7 @@ public class ModificationController {
 			}
 		}
 		else{
+			authorsL.add(this.practitionerService.getPractitionerByEmail("paride.casulli@gmail.com"));
 			//TODO authors list is empty, check if this is a default user for that class
 		}
 		String pad	=	Utils.generateEditor(confElements,authorsL,p);
@@ -226,15 +245,73 @@ public class ModificationController {
 		return "firepadtest";
 	}
 	
-	@RequestMapping(value = "/getMinorResolution", method=RequestMethod.POST)
-    public void minorRes(@RequestBody String data){
-		logger.info("arrived a minor resolution request");
+	@RequestMapping(value = "/getConflictResolution", method=RequestMethod.POST)
+    public void confRes(@RequestBody String data){
+		logger.info("arrived a resolution request");
 		logger.info("data "+data);
 		String escaped;
 		try {
 			escaped = URLDecoder.decode(StringEscapeUtils.unescapeHtml4(data),"UTF-8");
+			String[] datas	=	escaped.split("#");
+			HashMap<String,String> parsed	=	new HashMap<String,String>();
+			for(int i=0;i<datas.length;i++){
+				String[] 	innerData	=	datas[i].split("~");
+				String 		label		=	innerData[0];
+				String		value		=	innerData[1];
+				parsed.put(label, value);
+				logger.info("data read "+label+" "+value);
+			}
+			GridElement subj	=	this.gridElementService.getElementById(Integer.parseInt(parsed.get("id")),parsed.get("class")).clone();
+			subj.setState(GridElement.State.WORKING);
+			Field[] fields		=	subj.getClass().getDeclaredFields();
+			for(int i=0;i<fields.length;i++){
+				Field aField	=	fields[i];
+				aField.setAccessible(true);
+				if(parsed.containsKey(aField.getName())){
+					logger.info("found field in parsed elements: "+aField.getName()+" old value "+aField.get(subj)+" new value "+parsed.get(aField.getName()));
+					if(aField.getType().isAssignableFrom(List.class)){
+						logger.info(aField.getType().getSimpleName()+" "+List.class.getSimpleName()+" "+aField.getType().isAssignableFrom(List.class));
+						ParameterizedType aType	=	(ParameterizedType) aField.getGenericType();
+				        Class<?> listClass = (Class<?>) aType.getActualTypeArguments()[0];
+				        logger.info("list class" +listClass); // class java.lang.String.
+						List aList	=	(List) aField.get(subj);
+						aList.clear();
+						String[] labelArray	=	parsed.get(aField.getName()).split(",");
+						for(int j=0;j<labelArray.length;j++){
+							String aLabel	=	labelArray[j];
+							aLabel	=	aLabel.replace(",", "");
+							aLabel	=	aLabel.replace("=", "");
+							GridElement mostUp	=	this.gridElementService.getLatestWorking(aLabel, listClass.getSimpleName());
+							aList.add(mostUp);
+						}
+					}
+					else if(aField.getType().isAssignableFrom(String.class)){
+						aField.set(subj, parsed.get(aField.getName()));
+					}
+					else if(aField.getType().isAssignableFrom(Integer.class)){
+						aField.set(subj, Integer.parseInt(parsed.get(aField.getName())));
+					}
+					else if(aField.getType().isAssignableFrom(GridElement.class)){
+						String aLabel	=	parsed.get(aField.getName());
+						aLabel	=	aLabel.replace(",", "");
+						aLabel	=	aLabel.replace("=", "");
+						GridElement mostUp	=	this.gridElementService.getLatestWorking(aLabel, aField.getType().getSimpleName());
+						aField.set(subj, mostUp);
+					}
+				}
+			}
 			logger.info("data escaped "+escaped);
+			this.gridModificationService.applyAModificationToASingleElement(subj);
 		} catch (UnsupportedEncodingException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (IllegalArgumentException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (IllegalAccessException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}

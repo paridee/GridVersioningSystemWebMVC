@@ -24,6 +24,7 @@ import org.slf4j.LoggerFactory;
 import grid.entities.GridElement;
 import grid.entities.Practitioner;
 import grid.interfaces.services.GridElementService;
+import grid.modification.elements.Modification;
 
 /**
  * Utilities class with singletons methods
@@ -120,8 +121,9 @@ public class Utils {
 
 
 	public static String generateEditor(List<GridElement> collElements, ArrayList<Practitioner> authorsL, Practitioner currentUser){
-		ArrayList<GridElement> elements	=	new ArrayList<GridElement>();	//ADDED
-		elements.add(collElements.get(0));									//ADDED
+		//ArrayList<GridElement> elements	=	new ArrayList<GridElement>();	//ADDED
+		//elements.add(collElements.get(0));
+		List<GridElement> elements	=	collElements;//ADDED
 		if(elements.size()>0){
 			ArrayList<String> editorsVar		=	new ArrayList<String>();
 			ArrayList<String> fieldNames		=	new ArrayList<String>();
@@ -129,6 +131,8 @@ public class Utils {
 			ArrayList<String> buttonsId			=	new ArrayList<String>();	
 			ArrayList<String> listVar			=	new ArrayList<String>();
 			ArrayList<String> listFieldNames	=	new ArrayList<String>();
+			ArrayList<String> objectFieldVar	=	new ArrayList<String>();
+			ArrayList<String> objectFieldNames	=	new ArrayList<String>();
 			String top	=	"<h2>Authors list</h2><div id=\"status\"> </div>";
 			for(int i=0;i<authorsL.size();i++){
 				top=top+"<h3>"+authorsL.get(i).getName()+" approval status: <div id=\"approval"+authorsL.get(i).getId()+"\"> </div></h3><hr>";
@@ -140,9 +144,13 @@ public class Utils {
 					 "document.getElementById(\"approval"+authorsL.get(i).getId()+"\").innerHTML = snapshot.val();"+
 					 "approval"+elements.get(0).getLabel()+authorsL.get(i).getId()+"state=snapshot.val();"+
 					 "var allOK	=	allApproved();"+
-					 "if(allOK==true){document.getElementById(\"status\").innerHTML = generateString();"+
-					 "$.post(\"getMinorResolution\", generateString());"+
-					 "location.href = 'resolutionDashBoard';"+
+					 "if(allOK==true){"+
+					 //"document.getElementById(\"status\").innerHTML = generateString();"+
+					 "var postPayLoad = generateString();"+
+					 "$.post(\"../../getConflictResolution\", generateString());"+
+					 "console.log(postPayLoad);"+
+					 "alert(postPayLoad);"+
+					 //"location.href = 'resolutionDashBoard';"+
 					  "}"+
 					 "});"+
 				"</script>";
@@ -156,7 +164,13 @@ public class Utils {
 			top	=	top+
 					"		<div class=\"panel panel-info\">"+
 			"<div class=\"panel-heading\"><p><input type=\"button\" name=\"lockBtn\" class=\"btn btn-lg btn-primary btn-block\" value=\"Lock\" onclick=\"btnLock()\"><input type=\"button\" class=\"btn btn-lg btn-primary btn-block\" name=\"approveBtn\" value=\"Approve\" onclick=\"btnApprove()\" disabled><input type=\"button\" class=\"btn btn-lg btn-primary btn-block\" name=\"rejectBtn\" value=\"Reject\" onclick=\"btnReject()\" disabled></p>";
-			for(int k=0;k<elements.size();k++){;
+			if(!(Modification.minorUpdateClass.contains(elements.get(0).getClass()))){
+				//top	=	top	+	"<script>document.getElementsByName(\"rejectBtn\")[0].style.visibility = \"hidden\";</script>";
+			}
+			for(int k=0;k<elements.size();k++){
+				if(k>0){
+					top=	top	+ "<div class=\"panel panel-danger\"><div class=\"panel-heading\">";
+				}
 				GridElement editingElement	=	elements.get(k);
 				top					=	top+"<div id=\""+editingElement.getLabel()+"\"><b>"+editingElement.getClass().getSimpleName()+": "+editingElement.getLabel()+" v"+editingElement.getVersion()+"</b></div></div></br>";
 				Field[] fields				=	editingElement.getClass().getDeclaredFields();
@@ -193,12 +207,31 @@ public class Utils {
 						}
 						else if(value instanceof GridElement){
 							top				=	top+"</br>"+  
-												"<h3>"+fieldName+"</h3></br><p>"+((GridElement)value).getLabel()+"</p>";
+												"<h3>"+fieldName+"</h3></br>";
+							if(k>0){
+								top	=	top +"<br><p>"+((GridElement)value).getLabel()+"</p><br>";
+							}
+							else{
+								listFieldNames.add(fieldName);
+								listVar.add(fieldName+"List");
+								ArrayList<String> labels	=	new ArrayList<String>();
+								ArrayList<String> allLabels	=	new ArrayList<String>();
+								labels.add(((GridElement)value).getLabel());
+								for(GridElement el:collElements){
+									GridElement otherEl	=	(GridElement)	fields[i].get(el);
+									String aLabel		=	otherEl.getLabel();
+									if(!allLabels.contains(aLabel)){
+											allLabels.add(aLabel);
+									}
+								}
+							}
 						}
 						else if(value instanceof List){						
 							List aList	=	(List)value;
-							listFieldNames.add(fieldName);
-							listVar.add(fieldName+"List");
+							if(k==0){
+								listFieldNames.add(fieldName);
+								listVar.add(fieldName+"List");
+							}
 							top				=	top+"</br>"+  
 									"<h3>"+fieldName+"</h3></br>";
 							top	=	top+"";
@@ -219,7 +252,14 @@ public class Utils {
 										}
 									}
 									//top	=	top+((GridElement)aList.get(j)).getLabel();
-									top	=	top+generateListViewer(fieldName,allLabels,labels,elements.get(k),buttonsId);
+									if(k==0){
+										top	=	top+generateListViewer(fieldName,allLabels,labels,elements.get(k),buttonsId,false);
+									}
+									else{
+										for(String label:labels){
+											top	=	top	+"<br><p>"+label+"</p><br>";
+										}
+									}
 								}
 								else{
 									top = top+aList.get(j).toString();
@@ -293,7 +333,7 @@ public class Utils {
 		return "";
 	}
 
-	public static String generateListViewer(String name,List<String> merged,List<String> actual,GridElement element, ArrayList<String> buttonsId){
+	public static String generateListViewer(String name,List<String> merged,List<String> actual,GridElement element, ArrayList<String> buttonsId,boolean isField){
 		String addL	=	"";
 		String remL	=	"";
 		for(int i=0;i<merged.size();i++){
@@ -344,8 +384,11 @@ public class Utils {
 		    			"drawMGList"+name+"();"+
 		    			"});"+
 		    			"function addMG"+name+"(label){"+
-		    			"var index = "+name+"List.indexOf(label);"+
-		    			"if (index == -1) {"+
+		    			"var index = "+name+"List.indexOf(label);";
+		if(isField==true){
+			str	=	str+"if("+name+"List.length>1){return;}";
+		}
+		  str	=	str+  			"if (index == -1) {"+
 		    				name+"List.push(label);"+
 		    			"}"+
 		    			"var tempstr	=	"+name+"List.join();"+
