@@ -41,6 +41,11 @@ public interface GridService {
 	 */
 	public Grid upgradeGrid(Grid p);
 	
+	/**
+	 * Creates an upgrade of a grid without saving it on persistence layer
+	 * @param g grid to be upgraded
+	 * @return upgraded object
+	 */
 	public Grid createStubUpgrade(Grid g);
 	
 	/**

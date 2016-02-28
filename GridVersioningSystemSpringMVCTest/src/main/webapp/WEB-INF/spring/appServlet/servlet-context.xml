@@ -68,5 +68,21 @@
     <beans:bean id="practitionerDAO" class="grid.DAOImpl.PractitionerDAOImpl">
         <beans:property name="sessionFactory" ref="sessionFactory" />
     </beans:bean>
+    
+    <beans:bean id="defaultResponsibleService" class="grid.services.DefaultResponsibleServiceImpl">
+        <beans:property name="defaultResponsibleDao" ref="defaultResponsibleDAO" />
+    </beans:bean>
+    
+    <beans:bean id="defaultResponsibleDAO" class="grid.DAOImpl.DefaultResponsibleDaoImpl">
+        <beans:property name="sessionFactory" ref="sessionFactory" />
+    </beans:bean>
+    
+    <beans:bean id="subscriberPhaseService" class="grid.services.SubscriberPhaseServiceImpl">
+        <beans:property name="subscriberPhaseDAO" ref="subscriberPhaseDAO" />
+    </beans:bean>
+    
+    <beans:bean id="subscriberPhaseDAO" class="grid.DAOImpl.SubscriberPhaseDAOImpl">
+        <beans:property name="sessionFactory" ref="sessionFactory" />
+    </beans:bean>
 
 </beans:beans>

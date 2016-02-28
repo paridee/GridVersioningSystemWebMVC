@@ -6,12 +6,15 @@ import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import grid.entities.DefaultResponsible;
 import grid.entities.Project;
 import grid.entities.SubscriberPhase;
-import grid.interfaces.DAO.SubscriberPhaseDAO;
+import grid.interfaces.DAO.DefaultResponsibleDao;
 
-public class SubscriberPhaseDAOImpl implements SubscriberPhaseDAO {
-	private static final Logger logger	=	LoggerFactory.getLogger(SubscriberPhaseDAOImpl.class);
+public class DefaultResponsibleDaoImpl implements DefaultResponsibleDao {
+
+	private static final Logger logger	=	LoggerFactory.getLogger(DefaultResponsibleDaoImpl.class);
 	private SessionFactory		sessionFactory;
 	
 	/**
@@ -26,12 +29,12 @@ public class SubscriberPhaseDAOImpl implements SubscriberPhaseDAO {
 	 * {@inheritDoc}
 	 */
 	@Override
-	public List<SubscriberPhase> getAllSubscribers() {
+	public List<DefaultResponsible> getAllResponsibles() {
 		Session session				=	this.sessionFactory.getCurrentSession();
 		@SuppressWarnings("unchecked")
-		List<SubscriberPhase> subList		=	session.createQuery("from SubscriberPhase").list();
-		for(SubscriberPhase g : subList){
-			logger.info("SubscriberPhase::"+g);
+		List<DefaultResponsible> subList		=	session.createQuery("from DefaultResponsible").list();
+		for(DefaultResponsible g : subList){
+			logger.info("DefaultResponsible::"+g);
 		}
 		return subList;
 	}
@@ -40,12 +43,12 @@ public class SubscriberPhaseDAOImpl implements SubscriberPhaseDAO {
 	 * {@inheritDoc}
 	 */
 	@Override
-	public List<SubscriberPhase> getSubscribersByProject(Project aPrj) {
+	public List<DefaultResponsible>	getResponsiblesByClassName(String className){
 		Session session				=	this.sessionFactory.getCurrentSession();
 		@SuppressWarnings("unchecked")
-		List<SubscriberPhase> subList	=	session.createQuery("from SubscriberPhase P where P.aProject = '"+aPrj.getId()+"'").list();
-		for(SubscriberPhase g : subList){
-			logger.info("SubscriberPhase List::"+g);
+		List<DefaultResponsible> subList	=	session.createQuery("from DefaultResponsible P where P.className = '"+className+"'").list();
+		for(DefaultResponsible g : subList){
+			logger.info("DefaultResponsible List::"+g);
 		}
 		return subList;
 	}
@@ -54,21 +57,7 @@ public class SubscriberPhaseDAOImpl implements SubscriberPhaseDAO {
 	 * {@inheritDoc}
 	 */
 	@Override
-	public List<SubscriberPhase> getSubscribersByUrl(String url) {
-		Session session				=	this.sessionFactory.getCurrentSession();
-		@SuppressWarnings("unchecked")
-		List<SubscriberPhase> subList	=	session.createQuery("from SubscriberPhase P where P.url = '"+url+"'").list();
-		for(SubscriberPhase g : subList){
-			logger.info("SubscriberPhase List::"+g);
-		}
-		return subList;
-	}
-
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	public void updateSubscriber(SubscriberPhase p) {
+	public void updateDefaultResponsible(DefaultResponsible p) {
 		Session	session	=	this.sessionFactory.getCurrentSession();
 		session.update(p);
 		logger.info("updated a "+p.getClass()+" on persistence layer");
@@ -78,22 +67,22 @@ public class SubscriberPhaseDAOImpl implements SubscriberPhaseDAO {
 	 * {@inheritDoc}
 	 */
 	@Override
-	public void delete(SubscriberPhase p) {
+	public void delete(DefaultResponsible p) {
 		Session session	=	this.sessionFactory.getCurrentSession();
 		if(p!=null){
 			session.delete(p);
 		}
 		logger.info(p.getClass().getName()+" deleted successfully");
-	}
+		}
 
 	/**
 	 * {@inheritDoc}
 	 */
 	@Override
-	public void add(SubscriberPhase p) {
+	public void add(DefaultResponsible p) {
 		Session	session	=	this.sessionFactory.getCurrentSession();
 		session.persist(p);
-		logger.info("added a new "+p.getClass().getName()+" on persistence layer");	
+		logger.info("added a new "+p.getClass().getName()+" on persistence layer");		
 	}
 
 }

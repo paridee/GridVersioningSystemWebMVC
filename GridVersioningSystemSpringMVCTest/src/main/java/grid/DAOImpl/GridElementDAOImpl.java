@@ -59,7 +59,7 @@ public class GridElementDAOImpl implements GridElementDao {
 	public List<GridElement> listElement(Class c) {
 		Session session					=	this.sessionFactory.getCurrentSession();
 		@SuppressWarnings("unchecked")
-		List<GridElement> gridElList	=	session.createQuery("from "+c.getName()).list();
+		List<GridElement> gridElList	=	session.createQuery("from "+c.getName()+" order by timestamp asc").list();
 		for(GridElement g : gridElList){
 			logger.info("Element List::"+g);
 		}
@@ -92,7 +92,7 @@ public class GridElementDAOImpl implements GridElementDao {
 	@Override
 	public List<GridElement> getElementLog(String id, String table) {
 		Session session				=	this.sessionFactory.getCurrentSession();
-		List<GridElement> gElList	=	session.createQuery("from "+table+" where label = '"+id+"' order by version asc").list();
+		List<GridElement> gElList	=	session.createQuery("from "+table+" where label = '"+id+"' order by version asc,timestamp asc").list();
 		for(GridElement g : gElList){
 			logger.info("GridElement List:"+g);
 		}

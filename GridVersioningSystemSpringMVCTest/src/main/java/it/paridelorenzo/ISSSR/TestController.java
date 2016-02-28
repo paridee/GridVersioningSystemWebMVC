@@ -29,6 +29,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import grid.JSONFactory;
 import grid.Utils;
 import grid.JSONFactory.JSONType;
+import grid.entities.DefaultResponsible;
 import grid.entities.Goal;
 import grid.entities.Grid;
 import grid.entities.GridElement;
@@ -39,6 +40,7 @@ import grid.entities.Project;
 import grid.entities.Question;
 import grid.entities.Strategy;
 import grid.entities.UserRole;
+import grid.interfaces.services.DefaultResponsibleService;
 import grid.interfaces.services.GridElementService;
 import grid.interfaces.services.GridService;
 import grid.interfaces.services.PractitionerService;
@@ -53,12 +55,21 @@ public class TestController {
 	private JSONFactory 		jFact;
 	private PractitionerService practitionerService;
 	private GridModificationService gridModificationService;
+	private DefaultResponsibleService defaultResponsibleService;
 	
 	@Autowired(required=true)
 	@Qualifier(value="practitionerService")
 	public void setPractitionerService(PractitionerService practitionerService) {
 		this.practitionerService = practitionerService;
 	}
+	
+	@Autowired(required=true)
+	@Qualifier(value="defaultResponsibleService")
+	public void setDefaultResponsibleService(DefaultResponsibleService defaultResponsibleService) {
+		this.defaultResponsibleService = defaultResponsibleService;
+	}
+
+
 
 	@Autowired(required=true)
 	@Qualifier(value="gridModificationService")
@@ -274,7 +285,12 @@ public class TestController {
 		modObj.put("mainGoalsList", anArray);
 		this.logger.info("JSON MODIFICHE NUOVE "+modObj.toString());
 		//this.gridService.addGrid(start);//*/
-		
+		DefaultResponsible testpm	=	new DefaultResponsible();
+		testpm.setClassName("pm");
+		testpm.setPractitioner(pm);
+		this.defaultResponsibleService.add(testpm);
+		DefaultResponsible testLoad	=	this.defaultResponsibleService.getResponsibleByClassName("pm");
+		this.logger.info("loaded pm "+testLoad);
 		return "home";
 	}
 	

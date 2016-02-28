@@ -65,7 +65,7 @@ public class GridDAOImpl implements GridDAO {
 	public List<Grid> listAllGrids() {
 		Session session = this.sessionFactory.getCurrentSession();
 		@SuppressWarnings("unchecked")
-		List<Grid> gridElList = session.createQuery("from Grid order by version desc").list();
+		List<Grid> gridElList = session.createQuery("from Grid order by version desc, timestamp desc").list();
 		for (Grid g : gridElList) {
 			logger.info("Grid::" + g);
 		}
@@ -91,7 +91,7 @@ public class GridDAOImpl implements GridDAO {
 		Session session = this.sessionFactory.getCurrentSession();
 		@SuppressWarnings("unchecked")
 		List<Grid> gridElList = session
-				.createQuery("from Grid G where G.project.id = " + projid + " ORDER BY version DESC").list();
+				.createQuery("from Grid G where G.project.id = " + projid + " ORDER BY version DESC,timestamp desc").list();
 		if (gridElList.size() > 0) {
 			Grid latest = gridElList.get(0);
 			logger.info("Grid:: latest grid found" + latest + " version " + latest.getVersion());
@@ -108,7 +108,7 @@ public class GridDAOImpl implements GridDAO {
 		Session session = this.sessionFactory.getCurrentSession();
 		@SuppressWarnings("unchecked")
 		List<Grid> gridElList = session
-				.createQuery("from Grid G where G.project.id = " + projid + " order by version desc").list();
+				.createQuery("from Grid G where G.project.id = " + projid + " order by version desc, timestamp desc").list();
 		for (Grid g : gridElList) {
 			logger.info("Grid::" + g);
 		}

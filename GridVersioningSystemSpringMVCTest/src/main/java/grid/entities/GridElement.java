@@ -1,6 +1,7 @@
 package grid.entities;
 
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.HashMap;
 import java.util.List;
 import javax.persistence.CascadeType;
@@ -46,7 +47,26 @@ public abstract class GridElement implements Updatable{
 			nullable 	= 	false, 
 			length 		= 	20)
 	protected int 	version=1;
+	protected long	timestamp	= (Calendar.getInstance()).getTime().getTime();
 	
+	/**
+	 * Returns the creation timestamp of this GridElement
+	 * @return timestamp
+	 */
+	public long getTimestamp() {
+		return timestamp;
+	}
+	
+	/**
+	 * Sets a timestamp for this element
+	 * @param timestamp to be set
+	 */
+	public void setTimestamp(long timestamp) {
+		this.timestamp = timestamp;
+	}
+
+
+
 	/**
 	 * Returns a label for this Grid Entity (in Grid is named as ID, depending on the type of Element
 	 * @return label of this element

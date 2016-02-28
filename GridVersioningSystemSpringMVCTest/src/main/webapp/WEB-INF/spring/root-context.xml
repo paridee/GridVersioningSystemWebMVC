@@ -37,6 +37,7 @@
                 <beans:value>grid.entities.Practitioner</beans:value>
                 <beans:value>grid.entities.UserRole</beans:value>
                 <beans:value>grid.entities.SubscriberPhase</beans:value>
+                <beans:value>grid.entities.DefaultResponsible</beans:value>
             </beans:list>
         </beans:property>
         <beans:property name="hibernateProperties">
