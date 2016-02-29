@@ -15,13 +15,16 @@ import org.javers.core.diff.changetype.map.EntryAdded;
 import org.javers.core.diff.changetype.map.EntryChange;
 import org.javers.core.diff.changetype.map.EntryRemoved;
 import org.javers.core.diff.changetype.map.MapChange;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import grid.entities.Goal;
 import grid.entities.GridElement;
 import grid.entities.MeasurementGoal;
+import grid.modification.grid.GridModificationService;
 
 public class ObjectModificationService {
-	
+	private static final Logger logger = LoggerFactory.getLogger(ObjectModificationService.class);
 	/**
 	 * Gets the modifications between two GridElement
 	 * @param oldElement older element
@@ -38,6 +41,7 @@ public class ObjectModificationService {
 		}
 		ArrayList<GridElementModification> modifications	=	new ArrayList<GridElementModification>();
 		Javers 					javers			=	JaversBuilder.javers().registerValueObject(GridElement.class).build();
+		logger.info("elements compared "+oldElement+","+newElement);
 		Diff 					diff			=	javers.compare(oldElement, newElement);
 		List<Change> changes	=	diff.getChanges();
 		System.out.println("DIFF "+diff);

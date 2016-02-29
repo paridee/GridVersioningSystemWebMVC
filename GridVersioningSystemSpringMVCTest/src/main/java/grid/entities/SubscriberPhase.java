@@ -15,7 +15,7 @@ import javax.persistence.Table;
 @Entity
 @Table(name="SubscriberPhase")
 public class SubscriberPhase {
-	private int id;
+	private int id=0;
 	private int phase;
 	private String url;
 	private Project aProject;

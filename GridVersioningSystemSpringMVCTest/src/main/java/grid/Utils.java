@@ -147,7 +147,7 @@ public class Utils {
 					 "if(allOK==true){"+
 					 //"document.getElementById(\"status\").innerHTML = generateString();"+
 					 "var postPayLoad = generateString();"+
-					 "$.post(\"../../getConflictResolution\", generateString());"+
+					 "$.post(\"../../../getConflictResolution\", generateString());"+
 					 "console.log(postPayLoad);"+
 					 "alert(postPayLoad);"+
 					 //"location.href = 'resolutionDashBoard';"+
@@ -235,8 +235,8 @@ public class Utils {
 							top				=	top+"</br>"+  
 									"<h3>"+fieldName+"</h3></br>";
 							top	=	top+"";
-							for(int j=0;j<aList.size();j++){
-								if(aList.get(j) instanceof GridElement){
+							if(aList.size()>0){
+								if(aList.get(0) instanceof GridElement){
 									ArrayList<String> labels	=	new ArrayList<String>();
 									ArrayList<String> allLabels	=	new ArrayList<String>();
 									for(Object o:aList){
@@ -257,12 +257,14 @@ public class Utils {
 									}
 									else{
 										for(String label:labels){
-											top	=	top	+"<br><p>"+label+"</p><br>";
+											top	=	top	+"<br>"+label;
 										}
 									}
 								}
 								else{
-									top = top+aList.get(j).toString();
+									for(int j=0;j<aList.size();j++){
+										top = top+aList.get(j).toString();
+									}
 								}
 							}
 							top	=	top+"";

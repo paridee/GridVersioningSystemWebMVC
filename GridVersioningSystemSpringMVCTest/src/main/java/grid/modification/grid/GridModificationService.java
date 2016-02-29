@@ -1,10 +1,16 @@
 package grid.modification.grid;
 
+import java.io.BufferedReader;
+import java.io.DataOutputStream;
+import java.io.InputStreamReader;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
+
+import javax.net.ssl.HttpsURLConnection;
 
 import org.javers.core.Javers;
 import org.javers.core.JaversBuilder;
@@ -18,7 +24,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.transaction.annotation.Transactional;
 
+import grid.JSONFactory;
 import grid.Utils;
 import grid.entities.Goal;
 import grid.entities.Grid;
@@ -26,12 +34,15 @@ import grid.entities.GridElement;
 import grid.entities.GridElement.State;
 import grid.entities.Practitioner;
 import grid.entities.Project;
+import grid.entities.SubscriberPhase;
 import grid.interfaces.services.GridElementService;
 import grid.interfaces.services.GridService;
 import grid.interfaces.services.ProjectService;
+import grid.interfaces.services.SubscriberPhaseService;
 import grid.modification.elements.GridElementModification;
 import grid.modification.elements.Modification;
 import grid.modification.elements.ObjectModificationService;
+import it.paridelorenzo.ISSSR.ModificationController;
 
 /**
  * This class owns the task of calculating differences between two grids
@@ -44,7 +55,13 @@ public class GridModificationService {
 	private GridElementService 	gridElementService;
 	private GridService			gridService;
 	private ProjectService		projectService;
-	
+	private SubscriberPhaseService	subscriberPhaseService;
+
+	@Autowired(required=true)
+	@Qualifier(value="subscriberPhaseService")
+	public void setSubscriberPhaseService(SubscriberPhaseService subscriberPhaseService) {
+		this.subscriberPhaseService = subscriberPhaseService;
+	}
 	
 	@Autowired(required=true)
 	@Qualifier(value="projectService")
@@ -310,6 +327,7 @@ public class GridModificationService {
 				logger.info("going to update version numbers (3)");
 				this.updateVersionNumbersAndStatus(latestOriginal,newVersion);
 				this.gridService.addGrid(newVersion);
+				sendJSONToPhases(newVersion);
 				if(newVersion.isMainGoalsChanged()){
 					this.sendMainGoalChangeNotification(newVersion);
 				}
@@ -322,10 +340,59 @@ public class GridModificationService {
 		}
 	}
 	
+	private void sendJSONToPhases(Grid newVersion) {
+		Project aPrj	=	newVersion.getProject();
+		if(aPrj!=null){
+			List<SubscriberPhase> subscribers	=	this.subscriberPhaseService.getSubscribersByProject(aPrj);
+			for(SubscriberPhase sp : subscribers){
+				try{
+					String url = sp.getUrl();
+					URL obj = new URL(url);
+					HttpsURLConnection con = (HttpsURLConnection) obj.openConnection();
+
+					//add reuqest header
+					con.setRequestMethod("POST");
+					con.setRequestProperty("User-Agent", "Mozilla/5.0");
+					con.setRequestProperty("Accept-Language", "en-US,en;q=0.5");
+					JSONFactory af	=	new JSONFactory();
+					String urlParameters = af.obtainJson(newVersion, JSONFactory.JSONType.FIRST, null).toString();				
+					// Send post request
+					con.setDoOutput(true);
+					DataOutputStream wr = new DataOutputStream(con.getOutputStream());
+					wr.writeBytes(urlParameters);
+					wr.flush();
+					wr.close();
+
+					int responseCode = con.getResponseCode();
+					logger.info("\nSending 'POST' request to URL : " + url);
+					logger.info("Post parameters : " + urlParameters);
+					logger.info("Response Code : " + responseCode);
+
+					BufferedReader in = new BufferedReader(
+					        new InputStreamReader(con.getInputStream()));
+					String inputLine;
+					StringBuffer response = new StringBuffer();
+
+					while ((inputLine = in.readLine()) != null) {
+						response.append(inputLine);
+					}
+					in.close();
+					
+					//print result
+					logger.info(response.toString());
+				}
+				catch(Exception e){
+					e.printStackTrace();
+				}
+
+			}
+		}
+	}
+
 	private void sendMainGoalChangeNotification(Grid newGrid){
 		Practitioner pm	=	newGrid.getProject().getProjectManager();
 		if(pm!=null){
-			Utils.mailSender("GQM+S Versioning alert", "Dear "+pm.getName()+", the following Project: "+newGrid.getProject().getProjectId()+" had a main Goal change and requires an action, please check at the following link "+Utils.systemURL+"/MGLCResolution/"+newGrid.getId(),pm.getEmail());//+"/"+modified.getClass().getSimpleName()+"/"+modified.getIdElement(), responsibles.get(i).getEmail());
+			Utils.mailSender("GQM+S Versioning alert", "Dear "+pm.getName()+", the following Project: "+newGrid.getProject().getProjectId()+" had a main Goal change and requires an action, please check at the following link "+Utils.systemURL+"resolutionDashBoard",pm.getEmail());//+"/"+modified.getClass().getSimpleName()+"/"+modified.getIdElement(), responsibles.get(i).getEmail());
 			}
 		else{
 			this.logger.info("There is no PM!!! Use the default one");
@@ -345,13 +412,13 @@ public class GridModificationService {
 			if(responsibles.get(i)!=null){
 				this.logger.info("sending email for "+modified.getLabel()+" to "+responsibles.get(i).getEmail());
 				if(modified.getState().equals(GridElement.State.MINOR_CONFLICTING)){
-					Utils.mailSender("GQM+S Versioning alert", "Dear "+responsibles.get(i).getName()+", the following Grid element: "+(modified.getClass().getSimpleName())+" "+modified.getLabel()+" is in state "+modified.getState()+" and requires an action, please check at the following link "+Utils.systemURL+"/GEResolution/"+modified.getClass().getSimpleName()+"/"+modified.getLabel(), responsibles.get(i).getEmail());
+					Utils.mailSender("GQM+S Versioning alert", "Dear "+responsibles.get(i).getName()+", the following Grid element: "+(modified.getClass().getSimpleName())+" "+modified.getLabel()+" is in state "+modified.getState()+" and requires an action, please check at the following link "+Utils.systemURL+"/resolutionDashBoard", responsibles.get(i).getEmail());
 				}
 				else if(modified.getState().equals(GridElement.State.MAJOR_UPDATING)){
-					Utils.mailSender("GQM+S Versioning alert", "Dear "+responsibles.get(i).getName()+", the following Grid element: "+(modified.getClass().getSimpleName())+" "+modified.getLabel()+" is in state "+modified.getState()+" and requires an action, please check at the following link "+Utils.systemURL+"/GEResolution/"+modified.getClass().getSimpleName()+"/"+modified.getLabel(), responsibles.get(i).getEmail());
+					Utils.mailSender("GQM+S Versioning alert", "Dear "+responsibles.get(i).getName()+", the following Grid element: "+(modified.getClass().getSimpleName())+" "+modified.getLabel()+" is in state "+modified.getState()+" and requires an action, please check at the following link "+Utils.systemURL+"/resolutionDashBoard", responsibles.get(i).getEmail());
 				}
 				else if(modified.getState().equals(GridElement.State.MAJOR_CONFLICTING)){
-					Utils.mailSender("GQM+S Versioning alert", "Dear "+responsibles.get(i).getName()+", the following Grid element: "+(modified.getClass().getSimpleName())+" "+modified.getLabel()+" is in state "+modified.getState()+" and requires an action, please check at the following link "+Utils.systemURL+"/GEResolution/"+modified.getClass().getSimpleName()+"/"+modified.getLabel(), responsibles.get(i).getEmail());
+					Utils.mailSender("GQM+S Versioning alert", "Dear "+responsibles.get(i).getName()+", the following Grid element: "+(modified.getClass().getSimpleName())+" "+modified.getLabel()+" is in state "+modified.getState()+" and requires an action, please check at the following link "+Utils.systemURL+"/resolutionDashBoard", responsibles.get(i).getEmail());
 				}
 			}
 		}
@@ -547,6 +614,7 @@ public class GridModificationService {
 	 * @return
 	 * @throws Exception
 	 */
+	@Transactional
 	public Grid applyAModificationToASingleElement(Grid aGrid,GridElement newGridElement) throws Exception{
 		System.out.println("1");
 		GridElement oldVersion	=	aGrid.obtainAllEmbeddedElements().get(newGridElement.getLabel());
@@ -559,6 +627,7 @@ public class GridModificationService {
 			System.out.println("4");
 			Grid updated	=	aGrid;
 			List<Modification> mods	=	new ArrayList<Modification>();
+			logger.info("old version "+oldVersion+" "+oldVersion.getIdElement()+" new version "+newGridElement+" "+newGridElement.getIdElement());
 			mods.addAll(ObjectModificationService.getModification(oldVersion, newGridElement));
 			System.out.println("5");
 			if(mods.size()>0){
@@ -593,6 +662,7 @@ public class GridModificationService {
 				updated	=	this.refreshLinks(updated);
 				//TODO set right state for all elements
 				this.gridService.addGrid(updated);
+				sendJSONToPhases(updated);
 			}
 			else{
 				this.logger.info("no modification needed ");

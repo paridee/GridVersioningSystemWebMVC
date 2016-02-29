@@ -42,10 +42,13 @@ import grid.entities.Grid;
 import grid.entities.GridElement;
 import grid.entities.Practitioner;
 import grid.entities.Project;
+import grid.entities.SubscriberPhase;
+import grid.interfaces.services.DefaultResponsibleService;
 import grid.interfaces.services.GridElementService;
 import grid.interfaces.services.GridService;
 import grid.interfaces.services.PractitionerService;
 import grid.interfaces.services.ProjectService;
+import grid.interfaces.services.SubscriberPhaseService;
 import grid.modification.elements.GridElementModification;
 import grid.modification.elements.Modification;
 import grid.modification.elements.ObjectFieldModification;
@@ -57,19 +60,32 @@ import grid.modification.grid.GridModificationService;
 
 @Controller
 public class ModificationController {
-	private GridElementService 		gridElementService;
-	private GridService				gridService;
-	private ProjectService			projectService;
-	private GridModificationService gridModificationService;
-	private PractitionerService		practitionerService;
+	private GridElementService 			gridElementService;
+	private GridService					gridService;
+	private ProjectService				projectService;
+	private GridModificationService 	gridModificationService;
+	private PractitionerService			practitionerService;
+	private SubscriberPhaseService		subscriberPhaseService;
+	private DefaultResponsibleService	defaultResponsibleService;
 	private static final Logger logger = LoggerFactory.getLogger(ModificationController.class);
 	
+	@Autowired(required=true)
+	@Qualifier(value="defaultResponsibleService")
+	public void setDefaultResponsibleService(DefaultResponsibleService defaultResponsibleService) {
+		this.defaultResponsibleService = defaultResponsibleService;
+	}
+
+	@Autowired(required=true)
+	@Qualifier(value="subscriberPhaseService")
+	public void setSubscriberPhaseService(SubscriberPhaseService subscriberPhaseService) {
+		this.subscriberPhaseService = subscriberPhaseService;
+	}
+
 	@Autowired(required=true)
 	@Qualifier(value="practitionerService")
 	public void setPractitionerService(PractitionerService practitionerService) {
 		this.practitionerService = practitionerService;
 	}
-
 	@Autowired(required=true)
 	@Qualifier(value="gridElementService")
 	public void setGridElementService(GridElementService gridElementService) {
@@ -190,8 +206,8 @@ public class ModificationController {
 	}
 	
 
-	@RequestMapping(value = "/confEditor/{className}/{label}")
-    public String getConfEditor(@PathVariable String className,@PathVariable String label,Model model) {
+	@RequestMapping(value = "/confEditor/{className}/{label}/{prjId}") //prjId needed to get the PM!!!
+    public String getConfEditor(@PathVariable String className,@PathVariable String label,@PathVariable String prjId,Model model) {
 		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
 	    String email = auth.getName(); //get logged in username
 	    Practitioner p	=	this.practitionerService.getPractitionerByEmail(email);
@@ -223,11 +239,22 @@ public class ModificationController {
 			return "home";
 		}
 		ArrayList<Practitioner> authorsL	=	new ArrayList<Practitioner>();
-		for(GridElement ge : confElements){
-			List<Practitioner> authElement	=	ge.getAuthors();
-			for(Practitioner pr: authElement){
-				if(!authorsL.contains(pr)){
-					authorsL.add(pr);
+		if(Modification.minorUpdateClass.contains(classByName)){
+			for(GridElement ge : confElements){
+				List<Practitioner> authElement	=	ge.getAuthors();
+				for(Practitioner pr: authElement){
+					if(!authorsL.contains(pr)){
+						authorsL.add(pr);
+					}
+				}
+			}
+		}
+		else{
+			Project aPrj	=	this.projectService.getProjectById(Integer.parseInt(prjId));
+			if(aPrj!=null){
+				Practitioner pm	=	aPrj.getProjectManager();
+				if(pm!=null){
+					authorsL.add(pm);
 				}
 			}
 		}
@@ -237,14 +264,53 @@ public class ModificationController {
 			}
 		}
 		else{
-			authorsL.add(this.practitionerService.getPractitionerByEmail("paride.casulli@gmail.com"));
-			//TODO authors list is empty, check if this is a default user for that class
+			Practitioner defaultP;
+			if(!Modification.minorUpdateClass.contains(classByName)){
+				defaultP	=	this.defaultResponsibleService.getResponsibleByClassName("pm").getPractitioner();
+			}
+			else{
+				defaultP	=	this.defaultResponsibleService.getResponsibleByClassName(confElements.get(0).getClass().getSimpleName()).getPractitioner();
+			}
+			authorsL.add(defaultP);
 		}
 		String pad	=	Utils.generateEditor(confElements,authorsL,p);
 		model.addAttribute("pad", pad);
 		return "firepadtest";
 	}
 	
+	@RequestMapping(value = "/registerToGVSNotification/{phase}/{prjId}", method=RequestMethod.POST)
+    public @ResponseBody String registerToNotif(@PathVariable String phase,@PathVariable String prjId,@RequestBody String data){
+		logger.info("registered phase");
+		logger.info("data on post "+data);
+		JSONObject response	=	new JSONObject();
+		SubscriberPhase registered	=	new SubscriberPhase();
+		try{
+			registered.setPhase(Integer.parseInt(phase));
+		}
+		catch(Exception e){
+			response.put("error", "wrong phase number");
+			return response.toString();
+		}
+		registered.setUrl(data);
+		try {
+			prjId = URLDecoder.decode(StringEscapeUtils.unescapeHtml4(prjId),"UTF-8");
+		} catch (UnsupportedEncodingException e) {
+			response.put("error", "project format error");
+			e.printStackTrace();
+			return response.toString();
+		}
+		Project aPrj	=	this.projectService.getProjectByProjectId(prjId);
+		if(aPrj==null){
+			response.put("error", "project not found");
+			return response.toString();
+		}
+		registered.setaProject(aPrj);
+		this.subscriberPhaseService.add(registered);
+		response.put("result", "registered");
+		return response.toString();
+	}
+	
+
 	@RequestMapping(value = "/getConflictResolution", method=RequestMethod.POST)
     public void confRes(@RequestBody String data){
 		logger.info("arrived a resolution request");
@@ -282,7 +348,9 @@ public class ModificationController {
 							aLabel	=	aLabel.replace(",", "");
 							aLabel	=	aLabel.replace("=", "");
 							GridElement mostUp	=	this.gridElementService.getLatestWorking(aLabel, listClass.getSimpleName());
-							aList.add(mostUp);
+							if(mostUp!=null){
+								aList.add(mostUp);	
+							}
 						}
 					}
 					else if(aField.getType().isAssignableFrom(String.class)){

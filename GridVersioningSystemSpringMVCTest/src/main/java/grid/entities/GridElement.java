@@ -39,9 +39,9 @@ public abstract class GridElement implements Updatable{
 	@Column(name 		= 	"label", 
 			nullable 	= 	false, 
 			length 		= 	20)
-	protected String 	label;
+	protected String 	label="";
 	
-	protected int 		idElement;	//primary key
+	protected int 		idElement=0;	//primary key
 	
 	@Column(name 		= 	"version", 
 			nullable 	= 	false, 
