@@ -3,8 +3,6 @@ package grid.interfaces.DAO;
 import java.util.List;
 
 import grid.entities.DefaultResponsible;
-import grid.entities.Project;
-import grid.entities.SubscriberPhase;
 
 public interface DefaultResponsibleDao {
 	/**

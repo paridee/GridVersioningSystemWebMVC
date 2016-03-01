@@ -2,7 +2,6 @@ package grid.modification.grid;
 
 import grid.entities.Grid;
 import grid.entities.GridElement;
-import grid.modification.elements.Modification;
 
 public class GridElementAdd extends GridModification {
 

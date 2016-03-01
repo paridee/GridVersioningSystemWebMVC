@@ -1,20 +1,15 @@
 package it.paridelorenzo.ISSSR;
 
 import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.FileReader;
-import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.lang.reflect.Field;
 import java.lang.reflect.ParameterizedType;
-import java.lang.reflect.Type;
 import java.net.URLDecoder;
 import java.text.DateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
 
@@ -34,6 +29,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.servlet.ModelAndView;
 
 import grid.JSONFactory;
 import grid.Utils;
@@ -51,7 +47,6 @@ import grid.interfaces.services.ProjectService;
 import grid.interfaces.services.SubscriberPhaseService;
 import grid.modification.elements.GridElementModification;
 import grid.modification.elements.Modification;
-import grid.modification.elements.ObjectFieldModification;
 import grid.modification.elements.ObjectModificationService;
 import grid.modification.grid.GridElementAdd;
 import grid.modification.grid.GridElementRemove;
@@ -110,6 +105,11 @@ public class ModificationController {
 		this.gridModificationService = gridModificationService;
 	}
 
+	@RequestMapping(value = "/", method = RequestMethod.GET)
+	public ModelAndView redToHome(Locale locale, Model model) {
+		return new ModelAndView("redirect:/GVShome");
+	}
+	
 	@RequestMapping(value = "/modifications_new", method = RequestMethod.GET)
 	public String modNew(Locale locale, Model model) {
 		
@@ -125,13 +125,13 @@ public class ModificationController {
 				text	=	text+line;
 				line	=	reader.readLine();
 			}
-			this.logger.info(text);
+			logger.info(text);
 			JSONObject anObject	=	new JSONObject(text);
-			JSONFactory jsonFactory	=	new JSONFactory();
+			//JSONFactory jsonFactory	=	new JSONFactory();
 			int refVersion		=	-1;
-			String authorEmail	=	null;
+			//String authorEmail	=	null;
 			String aProjectId		=	null;		//label of the project
-			JSONFactory aFactory	=	new JSONFactory();
+			//JSONFactory aFactory	=	new JSONFactory();
 			JSONArray 	jsonData	=	null;
 			JSONArray	mainGoalsJSONArray	=	null;
 			if(anObject.has("refVersion")){
@@ -158,7 +158,7 @@ public class ModificationController {
 					}
 				}
 			}
-			this.logger.info("got latest working grid, id "+latestGrid.getId()+" state "+latestGrid.obtainGridState());
+			logger.info("got latest working grid, id "+latestGrid.getId()+" state "+latestGrid.obtainGridState());
 			ArrayList<String> modifiedObjectLabels	=	modifiedObjects(refGrid,latestGrid);
 			HashMap<String,GridElement> latestEl	=	latestGrid.obtainAllEmbeddedElements();
 			HashMap<String,Object>		modifiedEl	=	new HashMap<String,Object>();
@@ -215,7 +215,8 @@ public class ModificationController {
 	    model.addAttribute("email", p.getEmail());
 	    model.addAttribute("name", p.getName());
 	    List<GridElement> 	confElements	=	this.gridElementService.getElementByLabelAndState(label, className, GridElement.State.MINOR_CONFLICTING);
-	    Class classByName;
+	    @SuppressWarnings("rawtypes")
+		Class classByName;
 		try {
 			classByName = Class.forName("grid.entities."+className);
 		} catch (ClassNotFoundException e) {
@@ -311,6 +312,7 @@ public class ModificationController {
 	}
 	
 
+	@SuppressWarnings("unchecked")
 	@RequestMapping(value = "/getConflictResolution", method=RequestMethod.POST)
     public void confRes(@RequestBody String data){
 		logger.info("arrived a resolution request");
@@ -340,6 +342,7 @@ public class ModificationController {
 						ParameterizedType aType	=	(ParameterizedType) aField.getGenericType();
 				        Class<?> listClass = (Class<?>) aType.getActualTypeArguments()[0];
 				        logger.info("list class" +listClass); // class java.lang.String.
+						@SuppressWarnings("rawtypes")
 						List aList	=	(List) aField.get(subj);
 						aList.clear();
 						String[] labelArray	=	parsed.get(aField.getName()).split(",");
@@ -371,16 +374,12 @@ public class ModificationController {
 			logger.info("data escaped "+escaped);
 			this.gridModificationService.applyAModificationToASingleElement(subj);
 		} catch (UnsupportedEncodingException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} catch (IllegalArgumentException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} catch (IllegalAccessException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} catch (Exception e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 	}
@@ -390,12 +389,10 @@ public class ModificationController {
 		//Grid temp=JSONFactory.loadFromJson(jsonData, this.projectService);
 		System.out.println(jsonData.toString());
 		//this.gridService.addGrid(temp);
-		JSONObject response	=	new JSONObject();
 		Grid temp;
 		try {
 			JSONObject anObject	=	new JSONObject(jsonData);
 			int refVersion		=	-1;
-			String authorEmail	=	null;
 			if(anObject.has("refVersion")){
 				refVersion	=	anObject.getInt("refVersion");
 			}
@@ -454,7 +451,6 @@ public class ModificationController {
 				}
 			}
 		} catch (Exception e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 			return "error: generic exception";
 		}
@@ -524,6 +520,7 @@ public class ModificationController {
 				text	=	text+line;
 				line	=	reader.readLine();
 			}
+			reader.close();
 			JSONObject 	modJson	=	new JSONObject(text);
 			String 		prjId	=	"";
 			if(modJson.has("projectId")){
@@ -548,12 +545,13 @@ public class ModificationController {
 			logger.info("JSON loaded "+text);
 			logger.info("loaded grid version "+refGrid.getVersion()+" for project "+refGrid.getProject().getProjectId());
 			mods	=	testFactory.loadModificationJson(text, refGrid);
-			this.logger.info("Final modification list:");
+			logger.info("Final modification list:");
 			for(int i=0;i<mods.size();i++){
 				System.out.println(mods.get(i).toString());
 			}
 			Grid newVersion	=	this.gridModificationService.applyModifications(mods, refGrid, new ArrayList<String>()); //no conflicts
 			this.gridService.addGrid(newVersion);
+			reader.close();
 			
 		} catch (Exception e) {
 			// TODO Auto-generated catch block

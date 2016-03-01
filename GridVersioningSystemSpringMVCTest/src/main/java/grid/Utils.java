@@ -32,6 +32,12 @@ import grid.modification.elements.Modification;
  * @author Lorenzo La Banca
  */
 public class Utils {
+	
+	/**
+	 * Inner Class implementing a thread for email sending
+	 * @author Paride Casulli
+	 * @author Lorenzo La Banca	
+	 */
 	public static class MailSender implements Runnable{
 		String title	=	"";
 		String body		=	"";
@@ -119,7 +125,14 @@ public class Utils {
 		mailSend.start();
 	}
 
-
+	/**
+	 * Generates an editor (with firepad) for conflict resolution
+	 * @param collElements colliding Grid Elements
+	 * @param authorsL list of the authors involved in the resolution
+	 * @param currentUser current user of the system
+	 * @return HTML/javascript with an editor within
+	 */
+	@SuppressWarnings("rawtypes")
 	public static String generateEditor(List<GridElement> collElements, ArrayList<Practitioner> authorsL, Practitioner currentUser){
 		//ArrayList<GridElement> elements	=	new ArrayList<GridElement>();	//ADDED
 		//elements.add(collElements.get(0));
@@ -131,8 +144,6 @@ public class Utils {
 			ArrayList<String> buttonsId			=	new ArrayList<String>();	
 			ArrayList<String> listVar			=	new ArrayList<String>();
 			ArrayList<String> listFieldNames	=	new ArrayList<String>();
-			ArrayList<String> objectFieldVar	=	new ArrayList<String>();
-			ArrayList<String> objectFieldNames	=	new ArrayList<String>();
 			String top	=	"<h2>Authors list</h2><div id=\"status\"> </div>";
 			for(int i=0;i<authorsL.size();i++){
 				top=top+"<h3>"+authorsL.get(i).getName()+" approval status: <div id=\"approval"+authorsL.get(i).getId()+"\"> </div></h3><hr>";
@@ -149,8 +160,8 @@ public class Utils {
 					 "var postPayLoad = generateString();"+
 					 "$.post(\"../../../getConflictResolution\", generateString());"+
 					 "console.log(postPayLoad);"+
-					 "alert(postPayLoad);"+
-					 //"location.href = 'resolutionDashBoard';"+
+					 //"alert(postPayLoad);"+ //DEBUG PURPOSE
+					 "location.href = 'resolutionDashBoard';"+
 					  "}"+
 					 "});"+
 				"</script>";
@@ -335,6 +346,16 @@ public class Utils {
 		return "";
 	}
 
+	/**
+	 * Generates a viewer for a list (HTML)
+	 * @param name name of the field (list)
+	 * @param merged list of all grid elements label that can be added/removed
+	 * @param actual actual list of label representing the state of the element
+	 * @param element subject of this change
+	 * @param buttonsId buttons id list (created will be added and controller can enable/disable newly created buttons)
+	 * @param isField used in case of field instead of list (just an element can be added/removed)
+	 * @return
+	 */
 	public static String generateListViewer(String name,List<String> merged,List<String> actual,GridElement element, ArrayList<String> buttonsId,boolean isField){
 		String addL	=	"";
 		String remL	=	"";
@@ -410,6 +431,7 @@ public class Utils {
 		    			"</script>";
 		return str;
 	}
+	
 	/**
 	 * load the content of a text file on a string
 	 * @param path path of the file
@@ -501,14 +523,5 @@ public class Utils {
 		String gridElementString="<div class=\"panel-heading\">"+name+"</div><div class=\"panel-body\">"+desc+"</div>";
 		return gridElementString;
 	}
-	
-	public static int getPendingNumber(List<Integer> projectIds){
-		List<Integer> list = new ArrayList<>();
-		for(int i:list){
-			System.out.println(i);
-		}
-		return 1;
-	}
-	
 	
 }

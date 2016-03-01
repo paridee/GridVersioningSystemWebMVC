@@ -35,6 +35,7 @@ import grid.entities.GridElement.State;
 import grid.entities.Practitioner;
 import grid.entities.Project;
 import grid.entities.SubscriberPhase;
+import grid.interfaces.services.DefaultResponsibleService;
 import grid.interfaces.services.GridElementService;
 import grid.interfaces.services.GridService;
 import grid.interfaces.services.ProjectService;
@@ -42,7 +43,6 @@ import grid.interfaces.services.SubscriberPhaseService;
 import grid.modification.elements.GridElementModification;
 import grid.modification.elements.Modification;
 import grid.modification.elements.ObjectModificationService;
-import it.paridelorenzo.ISSSR.ModificationController;
 
 /**
  * This class owns the task of calculating differences between two grids
@@ -56,6 +56,13 @@ public class GridModificationService {
 	private GridService			gridService;
 	private ProjectService		projectService;
 	private SubscriberPhaseService	subscriberPhaseService;
+	private DefaultResponsibleService	defaultResponsibleService;
+	
+	@Autowired(required=true)
+	@Qualifier(value="defaultResponsibleService")
+	public void setDefaultResponsibleService(DefaultResponsibleService defaultResponsibleService) {
+		this.defaultResponsibleService = defaultResponsibleService;
+	}
 
 	@Autowired(required=true)
 	@Qualifier(value="subscriberPhaseService")
@@ -265,20 +272,13 @@ public class GridModificationService {
 						if(Modification.minorUpdateClass.contains(subj.getClass())){	//is a minor mod
 							if(modifiedObjectLabels.contains(subjLabel)){				//if is in conflict
 								modified.setState(State.MINOR_CONFLICTING);
-								//TODO send email for conflict
-								//Conflict aConflict	=	new Conflict();
-								//ArrayList<GridElement> conflicting	= new ArrayList<GridElement>();
-								//conflicting.add(modified);
-								//aConflict.setConflictState(Conflict.State.PENDING);
-								//aConflict.setConflictType(Type.MINOR);
-								//this.conflictService.addConflict(aConflict);
+								//TODO check logically if this check is enough or is needed a check like this one below
 							}
-							
 						}
 						else if(!Modification.minorUpdateClass.contains(subj.getClass())){	//is a major conflict
 							if(modifiedObjectLabels.contains(subjLabel)){
 								modified.setState(State.MAJOR_CONFLICTING);
-								this.logger.info("element in major conflict with an element of the current working grid");
+								logger.info("element in major conflict with an element of the current working grid");
 							}
 							else{
 								List<GridElement> pending	=	this.gridElementService.getElementByLabelAndState( subjLabel,modified.getClass().getSimpleName(),GridElement.State.MAJOR_UPDATING);
@@ -321,7 +321,7 @@ public class GridModificationService {
 						}
 					}
 					else{
-						this.logger.info("manage this case "+aMod.toString());
+						logger.info("manage this case "+aMod.toString());
 					}
 				}	
 				logger.info("going to update version numbers (3)");
@@ -395,10 +395,13 @@ public class GridModificationService {
 			Utils.mailSender("GQM+S Versioning alert", "Dear "+pm.getName()+", the following Project: "+newGrid.getProject().getProjectId()+" had a main Goal change and requires an action, please check at the following link "+Utils.systemURL+"resolutionDashBoard",pm.getEmail());//+"/"+modified.getClass().getSimpleName()+"/"+modified.getIdElement(), responsibles.get(i).getEmail());
 			}
 		else{
-			this.logger.info("There is no PM!!! Use the default one");
-			//TODO manage PM absence
+			logger.info("There is no PM!!! Use the default one");
+			pm	= this.defaultResponsibleService.getResponsibleByClassName("pm").getPractitioner();
+			if(pm!=null){
+				Utils.mailSender("GQM+S Versioning alert", "Dear "+pm.getName()+", the following Project: "+newGrid.getProject().getProjectId()+" had a main Goal change and requires an action, please check at the following link "+Utils.systemURL+"resolutionDashBoard",pm.getEmail());
+			}
 		}
-		}
+	}
 	
 	private void sendGridElementNotification(GridElement modified,Grid aGrid) {
 		ArrayList<Practitioner> responsibles	=	new ArrayList<Practitioner>();
@@ -410,7 +413,7 @@ public class GridModificationService {
 		}
 		for(int i=0;i<responsibles.size();i++){
 			if(responsibles.get(i)!=null){
-				this.logger.info("sending email for "+modified.getLabel()+" to "+responsibles.get(i).getEmail());
+				logger.info("sending email for "+modified.getLabel()+" to "+responsibles.get(i).getEmail());
 				if(modified.getState().equals(GridElement.State.MINOR_CONFLICTING)){
 					Utils.mailSender("GQM+S Versioning alert", "Dear "+responsibles.get(i).getName()+", the following Grid element: "+(modified.getClass().getSimpleName())+" "+modified.getLabel()+" is in state "+modified.getState()+" and requires an action, please check at the following link "+Utils.systemURL+"/resolutionDashBoard", responsibles.get(i).getEmail());
 				}
@@ -422,7 +425,7 @@ public class GridModificationService {
 				}
 			}
 		}
-		this.logger.info("#~#~NOTIFICATION STUB for item "+modified.getLabel()+" in state "+modified.getState());
+		logger.info("#~#~NOTIFICATION STUB for item "+modified.getLabel()+" in state "+modified.getState());
 	}
 	
 	private void updateVersionNumbersAndStatus(Grid latestGrid, Grid newVersion) {
@@ -435,13 +438,13 @@ public class GridModificationService {
 		}
 		while(anIt.hasNext()){
 			String key	=	anIt.next();
-			this.logger.info("fixing version number element "+key);
+			logger.info("fixing version number element "+key);
 			if(oldElements.containsKey(key)){
-				this.logger.info("element "+key+" found in old set");
+				logger.info("element "+key+" found in old set");
 				GridElement oldElement 	=	oldElements.get(key);
 				GridElement newElement 	=	newElements.get(key);
 				if(newElement.getVersion()>(oldElement.getVersion()+1)){
-					this.logger.info("element "+key+" fixing version from "+newElement.getVersion()+" to "+oldElement.getVersion()+1);
+					logger.info("element "+key+" fixing version from "+newElement.getVersion()+" to "+oldElement.getVersion()+1);
 					newElement.setVersion(this.gridElementService.getLatestVersion(newElement.getLabel(), newElement.getClass().getSimpleName())+1);
 					//manages "on cascading update..." invalidates older version
 					if((oldElement.getState()==GridElement.State.MAJOR_CONFLICTING)||(oldElement.getState()==GridElement.State.MAJOR_UPDATING)||(oldElement.getState()==GridElement.State.MINOR_CONFLICTING)){
@@ -513,7 +516,7 @@ public class GridModificationService {
 			if(current.getState()==GridElement.State.WORKING){
 				GridElement mostUp	=	this.gridElementService.getLatestWorking(key,current.getClass().getSimpleName());
 				if(mostUp.getVersion()>=current.getVersion()){
-					this.logger.info("found for WORKING element "+mostUp.getLabel()+" version "+mostUp.getVersion());
+					logger.info("found for WORKING element "+mostUp.getLabel()+" version "+mostUp.getVersion());
 					/*List<GridElementModification> mods;
 					try {
 						mods = ObjectModificationService.getModification(current, mostUp);	//check if most updated is different from current
@@ -530,7 +533,7 @@ public class GridModificationService {
 				}
 			}
 		}
-		this.logger.info("updating "+updated.size()+" references");
+		logger.info("updating "+updated.size()+" references");
 		for(GridElement el:updated){	//for each element in updated list
 			el	=	el.clone();
 			el.setVersion(el.getVersion()+1);
@@ -541,7 +544,7 @@ public class GridModificationService {
 					el.updateReferences(subj, false, false);
 				}
 			}
-			this.logger.info("updating references to an updated element "+el.getLabel()+"v"+el.getVersion());
+			logger.info("updating references to an updated element "+el.getLabel()+"v"+el.getVersion());
 			aGrid	=	this.gridService.updateGridElement(aGrid, el, true, false);
 			embeddedEl	=	aGrid.obtainAllEmbeddedElements(); //updates with the current element
 		}
@@ -633,9 +636,9 @@ public class GridModificationService {
 			if(mods.size()>0){
 				updated	=	this.gridService.createStubUpgrade(aGrid);
 				for(Modification aMod : mods){
-					this.logger.info("found modification "+aMod.toString());
+					logger.info("found modification "+aMod.toString());
 					if(aMod instanceof GridElementModification){
-						this.logger.info("apply modification "+aMod.toString());
+						logger.info("apply modification "+aMod.toString());
 						updated	=	this.applyAModification((GridElementModification)aMod, updated, updated.obtainAllEmbeddedElements());
 					}
 				}
@@ -665,7 +668,7 @@ public class GridModificationService {
 				sendJSONToPhases(updated);
 			}
 			else{
-				this.logger.info("no modification needed ");
+				logger.info("no modification needed ");
 				Grid updatedg		=	this.gridService.createStubUpgrade(aGrid);
 				updatedg.setVersion(this.gridService.getLatestGrid(updatedg.getProject().getId()).getVersion()+1);
 				GridElement thisG	=	updatedg.obtainAllEmbeddedElements().get(newGridElement.getLabel()).clone();
@@ -678,18 +681,20 @@ public class GridModificationService {
 		}
 	}
 	
-	
+	/**
+	 * Changes the state for all pending elements with the same label of the new Grid Element
+	 * @param newGridElement new element added in Grid
+	 */
 	private void abortAllPending(GridElement newGridElement) {
-		String label	=	newGridElement.getLabel();
-		this.logger.info("aborting pending");
+		logger.info("aborting pending");
 		List<GridElement> pending	=	this.gridElementService.getElementByLabelAndState(newGridElement.getLabel(), newGridElement.getClass().getSimpleName(), GridElement.State.MAJOR_CONFLICTING);
 		pending.addAll(this.gridElementService.getElementByLabelAndState(newGridElement.getLabel(), newGridElement.getClass().getSimpleName(), GridElement.State.MAJOR_UPDATING));
 		pending.addAll(this.gridElementService.getElementByLabelAndState(newGridElement.getLabel(), newGridElement.getClass().getSimpleName(), GridElement.State.MINOR_CONFLICTING));
-		this.logger.info("aborting pending"+pending.toString());
+		logger.info("aborting pending"+pending.toString());
 		newGridElement.setState(GridElement.State.SOLVED);
 		for(GridElement ge : pending){
 			ge.setState(GridElement.State.SOLVED);
-			this.logger.info("setting to solved the following element id "+ge.getIdElement()+" label "+ge.getLabel()+" version "+ge.getVersion());
+			logger.info("setting to solved the following element id "+ge.getIdElement()+" label "+ge.getLabel()+" version "+ge.getVersion());
 			this.gridElementService.updateGridElement(ge);
 		}
 		

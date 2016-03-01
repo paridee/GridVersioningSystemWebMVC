@@ -3,7 +3,6 @@ package grid.interfaces.services;
 import java.util.List;
 
 import grid.entities.DefaultResponsible;
-import grid.entities.Project;
 
 public interface DefaultResponsibleService {
 	/**

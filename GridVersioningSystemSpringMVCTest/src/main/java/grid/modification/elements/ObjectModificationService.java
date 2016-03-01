@@ -21,7 +21,6 @@ import org.slf4j.LoggerFactory;
 import grid.entities.Goal;
 import grid.entities.GridElement;
 import grid.entities.MeasurementGoal;
-import grid.modification.grid.GridModificationService;
 
 public class ObjectModificationService {
 	private static final Logger logger = LoggerFactory.getLogger(ObjectModificationService.class);
@@ -48,7 +47,6 @@ public class ObjectModificationService {
 		for(int i=0;i<changes.size();i++){
 			Change current	=	changes.get(i);
 			System.out.println(current.getClass().getName()+" "+current.getAffectedObject().get());
-			//TODO gestire se cambio measurement goal!!!
 			if(current.getClass().equals(ValueChange.class)){
 				ValueChange 		thisChange	=	(ValueChange)current;
 				GridElement 		changed		=	(GridElement)thisChange.getAffectedObject().get();
@@ -99,16 +97,15 @@ public class ObjectModificationService {
 					}
 			}
 		}
-		//TODO remove: testing purpose
-		System.out.println("my modifications:");
+		logger.info("my modifications:");
 		for(int i=0;i<modifications.size();i++){
-			System.out.println(modifications.get(i));
+			logger.info(modifications.get(i).toString());
 		}
 		
 		return modifications;
 	}
 	
-	public static ArrayList<GridElementModification> getListModification(List oldList,List newList,String listname,String involvedObjlabel){
+	public static ArrayList<GridElementModification> getListModification(@SuppressWarnings("rawtypes") List oldList,@SuppressWarnings("rawtypes") List newList,String listname,String involvedObjlabel){
 		HashMap		<String,Object>	oldListMap	=	new HashMap<String,Object>();
 		HashMap		<String,Object>	newListMap	=	new HashMap<String,Object>();
 		ArrayList<GridElementModification> modifications	=	new ArrayList<GridElementModification>();

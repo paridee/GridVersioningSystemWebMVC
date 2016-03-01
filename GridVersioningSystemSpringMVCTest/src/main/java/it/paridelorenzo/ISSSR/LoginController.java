@@ -11,7 +11,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.ModelAndView;
 
 import grid.entities.Practitioner;
-import grid.interfaces.services.GridElementService;
 import grid.interfaces.services.PractitionerService;
 
 @Controller

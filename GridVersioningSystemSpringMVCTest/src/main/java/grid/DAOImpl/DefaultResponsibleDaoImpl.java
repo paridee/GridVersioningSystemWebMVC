@@ -8,8 +8,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import grid.entities.DefaultResponsible;
-import grid.entities.Project;
-import grid.entities.SubscriberPhase;
 import grid.interfaces.DAO.DefaultResponsibleDao;
 
 public class DefaultResponsibleDaoImpl implements DefaultResponsibleDao {

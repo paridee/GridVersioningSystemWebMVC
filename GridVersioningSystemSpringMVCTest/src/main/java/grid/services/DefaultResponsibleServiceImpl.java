@@ -5,7 +5,6 @@ import java.util.List;
 import org.springframework.transaction.annotation.Transactional;
 
 import grid.entities.DefaultResponsible;
-import grid.entities.Project;
 import grid.interfaces.DAO.DefaultResponsibleDao;
 import grid.interfaces.services.DefaultResponsibleService;
 
