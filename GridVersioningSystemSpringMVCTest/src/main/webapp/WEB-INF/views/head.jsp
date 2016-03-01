@@ -41,5 +41,6 @@
      <link href="<c:url value='/resources/bootstrap/carousel.css' />" rel="stylesheet">
      <!-- Added styles -->
      <link href="<c:url value='/resources/gvs.css' />" rel="stylesheet">
+     <link rel="stylesheet" href="<c:url value='/resources/lobibox/dist/css/Lobibox.min.css' />"/>
      
   </head>

@@ -200,18 +200,13 @@ public class GVSWebController {
 	
 	@RequestMapping(value = "/solveUpdate", method=RequestMethod.POST)
     public @ResponseBody String solveUpdate(@RequestBody String jsonData) {
-		//System.out.println(jsonData.toString());
 		String type=jsonData.substring(0, jsonData.indexOf(","));
-		//System.out.println(type);
 		int nconflict=Integer.parseInt(jsonData.substring(jsonData.indexOf(",")+1,jsonData.indexOf("{") ));
-		//System.out.println(nconflict);
 		Gson gson = new Gson();
 		String jsonGE=jsonData.substring(jsonData.indexOf("{"), jsonData.length());
-		//System.out.println(jsonGE);
 		GridElement ge=null;
 		try {
 			ge = (GridElement)gson.fromJson(jsonGE, Class.forName(type));
-			//System.out.println(ge.toString());
 			List<GridElement> pending=this.gridElementService.getElementByLabelAndState(ge.getLabel(), Class.forName(type).getSimpleName(), GridElement.State.MAJOR_CONFLICTING);
 			pending.addAll(this.gridElementService.getElementByLabelAndState(ge.getLabel(), Class.forName(type).getSimpleName(), GridElement.State.MAJOR_UPDATING));
 			pending.addAll(this.gridElementService.getElementByLabelAndState(ge.getLabel(), Class.forName(type).getSimpleName(), GridElement.State.MINOR_CONFLICTING));
@@ -229,47 +224,36 @@ public class GVSWebController {
 				//apply modifications to grid element
 				if(!withPending)this.gridModificationService.applyAModificationToASingleElement(ge);
 				else {
-					System.out.println("cannot update: linked to pending elements");
 					JSONObject jsonObject = new JSONObject();
-					jsonObject.put("msg", "result");
-					jsonObject.put("resp", "erroreeeee");
+					jsonObject.put("type", "error");
+					jsonObject.put("msg", "Cannot update: linked to pending elements");
 					return jsonObject.toString();
 				}
 				
-				
-				/*GridElement geNew=this.gridModificationService.updateSingleElement(ge);
-				List<GridElement> elementsToUpdate=new ArrayList<GridElement>();
-				elementsToUpdate.add(geNew);
-				this.gridModificationService.updateReferencesToGe(elementsToUpdate);
-				*/
-				
-				
-				
-				
 				JSONObject jsonObject = new JSONObject();
-				jsonObject.put("msg", "result");
-				jsonObject.put("resp", "okkkkkkkk");
+				jsonObject.put("type", "success");
+				jsonObject.put("msg", "The conflict has been solved");
 				return jsonObject.toString();
 				
 			}
 			else if(pending.size()>nconflict){
 				JSONObject jsonObject = new JSONObject();
-				jsonObject.put("msg", "result");
-				jsonObject.put("resp", "error, other incoming updates to solve");
+				jsonObject.put("type", "error");
+				jsonObject.put("msg", "Other incoming updates to solve");
 				return jsonObject.toString();
 				
 			}
 			else if(pending.size()==0){
 				JSONObject jsonObject = new JSONObject();
-				jsonObject.put("msg", "result");
-				jsonObject.put("resp", "error, no pending elements to solve");
+				jsonObject.put("type", "error");
+				jsonObject.put("msg", "No pending elements to solve");
 				return jsonObject.toString();
 				
 			}
 			else{
 				JSONObject jsonObject = new JSONObject();
-				jsonObject.put("msg", "result");
-				jsonObject.put("resp", "ControllerSolveUpdate error");
+				jsonObject.put("type", "error");
+				jsonObject.put("msg", "System Error, please contact the System Administrator");
 				return jsonObject.toString();
 			}
 			
@@ -278,8 +262,8 @@ public class GVSWebController {
 			
 		} catch (Exception e) {
 			JSONObject jsonObject = new JSONObject();
-			jsonObject.put("msg", "result");
-			jsonObject.put("resp", "error");
+			jsonObject.put("type", "error");
+			jsonObject.put("msg", "Generic Exception, please contact the System Administrator");
 			e.printStackTrace();
 			return jsonObject.toString();
 			
@@ -363,9 +347,9 @@ public class GVSWebController {
 		    	}
 		    	else if(current==null){
 		    		JSONObject jsonObject = new JSONObject();
-		    		jsonObject.put("msg", "result");
-		    		jsonObject.put("resp", "error, cannot get working element with label: "+ jsonArray.getString(i));
-		    		System.out.println("error, cannot get working element with label: "+ jsonArray.getString(i));
+		    		jsonObject.put("type", "error");
+		    		jsonObject.put("msg", "Cannot get working element with label: "+ jsonArray.getString(i));
+		    		//System.out.println("error, cannot get working element with label: "+ jsonArray.getString(i));
 		    		return jsonObject.toString();
 		    		
 		    	}
@@ -376,29 +360,29 @@ public class GVSWebController {
 		Grid gridToSolve=this.gridService.getGridById(gridToSolveId);
 		if(workingGrid==null){
 			JSONObject jsonObject = new JSONObject();
-    		jsonObject.put("msg", "result");
-    		jsonObject.put("resp", "error, cannot get latest working grid for project: "+ prjId);
-    		System.out.println("error, cannot get latest working grid for project: "+ prjId);
+    		jsonObject.put("type", "error");
+    		jsonObject.put("msg", "Cannot get latest working grid for project: "+ prjId);
+    		//System.out.println("error, cannot get latest working grid for project: "+ prjId);
     		return jsonObject.toString();
 		}
 		else if(gridToSolve==null){
 			JSONObject jsonObject = new JSONObject();
-    		jsonObject.put("msg", "result");
-    		jsonObject.put("resp", "error, cannot get grid with id: "+ gridToSolveId);
+    		jsonObject.put("type", "error");
+    		jsonObject.put("msg", "error, cannot get grid with id: "+ gridToSolveId);
     		System.out.println("error, cannot get grid with id: "+ gridToSolveId);
     		return jsonObject.toString();
 		}
 		else if((!gridToSolve.isMainGoalsChanged())){
 			JSONObject jsonObject = new JSONObject();
-    		jsonObject.put("msg", "result");
-    		jsonObject.put("resp", "grid with id: "+ gridToSolveId+" has been already solved");
+    		jsonObject.put("type", "error");
+    		jsonObject.put("msg", "grid with id: "+ gridToSolveId+" has been already solved");
     		System.out.println("error, cannot get grid with id: "+ gridToSolveId);
     		return jsonObject.toString();
 		}
 		else if(mainGoalList.size()==0){
 			JSONObject jsonObject = new JSONObject();
-    		jsonObject.put("msg", "result");
-    		jsonObject.put("resp", "Main goal list can't be empty");
+    		jsonObject.put("type", "error");
+    		jsonObject.put("msg", "Main goal list can't be empty");
     		System.out.println("error, Main goal list can't be empty");
     		return jsonObject.toString();
 		}
@@ -430,15 +414,15 @@ public class GVSWebController {
 				this.gridService.updateGrid(gridToSolve);
 				
 				JSONObject jsonObject = new JSONObject();
-				jsonObject.put("msg", "result");
-				jsonObject.put("resp", "ok");
+				jsonObject.put("type", "success");
+				jsonObject.put("msg", "Main goal list updated");
 				return jsonObject.toString();
 				
 			}
 			else{
 				JSONObject jsonObject = new JSONObject();
-				jsonObject.put("msg", "result");
-				jsonObject.put("resp", "error,not Solvable");
+				jsonObject.put("type", "error");
+				jsonObject.put("msg", "Other pending elements to solve before");
 				return jsonObject.toString();
 				
 			}

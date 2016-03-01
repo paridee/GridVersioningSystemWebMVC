@@ -15,6 +15,8 @@
 	<c:choose>
     <c:when test="${error==NULL}">
     	<script type="text/javascript">
+    	
+    	
 		   	function acceptGE(json) {
 		   		var newjson=json.replace(/#/g,'"');
 		   		jQuery.ajax({
@@ -23,14 +25,26 @@
 				   	contentType: "application/json; charset=utf-8",
 				    dataType: "json",
 				   	data: newjson,
-				  	success: function (msg) { 
-				  		alert(JSON.stringify(msg));
-				  		window.location.href = "/ISSSR/resolutionDashBoard";
-				  		<%//TODO msg parser per vedere se è success o errore%>
-			  		},
+				  	success: function (response) { 
+				  		Lobibox.alert(response.type, //AVAILABLE TYPES: "error", "info", "success", "warning"
+			    			{
+			    			    msg: response.msg,
+			    			    closeButton     : false,
+			    			    callback: function ($this, type, ev) {
+			    			    	 window.location.href = "/ISSSR/resolutionDashBoard.php";
+			    			    }
+			    			   
+			    			   
+			    			});
+				  		
+				  	},
 					error: function (err){
 						alert(err.responseText);
-						location.reload(); 
+						Lobibox.alert("error", //AVAILABLE TYPES: "error", "info", "success", "warning"
+				    			{
+				    			    msg: err.responseText,
+				    			    hidden: window.location.href = "/ISSSR/resolutionDashBoard.php",
+				    			});
 					}
 			    });
 			};
@@ -111,7 +125,12 @@
     
     
 	</div><!-- /.container -->
-    
+     <!--Include these script files in the <head> or <body> tag-->
+      <script src="<c:url value='/resources/lobibox/lib/jquery.1.11.min.js' />"></script>
+      <script src="<c:url value='/resources/lobibox/dist/js/lobibox.min.js' />"></script>
+      <!-- If you do not need both (messageboxes and notifications) you can inclue only one of them -->
+      <script src="<c:url value='/resources/lobibox/dist/js/messageboxes.min.js' />"></script> 
+      <script src="<c:url value='/resources/lobibox/dist/js/notifications.min.js' />"></script> 
  </body>
 	<%@ include file="footer.jsp" %>
 
