@@ -14,6 +14,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -28,10 +30,12 @@ import grid.JSONFactory;
 import grid.entities.Goal;
 import grid.entities.Grid;
 import grid.entities.GridElement;
+import grid.entities.Practitioner;
 import grid.entities.GridElement.State;
 import grid.entities.Project;
 import grid.interfaces.services.GridElementService;
 import grid.interfaces.services.GridService;
+import grid.interfaces.services.PractitionerService;
 import grid.interfaces.services.ProjectService;
 import grid.modification.grid.GridModificationService;
  
@@ -42,6 +46,7 @@ public class GVSWebController {
 	private GridElementService 	gridElementService;
 	private GridModificationService gridModificationService;
 	private GridService			gridService;
+	private PractitionerService 	practitionerService;
 	private ProjectService		projectService;
 	private JSONFactory 		jFact;
 	private int nMenuButtons=3;
@@ -50,6 +55,11 @@ public class GVSWebController {
 	@Qualifier(value="gridElementService")
 	public void setGridElementService(GridElementService gridElementService) {
 		this.gridElementService = gridElementService;
+	}
+	@Autowired(required=true)
+	@Qualifier(value="practitionerService")
+	public void setPractitionerService(PractitionerService practitionerService) {
+		this.practitionerService = practitionerService;
 	}
 	
 	@Autowired(required=true)
@@ -497,9 +507,17 @@ public class GVSWebController {
     public String getGrid(@PathVariable("id") int id, Model model) {
 		model.addAttribute("pageTitle", "Lista Grids");
 		this.setActiveButton(1, model);
-		Grid tempGrid= this.gridService.getGridById(id);
+		Grid tempGrid=null;
+		String chart="";
+		try{
+			tempGrid= this.gridService.getGridById(id);
+			chart=createChart(tempGrid);
+		}
+		catch(Exception e){
+			e.printStackTrace();
+		}
 		model.addAttribute("grid", tempGrid);
-		String chart=createChart(tempGrid);
+		
 		System.out.println(chart);
 		model.addAttribute("gridTreeString",chart);
         return "grids";
@@ -596,41 +614,68 @@ public class GVSWebController {
     public String listAllProjects(Model model) {
 		model.addAttribute("pageTitle", "Lista Progetti");
 		this.setActiveButton(0, model);
-		List<Project> temp = this.projectService.listProjects();
-		model.addAttribute("listProjects", temp);
+		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+	    String email = auth.getName(); //get logged in username
+	    Practitioner p	=	this.practitionerService.getPractitionerByEmail(email);
+	    List<Project> temp = this.projectService.listProjects();
+	    List<Project> available=new ArrayList<Project>();
+	    for(Project prj:temp){
+	    	List<Practitioner> practs=this.gridService.getInvolvedPractitioners(prj.getId(), true);
+			if(practs.contains(p)){
+				available.add(prj);
+			}
+	    }
+	    model.addAttribute("listProjects", available);
+	    if(available.size()==0) model.addAttribute("error", "No projects available");
 		return "projects";
 		
 		
     }
 	@RequestMapping(value = "/projects/{id}")
     public String getProject(@PathVariable("id") int id, Model model) {
-		Project temp= this.projectService.getProjectById(id);
-		model.addAttribute("reqproject", temp);
-		List<Grid> templist= this.gridService.getGridLog(id);
-		model.addAttribute("nProjectGrids", templist.size());
-        model.addAttribute("listProjectGrids", templist);
-        Map<String, String> status=new HashMap<String,String>();
-		for(Grid g: templist){
-			Grid tempWorking= this.gridService.getLatestWorkingGrid(g.getProject().getId());
-			String state="";
-			if(g.isMainGoalsChanged()) {
-				state=state+"MGC";
-				if(g.obtainGridState()==Grid.GridState.UPDATING){
-					state=state+"-UPDATING";
+		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+	    String email = auth.getName(); //get logged in username
+	    Practitioner p	=	this.practitionerService.getPractitionerByEmail(email);
+	    Project temp=null;
+		try{
+			temp= this.projectService.getProjectById(id);
+			List<Practitioner> practs=this.gridService.getInvolvedPractitioners(id, true);
+			if(practs.contains(p)){
+				model.addAttribute("reqproject", temp);
+				List<Grid> templist= this.gridService.getGridLog(id);
+				model.addAttribute("nProjectGrids", templist.size());
+		        model.addAttribute("listProjectGrids", templist);
+		        Map<String, String> status=new HashMap<String,String>();
+				for(Grid g: templist){
+					Grid tempWorking= this.gridService.getLatestWorkingGrid(g.getProject().getId());
+					String state="";
+					if(g.isMainGoalsChanged()) {
+						state=state+"MGC";
+						if(g.obtainGridState()==Grid.GridState.UPDATING){
+							state=state+"-UPDATING";
+						}
+					}
+					else{
+						if(g.obtainGridState()==Grid.GridState.WORKING){
+							if (g.getVersion()<tempWorking.getVersion()){
+								state=state+"ARCHIVED";
+							}
+							else{state=state+g.obtainGridState().name();}
+						}
+						else{state=state+g.obtainGridState().name();}
+					}
+					status.put(g.getId()+"", state);
 				}
+				model.addAttribute("status", status);
 			}
 			else{
-				if(g.obtainGridState()==Grid.GridState.WORKING){
-					if (g.getVersion()<tempWorking.getVersion()){
-						state=state+"ARCHIVED";
-					}
-					else{state=state+g.obtainGridState().name();}
-				}
-				else{state=state+g.obtainGridState().name();}
+				model.addAttribute("error","You cannot access to this project");
 			}
-			status.put(g.getId()+"", state);
 		}
-		model.addAttribute("status", status);
+		catch(Exception e){
+			model.addAttribute("error","The requested project is not available");
+		}
+		
         return "projects";
     }
 	
@@ -656,7 +701,7 @@ public class GVSWebController {
 			newStack.add(ge);
 			String chart="chart_config = {chart: { connectors: {type: \"bCurve\",style: {\"stroke-width\": 2}}, container: \"#gridChart\", siblingSeparation:70, rootOrientation:'WEST',  subTeeSeparation:70, animateOnInit: true,node: {collapsable: true},animation: {nodeAnimation: \"easeInSine\",nodeSpeed: 500,connectorsAnimation: \"linear\",connectorsSpeed: 500}},";		
 			chart=chart+"nodeStructure: "+updateChart(newStack)+"};";
-			System.out.println(chart);
+			//System.out.println(chart);
 			model.addAttribute("gridTreeString",chart);
 			model.addAttribute("GEService", this.gridElementService);
 		}
@@ -671,7 +716,7 @@ public class GVSWebController {
 	
 	@RequestMapping(value = "/grids/add", method=RequestMethod.POST)
     public @ResponseBody String addGrid(@RequestBody String jsonData) {
-		System.out.println(jsonData.toString());
+		//System.out.println(jsonData.toString());
 		Grid temp;
 		try {
 			temp = JSONFactory.loadFromJson(jsonData, this.projectService);

@@ -45,6 +45,7 @@
    	<beans:bean id="gridService" class="grid.services.GridServiceImpl">
         <beans:property name="gridDAO" ref="gridDAO"></beans:property>
         <beans:property name="gridElementService" ref="gridElementService"></beans:property>
+        <beans:property name="defaultResponsibleService" ref="defaultResponsibleService"></beans:property>
     </beans:bean>
     
     <beans:bean id="projectDAO" class="grid.DAOImpl.ProjectDAOImpl">
