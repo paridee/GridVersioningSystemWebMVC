@@ -103,16 +103,7 @@ public class Utils {
 		}
 	}
 
-	/**
-	 * Converts a timestamp to date format
-	 * @param timestamp to be converted
-	 * @return string representation
-	 */
-	public static String dateStringFromTimestamp(long timestamp){
-	    Date date = new Date(timestamp);
-	    Format format = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
-	    return format.format(date);
-	}
+	
 	
 	/**
 	 * Converts hashmap of <String,GridElement> to an hashmap <String,Object>

@@ -51,7 +51,7 @@
 						            <td>${listgriditem.version}</td>
 						            <td><a href="<c:url value='/projects/${listgriditem.project.id}' />" >${listgriditem.project.projectId}</a></td>
 						        	<td>${status[currentGridId]}</td>
-						        	<td>${listgriditem.timestamp}</td>
+						        	<td>${listgriditem.dateStringFromTimestamp()}</td>
 						        </tr>
 						    </c:forEach>
 					    </tbody>

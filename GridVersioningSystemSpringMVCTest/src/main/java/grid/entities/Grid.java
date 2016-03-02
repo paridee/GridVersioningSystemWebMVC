@@ -1,7 +1,10 @@
 package grid.entities;
 
+import java.text.Format;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -246,5 +249,16 @@ public class Grid implements Updatable{
 	@Override
 	public ArrayList<GridElement> updateReferences(GridElement ge, boolean autoupgrade, boolean recursive) {
 		return this.updateReferences(ge, autoupgrade);
+	}
+	
+	
+	/**
+	 * Converts a timestamp to date format
+	 * @return string representation
+	 */
+	public String dateStringFromTimestamp(){
+	    Date date = new Date(this.timestamp);
+	    Format format = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
+	    return format.format(date);
 	}
 }
