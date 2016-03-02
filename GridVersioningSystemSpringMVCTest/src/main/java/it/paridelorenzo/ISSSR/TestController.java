@@ -279,7 +279,6 @@ public class TestController {
 		aNewMainGoal.setLabel("g9843");
 		aNewMainGoal.setDescription("sono un nuovo main goal");
 		start.getMainGoals().add(aNewMainGoal);
-		logger.info("TEST TIMESTAMP "+Utils.dateStringFromTimestamp(aNewMainGoal.getTimestamp()));
 		this.logger.info("JSON PRODOTTO "+aFactory.obtainJson(start, JSONType.FIRST,original));
 		JSONObject modObj	=	new JSONObject();
 		modObj.put("projectId", start.getProject().getProjectId());

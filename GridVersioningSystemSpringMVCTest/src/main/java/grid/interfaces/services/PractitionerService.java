@@ -2,6 +2,7 @@ package grid.interfaces.services;
 
 import java.util.List;
 import grid.entities.Practitioner;
+import grid.entities.Project;
 
 /**
  * Interface defining methods for a Practitioner service, following CRUD operations and more
@@ -46,5 +47,11 @@ public interface PractitionerService {
 	 * Add a practitioner on DB
 	 * @param p practitioner to be added
 	 */
-	public void add(Practitioner p);	
+	public void add(Practitioner p);
+	
+	/**
+	 * Get projects where practitioner is involved
+	 * @param p practitioner 
+	 */
+	public List<Project> getProjectsForPractitioner(Practitioner pr);
 }

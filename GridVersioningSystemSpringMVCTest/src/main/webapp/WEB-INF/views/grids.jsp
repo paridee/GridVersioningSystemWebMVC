@@ -51,7 +51,7 @@
 						            <td>${listgriditem.version}</td>
 						            <td><a href="<c:url value='/projects/${listgriditem.project.id}' />" >${listgriditem.project.projectId}</a></td>
 						        	<td>${status[currentGridId]}</td>
-						        	<td>${listgriditem.timestamp}</td>
+						        	<td>${listgriditem.dateStringFromTimestamp()}</td>
 						        </tr>
 						    </c:forEach>
 					    </tbody>
@@ -61,7 +61,7 @@
 			<c:otherwise>
 				<div style="float: left;width: 100%; text-align: center;">
     				<img style="max-height:100px; max-width: 100px;" alt="Alert" src="<c:url value='/resources/images/warning.png' />">
-    				<h1>No Grids available in the system</h1>
+    				<h1>${error}</h1>
  		  		</div>
 			</c:otherwise>
 		</c:choose>

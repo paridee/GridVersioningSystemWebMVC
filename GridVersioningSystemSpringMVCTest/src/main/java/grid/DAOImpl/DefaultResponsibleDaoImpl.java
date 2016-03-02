@@ -26,14 +26,11 @@ public class DefaultResponsibleDaoImpl implements DefaultResponsibleDao {
 	/**
 	 * {@inheritDoc}
 	 */
+	@SuppressWarnings("unchecked")
 	@Override
 	public List<DefaultResponsible> getAllResponsibles() {
 		Session session				=	this.sessionFactory.getCurrentSession();
-		@SuppressWarnings("unchecked")
 		List<DefaultResponsible> subList		=	session.createQuery("from DefaultResponsible").list();
-		for(DefaultResponsible g : subList){
-			logger.info("DefaultResponsible::"+g);
-		}
 		return subList;
 	}
 
