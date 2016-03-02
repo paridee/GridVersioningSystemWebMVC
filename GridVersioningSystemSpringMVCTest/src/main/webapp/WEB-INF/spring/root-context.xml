@@ -55,6 +55,9 @@
         <sec:intercept-url pattern="/updategr**" access="ROLE_USER,ROLE_ADMIN" />
         <sec:intercept-url pattern="/add**" access="ROLE_USER,ROLE_ADMIN" />
         <sec:intercept-url pattern="/GVShome**" access="ROLE_USER,ROLE_ADMIN" />
+        <sec:intercept-url pattern="/projects**" access="ROLE_USER,ROLE_ADMIN" />
+        <sec:intercept-url pattern="/confEditor**" access="ROLE_USER,ROLE_ADMIN" />
+        <sec:intercept-url pattern="/GEResolution**" access="ROLE_USER,ROLE_ADMIN" />
         <sec:form-login 
 		    login-page="/login" 
 		    default-target-url="/GVShome" 
