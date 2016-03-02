@@ -24,15 +24,10 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 
-import com.google.gson.Gson;
-
 import grid.JSONFactory;
-import grid.entities.Goal;
-import grid.entities.Grid;
-import grid.entities.GridElement;
-import grid.entities.Practitioner;
+import grid.entities.*;
 import grid.entities.GridElement.State;
-import grid.entities.Project;
+import grid.interfaces.services.DefaultResponsibleService;
 import grid.interfaces.services.GridElementService;
 import grid.interfaces.services.GridService;
 import grid.interfaces.services.PractitionerService;
@@ -49,6 +44,7 @@ public class GVSWebController {
 	private PractitionerService 	practitionerService;
 	private ProjectService		projectService;
 	private JSONFactory 		jFact;
+	private DefaultResponsibleService	defaultResponsibleService;
 	private int nMenuButtons=3;
 	
 	@Autowired(required=true)
@@ -60,6 +56,11 @@ public class GVSWebController {
 	@Qualifier(value="practitionerService")
 	public void setPractitionerService(PractitionerService practitionerService) {
 		this.practitionerService = practitionerService;
+	}
+	@Autowired(required=true)
+	@Qualifier(value="defaultResponsibleService")
+	public void setDefaultResponsibleService(DefaultResponsibleService defaultResponsibleService) {
+		this.defaultResponsibleService = defaultResponsibleService;
 	}
 	
 	@Autowired(required=true)
@@ -97,7 +98,12 @@ public class GVSWebController {
 		this.setActiveButton(2, model);
 		List<String> pendingLabels=new ArrayList<String>();
 		int nPendingChanges=0;
-		List<Project> projList=this.projectService.listProjects();
+		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+	    String email = auth.getName(); //get logged in username
+	    Practitioner p	=	this.practitionerService.getPractitionerByEmail(email);
+	    List<Project> projList = this.practitionerService.getProjectsForPractitioner(p);
+	    
+		
 		List<Project> projPending=new ArrayList<Project>();
 		Map <String, List<Grid>> projectPendingGrids=new HashMap<>();	//map projid, list pending grids
 		Map <String, List<GridElement>> projectGridsMajorPendingElements=new HashMap<>();
@@ -180,6 +186,8 @@ public class GVSWebController {
 		model.addAttribute("GridsMainGoalListChanged", projectGridsMainGoalListChanged);
 		model.addAttribute("GridModificationServiceInstance", this.gridModificationService);
 		model.addAttribute("GridElementServiceInstance", this.gridElementService);
+		model.addAttribute("DefaultResponsibleServiceInstance", this.defaultResponsibleService);
+		model.addAttribute("Practitioner", p);
 		return "resolutionDashBoard";
     }
 	
@@ -210,16 +218,16 @@ public class GVSWebController {
 	
 	@RequestMapping(value = "/solveUpdate", method=RequestMethod.POST)
     public @ResponseBody String solveUpdate(@RequestBody String jsonData) {
-		String type=jsonData.substring(0, jsonData.indexOf(","));
-		int nconflict=Integer.parseInt(jsonData.substring(jsonData.indexOf(",")+1,jsonData.indexOf("{") ));
-		Gson gson = new Gson();
-		String jsonGE=jsonData.substring(jsonData.indexOf("{"), jsonData.length());
+		JSONObject obj=new JSONObject(jsonData);
+		String type=obj.getString("type");
+		int id=obj.getInt("id");		
+		int nconflict=obj.getInt("nconflict");
 		GridElement ge=null;
 		try {
-			ge = (GridElement)gson.fromJson(jsonGE, Class.forName(type));
-			List<GridElement> pending=this.gridElementService.getElementByLabelAndState(ge.getLabel(), Class.forName(type).getSimpleName(), GridElement.State.MAJOR_CONFLICTING);
-			pending.addAll(this.gridElementService.getElementByLabelAndState(ge.getLabel(), Class.forName(type).getSimpleName(), GridElement.State.MAJOR_UPDATING));
-			pending.addAll(this.gridElementService.getElementByLabelAndState(ge.getLabel(), Class.forName(type).getSimpleName(), GridElement.State.MINOR_CONFLICTING));
+			ge = this.gridElementService.getElementById(id, type).clone();//(GridElement)gson.fromJson(jsonGE, Class.forName(type));
+			List<GridElement> pending=this.gridElementService.getElementByLabelAndState(ge.getLabel(), type, GridElement.State.MAJOR_CONFLICTING);
+			pending.addAll(this.gridElementService.getElementByLabelAndState(ge.getLabel(), type, GridElement.State.MAJOR_UPDATING));
+			pending.addAll(this.gridElementService.getElementByLabelAndState(ge.getLabel(), type, GridElement.State.MINOR_CONFLICTING));
 			//System.out.println("pendingsize:"+pending.size());
 			if(pending.size()==nconflict){
 				//if ge is not linked to pending objects
@@ -232,7 +240,9 @@ public class GVSWebController {
 				}
 				
 				//apply modifications to grid element
-				if(!withPending)this.gridModificationService.applyAModificationToASingleElement(ge);
+				if(!withPending){
+					this.gridModificationService.applyAModificationToASingleElement(ge);
+				}
 				else {
 					JSONObject jsonObject = new JSONObject();
 					jsonObject.put("type", "error");

@@ -12,6 +12,7 @@ import javax.persistence.Id;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
+import org.javers.core.metamodel.annotation.DiffIgnore;
 import org.springframework.security.crypto.bcrypt.BCrypt;
 
 /**
@@ -31,6 +32,7 @@ public class Practitioner {
 	protected String 	email;
 	protected String	password;
 	
+	@DiffIgnore
 	@OneToMany(fetch = FetchType.LAZY, mappedBy = "user",cascade = 	CascadeType.PERSIST)
 	private Set<UserRole> userRole = new HashSet<UserRole>(0);
 	

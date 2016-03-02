@@ -1,10 +1,11 @@
 <%@ page import="grid.Utils"%>
-<%@ page import =" grid.entities.GridElement" %>
+<%@ page import =" grid.entities.*" %>
 <%@ page import =" grid.interfaces.services.*" %>
 <%@ page import =" java.lang.reflect.Field" %>
 <%@ page import =" java.util.List" %>
+
 <%@ page import =" java.util.HashMap" %>
-<%@ page import =" com.google.gson.Gson" %>
+<%@ page import =" org.json.*" %>
 <%@ include file="head.jsp" %>
 
 
@@ -53,8 +54,7 @@
         <%
         	
         	GridElement we=(GridElement)request.getAttribute("workingGE");
-        	Gson gson = new Gson();
-			
+			System.out.println("-----------------prova");
 			
         	
         	List <GridElement> pendinglist=(List<GridElement>)request.getAttribute("updatingElements");
@@ -74,11 +74,12 @@
 												out.println(geString);%>
 											<div class="panel-footer">
 												<input type="button" value="Accept" onclick="acceptGE('<%
-				      								String s=gson.toJson(we); 
+													JSONObject	obj	=	new JSONObject();
+													obj.put("type", we.getClass().getSimpleName());
+													obj.put("id", we.getIdElement());
+				      								String s=obj.toString();
 				      								s=s.replaceAll("\"", "#"); 
-				      								String type=we.getClass().toString();
-				      								type=type.substring(6, type.length());
-				      								out.print(type+","+pendinglist.size()+s);%>')"/>
+				      								out.print(s);%>')"/>
 											</div>
 										</div>
 										
@@ -93,14 +94,17 @@
 										<%
 					       				for(GridElement ge: pendinglist){
 					       				%><div class="panel panel-default">
-					       				<%out.println(Utils.gridElementToHTMLString(ge,ges,true)); %>
+					       				<%out.println(Utils.gridElementToHTMLString(ge,ges,true));
+					       				%>
 					       					<div class="panel-footer">
 												<input type="button" value="Accept" onclick="acceptGE('<%
-														s=gson.toJson(ge); 
+														obj	=	new JSONObject();
+														obj.put("type", ge.getClass().getSimpleName());
+														obj.put("id", ge.getIdElement());
+														obj.put("nconflict", pendinglist.size());
+					      								s=obj.toString(); 
 														s=s.replaceAll("\"", "#"); 
-														type=ge.getClass().toString();
-					      								type=type.substring(6, type.length());
-					      								out.print(type+","+pendinglist.size()+s);%>')"/>
+														out.print(s);%>')"/>
 											</div>
 					       				</div>
 						       			<%

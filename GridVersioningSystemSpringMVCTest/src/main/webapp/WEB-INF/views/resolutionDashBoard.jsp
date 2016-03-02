@@ -1,6 +1,6 @@
 <%@page import="grid.modification.grid.GridModification"%>
 <%@ page import="grid.modification.grid.GridModificationService"%>
-<%@ page import="grid.interfaces.services.GridElementService"%>
+<%@ page import="grid.interfaces.services.*"%>
 <%@ page import =" grid.entities.*" %>
 <%@ page import =" java.lang.reflect.Field" %>
 <%@ page import =" java.util.List" %>
@@ -10,7 +10,9 @@
 
 <%
 	GridModificationService gms=(GridModificationService)request.getAttribute("GridModificationServiceInstance");
+	Practitioner currentUser=(Practitioner)request.getAttribute("Practitioner");
 	GridElementService ges=(GridElementService)request.getAttribute("GridElementServiceInstance");
+	DefaultResponsibleService drs=(DefaultResponsibleService)request.getAttribute("defaultResponsibleService");
 	List<Project> projPending=(List<Project>)request.getAttribute("PendingProjects");
 	Map <String, List<Grid>> projectPendingGrids=(Map <String, List<Grid>>)request.getAttribute("PendingProjectsGrids");	//map projid, list pending grids
 	Map <String, List<GridElement>> projectGridsMajorPendingElements=(Map <String, List<GridElement>>)request.getAttribute("MajorPendingProjectsGridsElements");
@@ -28,6 +30,10 @@
     
     <%if(projPending.size()!=0){
     	for(Project p: projPending){
+    		Practitioner pm=p.getProjectManager();
+    		if(pm==null){
+    			pm=drs.getResponsibleByClassName("pm").getPractitioner();
+    		}
     		if(projectPendingGrids.containsKey(p.getId()+"")){
     			List<Grid> pendGrids=projectPendingGrids.get(p.getId()+"");
     			%>
@@ -48,7 +54,10 @@
     					List<GridElement> geList=projectGridsMajorPendingElements.get(p.getId()+"-"+g.getId());
     					%><li class="list-group-item"><div style="float:left;">MajorUpdates</div> <div class="badge" style="float:left; margin-left:5px; margin-right: 5px;"><%out.print(geList.size()); %></div> <%
     					for(GridElement ge:geList){
-    						if (gms.isSolvable(ge)){
+    						if(currentUser!=pm){
+    							out.print("<span style=\"cursor: pointer\" class=\"label label-danger\" style=\"margin-left: 5px;\" data-toggle=\"tooltip\" data-placement=\"auto right\" title=\"You cannot solve this element\">"+ge.getLabel()+"</span>");
+    						}
+    						else if (gms.isSolvable(ge)){
     							out.print("<a style=\"text-decoration:none\" href=\"/ISSSR/GEResolution/"+ge.getClass().getSimpleName()+"/"+ge.getLabel()+"\">"+"<span class=\"label label-success\"  style=\"margin-left: 5px;\">"+ge.getLabel()+"</span>"+"</a> ");
 					        }
     						else out.print("<span style=\"cursor: pointer\" class=\"label label-warning\" style=\"margin-left: 5px;\" data-toggle=\"tooltip\" data-placement=\"auto right\" title=\"You have to solve other pending Grid Elements before\">"+ge.getLabel()+"</span>");
@@ -59,7 +68,10 @@
     					List<GridElement> geList=projectGridsMajorConflictElements.get(p.getId()+"-"+g.getId());
     					%><li class="list-group-item"><div style="float:left;">MajorConflicts</div> <div class="badge" style="float:left; margin-left:5px; margin-right: 5px;"><%out.print(geList.size()); %></div> <%
     					for(GridElement ge:geList){
-    						if (gms.isSolvable(ge)){
+    						if(currentUser!=pm){
+    							out.print("<span style=\"cursor: pointer\" class=\"label label-danger\" style=\"margin-left: 5px;\" data-toggle=\"tooltip\" data-placement=\"auto right\" title=\"You cannot solve this element\">"+ge.getLabel()+"</span>");
+    						}
+    						else if(gms.isSolvable(ge)){
     							out.print("<a style=\"text-decoration:none\" href=\"/ISSSR/GEResolution/"+ge.getClass().getSimpleName()+"/"+ge.getLabel()+"\">"+"<span class=\"label label-success\" style=\"margin-left: 5px;\">"+ge.getLabel()+"</span>"+"</a> ");
 					        }
     						else out.print("<span style=\"cursor: pointer\" class=\"label label-warning\" style=\"margin-left: 5px;\" data-toggle=\"tooltip\" data-placement=\"auto right\" title=\"You have to solve other pending Grid Elements before\">"+ge.getLabel()+"</span>");

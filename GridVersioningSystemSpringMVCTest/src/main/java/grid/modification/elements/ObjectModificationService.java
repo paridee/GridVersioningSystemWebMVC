@@ -85,6 +85,7 @@ public class ObjectModificationService {
 				String		listname	=	thisChange.getPropertyName();
 				Field field;
 				Object subject	=	thisChange.getAffectedObject().get();
+				//TODO
 				field = subject.getClass().getDeclaredField(thisChange.getPropertyName());
 				field.setAccessible(true);
 				if(!thisChange.getAffectedGlobalId().value().contains("#")){//excludes inner changes
