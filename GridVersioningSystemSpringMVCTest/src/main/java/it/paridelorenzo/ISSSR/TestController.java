@@ -45,6 +45,9 @@ import grid.interfaces.services.GridElementService;
 import grid.interfaces.services.GridService;
 import grid.interfaces.services.PractitionerService;
 import grid.interfaces.services.ProjectService;
+import grid.modification.elements.GridElementModification;
+import grid.modification.elements.Modification;
+import grid.modification.elements.ObjectModificationService;
 import grid.modification.grid.GridModificationService;
 
 @Controller
@@ -323,6 +326,25 @@ public class TestController {
 		this.logger.info("default responsible size "+defaults.size());
 		List<Practitioner> practs	=	this.gridService.getInvolvedPractitioners(start.getProject().getId(), true);
 		this.logger.info("responsible for prj size "+practs.size());
+		Strategy s2Clone	=	(Strategy) s2.clone();
+		ArrayList<Practitioner> oldP	=	new ArrayList<Practitioner>();
+		oldP.add(pm);
+		oldP.add(lorenzo);
+		s2.setAuthors(oldP);
+		oldP	=	new ArrayList<Practitioner>();
+		oldP.add(pm);
+		s2Clone.setAuthors(oldP);
+		try {
+			List<GridElementModification> mods	=	ObjectModificationService.getModification(s2, s2Clone);
+			for(GridElementModification aMod:mods){
+				logger.info(aMod.toString());
+				aMod.apply(s2, new Grid());
+			}
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
 		return "home";
 	}
 	

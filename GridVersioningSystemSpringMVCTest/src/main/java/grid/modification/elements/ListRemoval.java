@@ -52,7 +52,9 @@ public class ListRemoval extends GridElementModification {
 				aList.remove(element);
 			}
 			else if(this.listNameToBeChanged.equals("authors")){
+				//System.out.println("removing author "+this.objectToBeRemoved+" contained "+aList.contains(this.objectToBeRemoved)+" list size "+aList.size());
 				aList.remove(this.objectToBeRemoved);
+				//System.out.println("new list size "+aList.size());
 			}
 			else throw new Exception("Object to be removed not found in current Grid");	
 		}
