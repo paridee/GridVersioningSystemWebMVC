@@ -90,7 +90,7 @@
         <property name="practitionerDAO" ref="practitionerDAO" />
     </bean>
     
-    <bean id="practitionerDAO" class="grid.DAOImpl.PractitionerDAOImpl">
+    <bean id="practitionerDAO" class="PractitionerDAOImpl">
         <property name="sessionFactory" ref="sessionFactory" />
     </bean>
     

@@ -45,6 +45,7 @@
    	<beans:bean id="gridService" class="grid.services.GridServiceImpl">
         <beans:property name="gridDAO" ref="gridDAO"></beans:property>
         <beans:property name="gridElementService" ref="gridElementService"></beans:property>
+    	<beans:property name="defaultResponsibleService" ref="defaultResponsibleService"></beans:property>
     </beans:bean>
     
     <beans:bean id="projectDAO" class="grid.DAOImpl.ProjectDAOImpl">
@@ -65,7 +66,7 @@
         <beans:property name="practitionerDAO" ref="practitionerDAO" />
     </beans:bean>
     
-    <beans:bean id="practitionerDAO" class="grid.DAOImpl.PractitionerDAOImpl">
+    <beans:bean id="practitionerDAO" class="PractitionerDAOImpl">
         <beans:property name="sessionFactory" ref="sessionFactory" />
     </beans:bean>
     
