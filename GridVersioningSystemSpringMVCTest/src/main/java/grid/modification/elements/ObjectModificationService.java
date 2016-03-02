@@ -18,9 +18,11 @@ import org.javers.core.diff.changetype.map.MapChange;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import grid.Utils;
 import grid.entities.Goal;
 import grid.entities.GridElement;
 import grid.entities.MeasurementGoal;
+import grid.entities.Practitioner;
 
 public class ObjectModificationService {
 	private static final Logger logger = LoggerFactory.getLogger(ObjectModificationService.class);
@@ -83,10 +85,14 @@ public class ObjectModificationService {
 			else if(current.getClass().equals(ListChange.class)){
 				ListChange 	thisChange	=	(ListChange)current;
 				String		listname	=	thisChange.getPropertyName();
-				Field field;
+				Field field = null;
 				Object subject	=	thisChange.getAffectedObject().get();
-				//TODO
-				field = subject.getClass().getDeclaredField(thisChange.getPropertyName());
+				if(Utils.getFieldNamesForAClass(subject.getClass()).contains(thisChange.getPropertyName())){				
+					field = subject.getClass().getDeclaredField(thisChange.getPropertyName());
+				}
+				else if(Utils.getFieldNamesForAClass(subject.getClass().getSuperclass()).contains(thisChange.getPropertyName())){
+					field = subject.getClass().getSuperclass().getDeclaredField(thisChange.getPropertyName());
+				}
 				field.setAccessible(true);
 				if(!thisChange.getAffectedGlobalId().value().contains("#")){//excludes inner changes
 					System.out.println(oldElement+" new "+newElement+" field "+field.getName()+" change "+current.toString());
@@ -150,13 +156,22 @@ public class ObjectModificationService {
 						if(thisAdd.getValue() instanceof GridElement){
 							append.setNewLoadedObject(thisAdd.getValue());
 						}
+						if(thisAdd.getValue() instanceof Practitioner){
+							append.setNewLoadedObject(thisAdd.getValue());
+						}
 						modifications.add(append);
 					}
 					else if(entryChange.getClass().equals(EntryRemoved.class)){
 						System.out.println("found removal on list "+listname+" element "+involvedObjlabel);
 						EntryRemoved 	thisRem	=	(EntryRemoved)entryChange;
 						ListRemoval		remove	=	new ListRemoval();
-						remove.setRemovedObjectLabel(thisRem.getKey().toString());
+						if(thisRem.getValue() instanceof GridElement){
+							remove.setRemovedObjectLabel(thisRem.getKey().toString());
+						}
+						if(thisRem.getValue() instanceof Practitioner){
+							remove.setRemovedObjectLabel(thisRem.getKey().toString());
+							remove.setObjectToBeRemoved(thisRem.getValue());
+						}
 						remove.setListNameToBeChanged(listname);
 						remove.setSubjectLabel(involvedObjlabel);
 						modifications.add(remove);

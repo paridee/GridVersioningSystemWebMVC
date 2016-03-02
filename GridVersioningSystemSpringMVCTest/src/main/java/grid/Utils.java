@@ -103,6 +103,22 @@ public class Utils {
 		}
 	}
 
+	/**
+	 * Get a list of field name list
+	 * @param c class to be checked
+	 * @return field list
+	 */
+	public static List<String> getFieldNamesForAClass(Class c){
+		ArrayList<String>	fieldsL	=	new ArrayList<String>();
+		Field[] fields	=	c.getDeclaredFields();
+		for(int i=0;i<fields.length;i++){
+			String fieldName	=	fields[i].getName();
+			if(!fieldsL.contains(fieldName)){
+				fieldsL.add(fieldName);
+			}
+		}
+		return fieldsL;
+	}
 	
 	
 	/**

@@ -4,6 +4,7 @@ import java.lang.reflect.Field;
 import java.util.HashMap;
 import java.util.List;
 
+import grid.Utils;
 import grid.entities.Grid;
 import grid.entities.GridElement;
 
@@ -11,6 +12,7 @@ public class ListRemoval extends GridElementModification {
 	
 	private String 	listNameToBeChanged;
 	private String	removedObjectLabel;
+	private Object  objectToBeRemoved=null;
 	
 	public String getListNameToBeChanged() {
 		return listNameToBeChanged;
@@ -24,12 +26,22 @@ public class ListRemoval extends GridElementModification {
 	public void setRemovedObjectLabel(String removedObjectLabel) {
 		this.removedObjectLabel = removedObjectLabel;
 	}
-	
-	
+	public Object getObjectToBeRemoved() {
+		return objectToBeRemoved;
+	}
+	public void setObjectToBeRemoved(Object objectToBeRemoved) {
+		this.objectToBeRemoved = objectToBeRemoved;
+	}
 	@SuppressWarnings("rawtypes")
 	@Override
 	public void apply(GridElement anElement, Grid aGrid) throws Exception {
-		Field aField	=	anElement.getClass().getDeclaredField(this.listNameToBeChanged);
+		Field aField	=	null;
+		if(Utils.getFieldNamesForAClass(anElement.getClass()).contains(this.listNameToBeChanged)){				
+			aField = anElement.getClass().getDeclaredField(this.listNameToBeChanged);
+		}
+		else if(Utils.getFieldNamesForAClass(anElement.getClass().getSuperclass()).contains(this.listNameToBeChanged)){
+			aField = anElement.getClass().getSuperclass().getDeclaredField(this.listNameToBeChanged);
+		}
 		aField.setAccessible(true);
 		Object myList	=	aField.get(anElement);
 		if(myList instanceof List){
@@ -39,7 +51,10 @@ public class ListRemoval extends GridElementModification {
 				GridElement	element	=	elMap.get(this.removedObjectLabel);
 				aList.remove(element);
 			}
-			else throw new Exception("Object to be added not found in current Grid");	
+			else if(this.listNameToBeChanged.equals("authors")){
+				aList.remove(this.objectToBeRemoved);
+			}
+			else throw new Exception("Object to be removed not found in current Grid");	
 		}
 		else{
 			throw new Exception("Trying to make list modification to a non list object");

@@ -8,6 +8,7 @@ import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import grid.Utils;
 import grid.entities.Grid;
 import grid.entities.GridElement;
 
@@ -78,7 +79,13 @@ public class ListAppend extends GridElementModification {
 	@SuppressWarnings({ "rawtypes", "unchecked" })
 	@Override
 	public void apply(GridElement anElement, Grid grid) throws Exception {
-		Field aField	=	anElement.getClass().getDeclaredField(this.listNameToBeChanged);
+		Field aField	=	null;
+		if(Utils.getFieldNamesForAClass(anElement.getClass()).contains(this.listNameToBeChanged)){				
+			aField = anElement.getClass().getDeclaredField(this.listNameToBeChanged);
+		}
+		else if(Utils.getFieldNamesForAClass(anElement.getClass().getSuperclass()).contains(this.listNameToBeChanged)){
+			aField = anElement.getClass().getSuperclass().getDeclaredField(this.listNameToBeChanged);
+		}
 		aField.setAccessible(true);
 		Object myList	=	aField.get(anElement);
 		if(myList instanceof List){
@@ -91,11 +98,15 @@ public class ListAppend extends GridElementModification {
 			}
 			else if(this.newLoadedObject!=null){	//i have to append a new object
 				logger.info("appending an object not existing on this grid");
-				newLoadedObject	=	((GridElement) newLoadedObject).clone();
-				HashMap<String, GridElement> elements	=	grid.obtainAllEmbeddedElements();
-				Iterator<String> it	=	elements.keySet().iterator();
-				while(it.hasNext()){
-					((GridElement) newLoadedObject).updateReferences(elements.get(it.next()), false, false);
+				if(!this.listNameToBeChanged.equals("authors")){
+					newLoadedObject	=	((GridElement) newLoadedObject).clone();
+					HashMap<String, GridElement> elements	=	grid.obtainAllEmbeddedElements();
+					Iterator<String> it	=	elements.keySet().iterator();
+					if(!this.listNameToBeChanged.equals("authors")){
+						while(it.hasNext()){
+							((GridElement) newLoadedObject).updateReferences(elements.get(it.next()), false, false);
+						}
+					}
 				}
 				aList.add(newLoadedObject);
 			}
