@@ -320,6 +320,10 @@ public class TestController {
 		this.defaultResponsibleService.add(aResp);
 		DefaultResponsible testLoad	=	this.defaultResponsibleService.getResponsibleByClassName("pm");
 		this.logger.info("loaded pm "+testLoad);
+		List<DefaultResponsible> defaults	=	this.defaultResponsibleService.getAllResponsibles();
+		this.logger.info("default responsible size "+defaults.size());
+		List<Practitioner> practs	=	this.gridService.getInvolvedPractitioners(start.getProject().getId(), true);
+		this.logger.info("responsible for prj size "+practs.size());
 		return "home";
 	}
 	
