@@ -463,36 +463,49 @@ public class GVSWebController {
     public String listAllGrids(Model model) {
 		model.addAttribute("pageTitle", "Lista Grids");
 		this.setActiveButton(1, model);
-		List<Grid> temp= this.gridService.listAllGrids();
-		Map<String, String> status=new HashMap<String,String>();
-		for(Grid g: temp){
-			Grid tempWorking= this.gridService.getLatestWorkingGrid(g.getProject().getId());
-			String state="";
-			if(g.isMainGoalsChanged()) {
-				state=state+"MGC";
-				if(g.obtainGridState()==Grid.GridState.UPDATING){
-					state=state+"-UPDATING";
+		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+	    String email = auth.getName(); //get logged in username
+	    Practitioner p	=	this.practitionerService.getPractitionerByEmail(email);
+	    List<Project> projects = this.practitionerService.getProjectsForPractitioner(p);
+	    List<Grid> temp=new ArrayList<Grid>();
+	    Map<String, String> status=new HashMap<String,String>();
+	    for(Project current: projects){
+	    	List<Grid> temp2= this.gridService.getGridLog(current.getId());
+			for(Grid g: temp2){
+				Grid tempWorking= this.gridService.getLatestWorkingGrid(g.getProject().getId());
+				String state="";
+				if(g.isMainGoalsChanged()) {
+					state=state+"MGC";
+					if(g.obtainGridState()==Grid.GridState.UPDATING){
+						state=state+"-UPDATING";
+					}
 				}
-			}
-			else{
-				if(g.obtainGridState()==Grid.GridState.WORKING){
-					if (g.getVersion()<tempWorking.getVersion()){
-						state=state+"ARCHIVED";
+				else{
+					if(g.obtainGridState()==Grid.GridState.WORKING){
+						if (g.getVersion()<tempWorking.getVersion()){
+							state=state+"ARCHIVED";
+						}
+						else{state=state+g.obtainGridState().name();}
 					}
 					else{state=state+g.obtainGridState().name();}
 				}
-				else{state=state+g.obtainGridState().name();}
+				
+				
+				
+				
+				status.put(g.getId()+"", state);
 			}
-			
-			
-			
-			
-			status.put(g.getId()+"", state);
-		}
-		System.out.println(status);
-        model.addAttribute("listGrids", temp);
-        model.addAttribute("status", status);
-        return "grids";
+			temp.addAll(temp2);
+	    }
+	    if(temp.size()>0){
+	    	model.addAttribute("listGrids", temp);
+	        model.addAttribute("status", status);
+	        
+	    }
+	    else{
+	    	model.addAttribute("error","No grids available");
+	    }
+	    return "grids";
     }
 	
 	private void setActiveButton(int i, Model model) {
@@ -507,20 +520,28 @@ public class GVSWebController {
     public String getGrid(@PathVariable("id") int id, Model model) {
 		model.addAttribute("pageTitle", "Lista Grids");
 		this.setActiveButton(1, model);
-		Grid tempGrid=null;
+		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+	    String email = auth.getName(); //get logged in username
+	    Practitioner p	=	this.practitionerService.getPractitionerByEmail(email);
+	    List<Project> projects = this.practitionerService.getProjectsForPractitioner(p);
+	    Grid tempGrid=null;
 		String chart="";
 		try{
 			tempGrid= this.gridService.getGridById(id);
-			chart=createChart(tempGrid);
+			if (projects.contains(tempGrid.getProject())){
+				chart=createChart(tempGrid);
+				model.addAttribute("grid", tempGrid);
+				model.addAttribute("gridTreeString",chart);
+		        
+		    }
+			else{
+				model.addAttribute("error","You cannot acces to this grid");
+			}
 		}
 		catch(Exception e){
-			e.printStackTrace();
+			model.addAttribute("error","Grid not found");
 		}
-		model.addAttribute("grid", tempGrid);
-		
-		System.out.println(chart);
-		model.addAttribute("gridTreeString",chart);
-        return "grids";
+		return "grids";
     }
 	
 	private String createChart(Grid g){
@@ -617,14 +638,7 @@ public class GVSWebController {
 		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
 	    String email = auth.getName(); //get logged in username
 	    Practitioner p	=	this.practitionerService.getPractitionerByEmail(email);
-	    List<Project> temp = this.projectService.listProjects();
-	    List<Project> available=new ArrayList<Project>();
-	    for(Project prj:temp){
-	    	List<Practitioner> practs=this.gridService.getInvolvedPractitioners(prj.getId(), true);
-			if(practs.contains(p)){
-				available.add(prj);
-			}
-	    }
+	    List<Project> available=this.practitionerService.getProjectsForPractitioner(p);
 	    model.addAttribute("listProjects", available);
 	    if(available.size()==0) model.addAttribute("error", "No projects available");
 		return "projects";

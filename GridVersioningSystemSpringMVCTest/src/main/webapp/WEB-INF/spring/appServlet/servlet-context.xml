@@ -64,6 +64,8 @@
     
     <beans:bean id="practitionerService" class="grid.services.PractitionerServiceImpl">
         <beans:property name="practitionerDAO" ref="practitionerDAO" />
+        <beans:property name="projectService" ref="projectService"></beans:property>
+        <beans:property name="gridService" ref="gridService"></beans:property>
     </beans:bean>
     
     <beans:bean id="practitionerDAO" class="grid.DAOImpl.PractitionerDAOImpl">
