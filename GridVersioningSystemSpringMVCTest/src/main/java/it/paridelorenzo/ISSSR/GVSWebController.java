@@ -323,6 +323,7 @@ public class GVSWebController {
 	        model.addAttribute("currentGrid", current);
 	        model.addAttribute("workingMGList", workingMGList);
 	        model.addAttribute("currentMGList", currentMGList);
+	        model.addAttribute("GEService", this.gridElementService);
 		}
         return "MGResolution";
     }

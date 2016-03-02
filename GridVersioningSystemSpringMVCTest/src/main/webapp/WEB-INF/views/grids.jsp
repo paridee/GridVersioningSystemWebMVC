@@ -1,3 +1,5 @@
+
+
 <%@ include file="head.jsp" %>
 
   <body>
@@ -30,6 +32,7 @@
 						        <th>Grid Version</th>
 						        <th>Project</th>
 						        <th>State</th>
+						        <th>Creation date</th>
 						    </tr>
 					    </thead>
 					    <tbody>
@@ -48,6 +51,7 @@
 						            <td>${listgriditem.version}</td>
 						            <td><a href="<c:url value='/projects/${listgriditem.project.id}' />" >${listgriditem.project.projectId}</a></td>
 						        	<td>${status[currentGridId]}</td>
+						        	<td>${listgriditem.timestamp}</td>
 						        </tr>
 						    </c:forEach>
 					    </tbody>

@@ -14,7 +14,9 @@
 					String geString=Utils.gridElementToHTMLString(ge,ges,false);
 					out.println(geString);
 					%>
-					
+					<div class="panel-footer" style="text-align: right;">
+						<a class="btn btn-primary" href="/ISSSR/elementhistory/<%out.print(ge.getClass().getSimpleName()); %>/<%out.print(ge.getLabel()); %>" role="button">Show element history</a>
+					</div>
 				</div>
 				<div class="panel panel-default">
 					<div class="panel-heading"><b>Grid Element Chart</b></div>

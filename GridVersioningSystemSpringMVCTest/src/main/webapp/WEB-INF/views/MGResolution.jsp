@@ -1,5 +1,6 @@
 <%@ page import="grid.Utils"%>
-<%@ page import =" grid.entities.GridElement" %>
+<%@ page import =" grid.interfaces.services.*" %>
+<%@ page import =" grid.entities.*" %>
 <%@ page import =" java.lang.reflect.Field" %>
 <%@ page import =" java.util.List" %>
 <%@ page import =" java.util.HashMap" %>
@@ -71,13 +72,23 @@
 			    });
     		}
     	</script>
+    	<%GridElementService ges=(GridElementService)request.getAttribute("GEService");
+    	%>
     	<div class="panel panel-default">
 			<div class="panel-heading">
 				<b>Working main goal list</b>
 			</div>
 			<div class="panel-body">
-				<c:forEach items="${workingGrid.mainGoals}" var="maingoal"><span class="label label-success" style="margin-left: 5px;">${maingoal.label}</span></c:forEach>
-			</div>
+<%
+				Grid workingGrid=(Grid)request.getAttribute("workingGrid");
+				List<Goal> currentGoals=workingGrid.getMainGoals();
+				for(Goal fieldValueGE: currentGoals){
+					int id=ges.getLatestWorking(fieldValueGE.getLabel(), fieldValueGE.getClass().getSimpleName()).getIdElement();
+					out.print("<a style=\"text-decoration:none;\" href=\"/ISSSR/element/"+fieldValueGE.getClass().getSimpleName()+"/"+id+"\"><span class=\"label label-success\" style=\"margin-left: 5px;\">"+fieldValueGE.getLabel()+"</span></a>");
+					
+				}
+				
+				%>			</div>
 			<div class="panel-footer">
 				<input type="button" value="Accept" onclick="acceptList(${workingMGList})"/><br>
 			</div>
@@ -87,7 +98,18 @@
 				<b>New list to approve</b>
 			</div>
 			<div class="panel-body">
-				<c:forEach items="${currentGrid.mainGoals}" var="maingoal"><span class="label label-success"  style="margin-left: 5px;">${maingoal.label}</span></c:forEach>
+				<%
+				Grid currentGrid=(Grid)request.getAttribute("currentGrid");
+				currentGoals=currentGrid.getMainGoals();
+				for(Goal fieldValueGE: currentGoals){
+					int id=ges.getLatestWorking(fieldValueGE.getLabel(), fieldValueGE.getClass().getSimpleName()).getIdElement();
+					out.print("<a style=\"text-decoration:none;\" href=\"/ISSSR/element/"+fieldValueGE.getClass().getSimpleName()+"/"+id+"\"><span class=\"label label-success\" style=\"margin-left: 5px;\">"+fieldValueGE.getLabel()+"</span></a>");
+					
+				}
+				
+				%>
+			
+			
 			</div>
 			<div class="panel-footer">
 				<input type="button" value="Accept" onclick="acceptList(${currentMGList})"/><br>

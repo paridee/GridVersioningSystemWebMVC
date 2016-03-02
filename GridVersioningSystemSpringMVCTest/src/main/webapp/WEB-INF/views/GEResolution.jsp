@@ -31,7 +31,7 @@
 			    			    msg: response.msg,
 			    			    closeButton     : false,
 			    			    callback: function ($this, type, ev) {
-			    			    	 window.location.href = "/ISSSR/resolutionDashBoard.php";
+			    			    	 window.location.href = "/ISSSR/resolutionDashBoard";
 			    			    }
 			    			   
 			    			   
@@ -43,7 +43,7 @@
 						Lobibox.alert("error", //AVAILABLE TYPES: "error", "info", "success", "warning"
 				    			{
 				    			    msg: err.responseText,
-				    			    hidden: window.location.href = "/ISSSR/resolutionDashBoard.php",
+				    			    hidden: window.location.href = "/ISSSR/resolutionDashBoard",
 				    			});
 					}
 			    });
