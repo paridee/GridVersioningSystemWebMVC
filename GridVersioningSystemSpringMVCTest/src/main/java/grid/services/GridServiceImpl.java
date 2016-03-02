@@ -10,10 +10,14 @@ import org.springframework.transaction.annotation.Transactional;
 
 import grid.JSONFactory.JSONType;
 import grid.Utils;
+import grid.entities.DefaultResponsible;
 import grid.entities.Goal;
 import grid.entities.Grid;
 import grid.entities.GridElement;
+import grid.entities.Practitioner;
+import grid.entities.Project;
 import grid.interfaces.DAO.GridDAO;
+import grid.interfaces.services.DefaultResponsibleService;
 import grid.interfaces.services.GridElementService;
 import grid.interfaces.services.GridService;
 
@@ -26,8 +30,9 @@ import grid.interfaces.services.GridService;
  */
 
 public class GridServiceImpl implements GridService {
-	private GridDAO 			gridDao;
-	private GridElementService 	gridElementService;
+	private GridDAO 					gridDao;
+	private GridElementService 			gridElementService;
+	private DefaultResponsibleService	defaultResponsibleService;
 	
 	/**
 	 * Sets a DAO that will be used in the following Grid operations
@@ -37,6 +42,16 @@ public class GridServiceImpl implements GridService {
 		this.gridDao	=	dao;
 	}
 	
+	/**
+	 * Sets a DefaultResponsibleService for responsibles identification
+	 * @param defaultResponsibleService service
+	 */
+	public void setDefaultResponsibleService(DefaultResponsibleService defaultResponsibleService) {
+		this.defaultResponsibleService = defaultResponsibleService;
+	}
+
+
+
 	/**
 	 * Sets a GridElementService that will be used in the following Grid operations
 	 * @param service that will be used
@@ -225,12 +240,6 @@ public class GridServiceImpl implements GridService {
 	}
 
 	@Override
-	public JSONObject obtainJson(Grid element, JSONType type) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
 	public Grid createStubUpgrade(Grid g) {
 		Grid 						newVersion	=	new Grid();
 		ArrayList<Goal> mainGoalsCopy	=	new ArrayList<Goal>();
@@ -243,6 +252,45 @@ public class GridServiceImpl implements GridService {
 		newVersion.setVersion(g.getVersion()+1);
 		newVersion.setMainGoalsChanged(g.isMainGoalsChanged());
 		return newVersion;
+	}
+
+	@Override
+	public List<Practitioner> getInvolvedPractitioners(int projid, boolean includeDefaults) {
+		List<Grid> allGrids	=	this.getGridLog(projid);
+		ArrayList<Practitioner> practitioners	=	new ArrayList<Practitioner>();
+		Project aPrj	=	null;
+		if(allGrids.size()>0){
+			aPrj	=	allGrids.get(0).getProject();
+			if(aPrj!=null){
+				Practitioner pm	=	aPrj.getProjectManager();
+				if(pm!=null){
+					practitioners.add(pm);
+				}
+			}
+			for(Grid g:allGrids){
+				HashMap<String,GridElement> gridElements	=	g.obtainAllEmbeddedElements();
+				Iterator<String> anIterator	=	gridElements.keySet().iterator();
+				while(anIterator.hasNext()){
+					GridElement anElement		=	gridElements.get(anIterator.next());
+					List<Practitioner> authors	=	anElement.getAuthors();
+					for(Practitioner p:authors){
+						if(!practitioners.contains(p)){
+							practitioners.add(p);
+						}
+					}
+				}
+			}
+		}
+		if(includeDefaults){
+			List<DefaultResponsible> defRes	=	this.defaultResponsibleService.getAllResponsibles();
+			for(DefaultResponsible dr:defRes){
+				Practitioner pract	=	dr.getPractitioner();
+				if(!practitioners.contains(pract)){
+					practitioners.add(pract);
+				}
+			}
+		}
+		return practitioners;
 	}
 
 }

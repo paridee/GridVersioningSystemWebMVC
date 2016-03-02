@@ -7,6 +7,7 @@ import org.json.JSONObject;
 import grid.JSONFactory.JSONType;
 import grid.entities.Grid;
 import grid.entities.GridElement;
+import grid.entities.Practitioner;
 
 /**
  * Interface defining methods for a Grid service, following CRUD operations and more
@@ -84,6 +85,13 @@ public interface GridService {
 	public List<Grid> getGridLog(int projid);
 	
 	/**
+	 * Returns a list of practitioners involved in this project
+	 * @param projid project id
+	 * @return involved practitioners
+	 */
+	public List<Practitioner> getInvolvedPractitioners(int projid,boolean includeDefaults);
+	
+	/**
 	 * Updates an element on the Grid
 	 * @param g Grid of the element to be updated
 	 * @param ge Element of the Grid to be updated
@@ -103,11 +111,4 @@ public interface GridService {
 	 */
 	public boolean isAddUpdate(Grid oldGrid, Grid newGrid);
 	
-	/**
-	 * Obtain a json representation for this Grid
-	 * @param element grid to be serialized
-	 * @param type type of json output
-	 * @return Json
-	 */
-	public JSONObject obtainJson(Grid element,JSONType type);
 }

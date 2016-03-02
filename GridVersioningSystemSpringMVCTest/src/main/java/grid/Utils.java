@@ -5,7 +5,11 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.lang.reflect.Field;
+import java.text.Format;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Properties;
@@ -99,6 +103,17 @@ public class Utils {
 		}
 	}
 
+	/**
+	 * Converts a timestamp to date format
+	 * @param timestamp to be converted
+	 * @return string representation
+	 */
+	public static String dateStringFromTimestamp(long timestamp){
+	    Date date = new Date(timestamp);
+	    Format format = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
+	    return format.format(date);
+	}
+	
 	/**
 	 * Converts hashmap of <String,GridElement> to an hashmap <String,Object>
 	 * @param map input map
