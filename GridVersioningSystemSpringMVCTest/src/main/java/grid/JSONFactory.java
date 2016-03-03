@@ -24,6 +24,7 @@ import grid.entities.Practitioner;
 import grid.entities.Project;
 import grid.entities.Question;
 import grid.entities.Strategy;
+import grid.entities.UserRole;
 import grid.interfaces.services.ProjectService;
 import grid.modification.elements.Modification;
 import grid.modification.elements.ObjectFieldModification;
@@ -374,7 +375,11 @@ public class JSONFactory {
 			if(aPract==null){
 				aPract	=	new Practitioner();
 				aPract.setEmail(((JSONObject)authors.get(i)).getString("email"));
-				aPract.setEmail(((JSONObject)authors.get(i)).getString("name"));
+				aPract.setName(((JSONObject)authors.get(i)).getString("name"));
+				aPract.setPassword("$2a$10$04TVADrR6/SPLBjsK0N30.Jf5fNjBugSACeGv1S69dZALR7lSov0y");
+				UserRole aUserRole	=	new UserRole();
+				aUserRole.setUser(aPract);
+				aUserRole.setRole("ROLE_USER");
 				practitionerService.add(aPract);
 			}
 			practitioners.add(aPract);
