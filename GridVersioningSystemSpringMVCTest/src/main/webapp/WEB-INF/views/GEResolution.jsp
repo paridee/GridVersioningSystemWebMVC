@@ -14,7 +14,7 @@
     <%@ include file="navBar.jsp" %>
 	
 	<c:choose>
-    <c:when test="${error==NULL}">
+    <c:when test="${error==null">
     	<script type="text/javascript">
     	
     	
@@ -77,6 +77,7 @@
 													JSONObject	obj	=	new JSONObject();
 													obj.put("type", we.getClass().getSimpleName());
 													obj.put("id", we.getIdElement());
+													obj.put("nconflict", pendinglist.size());
 				      								String s=obj.toString();
 				      								s=s.replaceAll("\"", "#"); 
 				      								out.print(s);%>')"/>

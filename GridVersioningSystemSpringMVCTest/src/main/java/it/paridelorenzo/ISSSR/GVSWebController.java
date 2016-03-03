@@ -32,6 +32,7 @@ import grid.interfaces.services.GridElementService;
 import grid.interfaces.services.GridService;
 import grid.interfaces.services.PractitionerService;
 import grid.interfaces.services.ProjectService;
+import grid.modification.elements.Modification;
 import grid.modification.grid.GridModificationService;
  
  
@@ -193,24 +194,68 @@ public class GVSWebController {
 	
 	
 	
-	@RequestMapping(value = "/GEResolution/{type}/{label}", method = RequestMethod.GET)
-	public String GEResolution(@PathVariable("type") String type,@PathVariable("label") String label,Model model) {
+	@RequestMapping(value = "/GEResolution/{pid}/{type}/{label}", method = RequestMethod.GET)
+	public String GEResolution(@PathVariable("type") String type,@PathVariable("pid") int pid,@PathVariable("label") String label,Model model) {
 		model.addAttribute("pageTitle", "Grids Versioning System");
 		List <GridElement> geList=this.gridElementService.getElementByLabelAndState(label, type, GridElement.State.MAJOR_UPDATING);
 		geList.addAll(this.gridElementService.getElementByLabelAndState(label, type, GridElement.State.MAJOR_CONFLICTING));
 		geList.addAll(this.gridElementService.getElementByLabelAndState(label, type, GridElement.State.MINOR_CONFLICTING));
 		GridElement workingGE=this.gridElementService.getLatestWorking(label, type);
-		if (geList.size()>0&&workingGE!=null){
-			model.addAttribute("workingGE", workingGE);
-			model.addAttribute("updatingElements", geList);
+		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+	    String email = auth.getName(); //get logged in username
+	    Practitioner p	=	this.practitionerService.getPractitionerByEmail(email);
+		
+		if(Modification.minorUpdateClass.contains(workingGE.getClass())){
+			//minor.conflict-verifico se sono tra gli autori
+			List<Practitioner> practList=new ArrayList<Practitioner>();
+			for(GridElement current: geList){
+				practList.addAll(current.getAuthors());
+			}
+			if(practList.size()==0){
+				practList.add(this.defaultResponsibleService.getResponsibleByClassName(workingGE.getClass().getSimpleName()).getPractitioner());
+			}
+			if(practList.contains(p)){
+				if (geList.size()>0&&workingGE!=null){
+					model.addAttribute("workingGE", workingGE);
+					model.addAttribute("updatingElements", geList);
+					
+				}
+				else if (workingGE!=null&&geList.size()==0){
+					model.addAttribute("error", "The requested Grid Element is in a consistent state");
+				}
+				else{
+					model.addAttribute("error", "The requested Grid Element is not available");
+				}
+			}
+			
+			
+			
 			
 		}
-		else if (workingGE!=null&&geList.size()==0){
-			model.addAttribute("error", "The requested Grid Element is in a consistent state");
+		else {
+			Practitioner currentPract=this.projectService.getProjectById(pid).getProjectManager();
+			if (currentPract==null){
+				currentPract=this.defaultResponsibleService.getResponsibleByClassName("pm").getPractitioner();
+			}
+			if(currentPract==p){
+				if (geList.size()>0&&workingGE!=null){
+					model.addAttribute("workingGE", workingGE);
+					model.addAttribute("updatingElements", geList);
+					
+				}
+				else if (workingGE!=null&&geList.size()==0){
+					model.addAttribute("error", "The requested Grid Element is in a consistent state");
+				}
+				else{
+					model.addAttribute("error", "The requested Grid Element is not available");
+				}
+			}
+			
 		}
-		else{
-			model.addAttribute("error", "The requested Grid Element is not available");
-		}
+		
+		
+		
+		
 		model.addAttribute("GEService", this.gridElementService);
 		return "GEResolution";
 	}
