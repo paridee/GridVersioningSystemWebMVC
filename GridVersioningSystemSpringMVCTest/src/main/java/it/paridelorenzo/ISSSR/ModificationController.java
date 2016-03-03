@@ -276,7 +276,7 @@ public class ModificationController {
 		}
 		String pad	=	Utils.generateEditor(confElements,authorsL,p);
 		model.addAttribute("pad", pad);
-		return "firepadtest";
+		return "editorGE";
 	}
 	
 	@RequestMapping(value = "/registerToGVSNotification/{phase}/{prjId}", method=RequestMethod.POST)

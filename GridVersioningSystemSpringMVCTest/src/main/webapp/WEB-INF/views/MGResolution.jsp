@@ -61,13 +61,23 @@
 				   	contentType: "application/json; charset=utf-8",
 				    dataType: "json",
 				   	data: newjson,
-				  	success: function (msg) { 
-				  		alert(JSON.stringify(msg));
-				  		window.location.href = "/ISSSR/resolutionDashBoard.php";
+				  	success: function (response) { 
+				  		Lobibox.alert(response.type, //AVAILABLE TYPES: "error", "info", "success", "warning"
+				    			{
+				    			    msg: response.msg,
+				    			    closeButton     : false,
+				    			    callback: function ($this, type, ev) {
+				    			    	 window.location.href = "/ISSSR/resolutionDashBoard";
+				    			    }
+				    			});
 			  		},
 					error: function (err){
 						alert(err.responseText);
-						location.reload(); 
+						Lobibox.alert("error", //AVAILABLE TYPES: "error", "info", "success", "warning"
+				    			{
+				    			    msg: err.responseText,
+				    			    hidden: window.location.href = "/ISSSR/resolutionDashBoard",
+				    			});
 					}
 			    });
     		}

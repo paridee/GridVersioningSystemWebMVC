@@ -76,23 +76,7 @@ ${pad}
 </div>
 
 <%@ include file="footer.jsp" %>
-<c:if test="${gridTreeString!=null}">
-<!-- Treant javascript -->
-    <script src="<c:url value='/resources/Treant/vendor/raphael.js' />"></script>
-    <script src="<c:url value='/resources/Treant/Treant.min.js' />"></script>
-    <script src="<c:url value='/resources/Treant/vendor/jquery.easing.js' />"></script>
-	<script src="<c:url value='/resources/Treant/vendor/perfect-scrollbar/jquery.mousewheel.js' />"></script>
-	<script src="<c:url value='/resources/Treant/vendor/perfect-scrollbar/perfect-scrollbar.js' />"></script><script>${gridTreeString};
-    	var my_chart = new Treant(chart_config);
-   	</script>
-</c:if>
-<script type="text/javascript">
-    jQuery(document).ready(function($) {
-        $(".clickable-row").click(function() {
-            window.document.location = $(this).data("href");
-        });
-    });
-    </script>
+
    	 
 </body>
 </html>

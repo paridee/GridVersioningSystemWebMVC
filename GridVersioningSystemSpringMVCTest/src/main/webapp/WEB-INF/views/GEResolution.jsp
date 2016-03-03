@@ -34,10 +34,7 @@
 			    			    callback: function ($this, type, ev) {
 			    			    	 window.location.href = "/ISSSR/resolutionDashBoard";
 			    			    }
-			    			   
-			    			   
 			    			});
-				  		
 				  	},
 					error: function (err){
 						alert(err.responseText);
