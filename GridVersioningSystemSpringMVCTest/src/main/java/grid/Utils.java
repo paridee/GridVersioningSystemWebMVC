@@ -386,6 +386,8 @@ public class Utils {
 	 * @return
 	 */
 	public static String generateListViewer(String name,List<String> merged,List<String> actual,GridElement element, ArrayList<String> buttonsId,boolean isField){
+		//TODO OOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO 8=D
+		System.out.println(""+merged.toString());
 		String addL	=	"";
 		String remL	=	"";
 		for(int i=0;i<merged.size();i++){
