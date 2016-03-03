@@ -194,6 +194,11 @@ public class Utils {
 				top=top+"if(approval"+elements.get(0).getLabel()+authorsL.get(i).getId()+"state!=\"approved\"){return false;}";
 			}
 			top	=	top+"return true;}</script>";
+			top	=	top+"function allRej(){";
+			for(int i=0;i<authorsL.size();i++){
+				top=top+"approval"+elements.get(0).getLabel()+authorsL.get(i).getId()+".set({value:\"not approved\"});";
+			}
+			top	=	top+"}</script>";
 			top	=	top+
 					"		<div class=\"panel panel-info\">"+
 			"<div class=\"panel-heading\"><p><input type=\"button\" name=\"lockBtn\" class=\"btn btn-lg btn-primary btn-block\" value=\"Lock\" onclick=\"btnLock()\"><input type=\"button\" class=\"btn btn-lg btn-primary btn-block\" name=\"approveBtn\" value=\"Approve\" onclick=\"btnApprove()\" disabled><input type=\"button\" class=\"btn btn-lg btn-primary btn-block\" name=\"rejectBtn\" value=\"Reject\" onclick=\"btnReject()\" disabled></p>";
@@ -319,7 +324,8 @@ public class Utils {
 					"var result = snapshot.val();"+
 					//"alert(\"cambio!!!\".concat(result));"+
 					"if(snapshot.val()==\"false\"){"+
-						"approval"+elements.get(0).getLabel()+currentUser.getId()+".set({value:\"not approved\"});";
+						"approval"+elements.get(0).getLabel()+currentUser.getId()+".set({value:\"not approved\"});"+
+						"allRej();";
 						for(int e=0;e<editorsVar.size();e++){
 							top	=	top+editorsVar.get(e)+".setOption(\"readOnly\",false);";
 						}
