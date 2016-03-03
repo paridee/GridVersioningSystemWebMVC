@@ -183,7 +183,7 @@ public class Utils {
 					 "$.post(\"../../../getConflictResolution\", generateString());"+
 					 "console.log(postPayLoad);"+
 					 //"alert(postPayLoad);"+ //DEBUG PURPOSE
-					 "location.href = 'resolutionDashBoard';"+
+					 "location.href = '../../../resolutionDashBoard';"+
 					  "}"+
 					 "});"+
 				"</script>";
