@@ -166,15 +166,16 @@ public class Utils {
 			ArrayList<String> buttonsId			=	new ArrayList<String>();	
 			ArrayList<String> listVar			=	new ArrayList<String>();
 			ArrayList<String> listFieldNames	=	new ArrayList<String>();
-			String top	=	"<h2>Authors list</h2><div id=\"status\"> </div>";
+			String top	=	"<h2>Authors list</h2>\n<div style=\"float: left; width:100%; margin-bottom:20px;\">\n";
 			for(int i=0;i<authorsL.size();i++){
-				top=top+"<h3>"+authorsL.get(i).getName()+" approval status: <div id=\"approval"+authorsL.get(i).getId()+"\"> </div></h3><hr>";
-				top=top+"<script>"+
+				top=top+"<div style=\"-webkit-border-radius: 3px;-moz-border-radius: 3px;border-radius: 3px;padding: 3px; border: 1px solid grey; float: left;text-align:center;\">"+authorsL.get(i).getName()+"<br><div id=\"approval"+authorsL.get(i).getId()+"\"> </div></div>\n";
+				top=top+"<script>\n"+
 				"var approval"+elements.get(0).getLabel()+authorsL.get(i).getId()+" = new Firebase('fiery-torch-6050.firebaseio.com/"+elements.get(0).getLabel()+"approval"+authorsL.get(i).getId()+"');"+
 				"var approval"+elements.get(0).getLabel()+authorsL.get(i).getId()+"state;"+
 				"approval"+elements.get(0).getLabel()+authorsL.get(i).getId()+".child(\"value\").on(\"value\", function(snapshot) {"+
 					 //"alert(snapshot.val());"+  // Alerts "San Francisco"
-					 "document.getElementById(\"approval"+authorsL.get(i).getId()+"\").innerHTML = snapshot.val();"+
+					 "if(snapshot.val()==\"approved\"){document.getElementById(\"approval"+authorsL.get(i).getId()+"\").innerHTML = \"<span class='label label-success'>\"+snapshot.val()+\"</span>\";}"+
+					 "else if(snapshot.val()==\"not approved\"){document.getElementById(\"approval"+authorsL.get(i).getId()+"\").innerHTML = \"<span class='label label-danger'>\"+snapshot.val()+\"</span>\";}"+
 					 "approval"+elements.get(0).getLabel()+authorsL.get(i).getId()+"state=snapshot.val();"+
 					 "var allOK	=	allApproved();"+
 					 "if(allOK==true){"+
@@ -186,9 +187,9 @@ public class Utils {
 					 "location.href = '../../../resolutionDashBoard';"+
 					  "}"+
 					 "});"+
-				"</script>";
+				"</script>\n";
 			}
-			top	=	top+"<script>"+
+			top	=	top+"</div><script>"+
 			"function allApproved(){";
 			for(int i=0;i<authorsL.size();i++){
 				top=top+"if(approval"+elements.get(0).getLabel()+authorsL.get(i).getId()+"state!=\"approved\"){return false;}";
@@ -200,17 +201,17 @@ public class Utils {
 			}
 			top	=	top+"}</script>";
 			top	=	top+
-					"		<div class=\"panel panel-info\">"+
+					"		\n<div class=\"panel panel-info\" style=\"float:left; width:49%;\">"+
 			"<div class=\"panel-heading\"><p><input type=\"button\" name=\"lockBtn\" class=\"btn btn-lg btn-primary btn-block\" value=\"Lock\" onclick=\"btnLock()\"><input type=\"button\" class=\"btn btn-lg btn-primary btn-block\" name=\"approveBtn\" value=\"Approve\" onclick=\"btnApprove()\" disabled><input type=\"button\" class=\"btn btn-lg btn-primary btn-block\" name=\"rejectBtn\" value=\"Reject\" onclick=\"btnReject()\" disabled></p>";
 			if(!(Modification.minorUpdateClass.contains(elements.get(0).getClass()))){
 				//top	=	top	+	"<script>document.getElementsByName(\"rejectBtn\")[0].style.visibility = \"hidden\";</script>";
 			}
 			for(int k=0;k<elements.size();k++){
 				if(k>0){
-					top=	top	+ "<div class=\"panel panel-danger\"><div class=\"panel-heading\">";
+					top=	top	+ "\n<div class=\"panel panel-danger\"  style=\"float:right; width:49%;\"><div class=\"panel-heading\">\n";
 				}
 				GridElement editingElement	=	elements.get(k);
-				top					=	top+"<div id=\""+editingElement.getLabel()+"\"><b>"+editingElement.getClass().getSimpleName()+": "+editingElement.getLabel()+" v"+editingElement.getVersion()+"</b></div></div></br>";
+				top					=	top+"<div id=\""+editingElement.getLabel()+"\"><b>"+editingElement.getClass().getSimpleName()+": "+editingElement.getLabel()+" v"+editingElement.getVersion()+"</b></div></div>";
 				Field[] fields				=	editingElement.getClass().getDeclaredFields();
 				for(int i=0;i<fields.length;i++){
 					fields[i].setAccessible(true);
@@ -218,9 +219,9 @@ public class Utils {
 					try {
 						Object value		=	fields[i].get(editingElement);
 						if(k==0&&(!((value instanceof GridElement)||(value instanceof List)||(fieldName.equals("strategyType"))))){
-							top				=	top+"</br>"+  
-												"<h3>"+fieldName+"</h3>"+
-												"<div id=\""+editingElement.getIdElement()+fieldName+"\" class=\"firepad-container\">"+
+							top				=	top+  
+												"<div style=\"padding-left: 3px;float:left; width:100%; font-weight: bolder; font-size: 18px;\">"+fieldName+"</div>"+
+												"<div style=\"float:left; width:100%;\" id=\""+editingElement.getIdElement()+fieldName+"\" class=\"firepad-container\">"+
 												"<script>"+
 												"var codeMirror"+editingElement.getLabel()+fieldName+editingElement.getVersion()+";"+
 												"var firepadRef"+editingElement.getIdElement()+fieldName+";"+
@@ -244,8 +245,8 @@ public class Utils {
 							fieldNames.add(fieldName);
 						}
 						else if(value instanceof GridElement){
-							top				=	top+"</br>"+  
-												"<h3>"+fieldName+"</h3></br>";
+							top				=	top+  
+												"<div style=\"padding-left: 3px;float:left; width:100%; font-weight: bolder; font-size: 18px;\">"+fieldName+"</div>";
 							if(k>0){
 								top	=	top +"<br><p>"+((GridElement)value).getLabel()+"</p><br>";
 							}
@@ -270,8 +271,8 @@ public class Utils {
 								listFieldNames.add(fieldName);
 								listVar.add(fieldName+"List");
 							}
-							top				=	top+"</br>"+  
-									"<h3>"+fieldName+"</h3></br>";
+							top				=	top+  
+									"<div style=\"padding-left: 3px;float:left; width:100%; font-weight: bolder; font-size: 18px;\">"+fieldName+"</div>";
 							top	=	top+"";
 							if(aList.size()>0){
 								if(aList.get(0) instanceof GridElement){
@@ -309,7 +310,7 @@ public class Utils {
 						}
 						else{
 							top				=	top+  
-											"<h3>"+fieldName+"</h3></br><p>"+value.toString()+"</p>";
+											"<div style=\"padding-left: 3px;float:left; width:100%; font-weight: bolder; font-size: 18px;\">"+fieldName+"</div><p>"+value.toString()+"</p>";
 						}
 					} catch (IllegalArgumentException | IllegalAccessException e) {
 						e.printStackTrace();

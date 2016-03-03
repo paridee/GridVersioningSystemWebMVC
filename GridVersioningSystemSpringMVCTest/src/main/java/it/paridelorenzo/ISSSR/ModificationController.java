@@ -232,7 +232,7 @@ public class ModificationController {
 	    	logger.info("minor class");
 	    }
 		GridElement 		working			=	this.gridElementService.getLatestWorking(label, className);
-		confElements.add(working);
+		confElements.add(0,working);
 		if(working==null){
 			return "home";
 		}
