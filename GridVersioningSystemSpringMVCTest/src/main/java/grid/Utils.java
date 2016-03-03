@@ -5,6 +5,7 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.lang.reflect.Field;
+import java.lang.reflect.ParameterizedType;
 import java.text.Format;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -183,7 +184,7 @@ public class Utils {
 					 "var postPayLoad = generateString();"+
 					 "$.post(\"../../../getConflictResolution\", generateString());"+
 					 "console.log(postPayLoad);"+
-					 //"alert(postPayLoad);"+ //DEBUG PURPOSE
+					 "alert(postPayLoad);"+ //DEBUG PURPOSE
 					 "location.href = '../../../resolutionDashBoard';"+
 					  "}"+
 					 "});"+
@@ -265,7 +266,13 @@ public class Utils {
 								}
 							}
 						}
-						else if(value instanceof List){						
+						else if(value instanceof List){		
+							//obtain list type
+							Field thisField	=	fields[i];
+							ParameterizedType listType = (ParameterizedType) thisField.getGenericType();
+					        Class<?> listClass = (Class<?>) listType.getActualTypeArguments()[0];
+							logger.info("Found a list, items are type: "+listClass.getClass().getSimpleName());
+							
 							List aList	=	(List)value;
 							if(k==0){
 								listFieldNames.add(fieldName);
@@ -274,36 +281,36 @@ public class Utils {
 							top				=	top+  
 									"<div style=\"padding-left: 3px;float:left; width:100%; font-weight: bolder; font-size: 18px;\">"+fieldName+"</div>";
 							top	=	top+"";
-							if(aList.size()>0){
-								if(aList.get(0) instanceof GridElement){
-									ArrayList<String> labels	=	new ArrayList<String>();
-									ArrayList<String> allLabels	=	new ArrayList<String>();
-									for(Object o:aList){
-										labels.add(((GridElement)o).getLabel());
-									}
-									for(GridElement el:collElements){
-										List links	=(List)	fields[i].get(el);
-										for(Object obj:links){
-											String aLabel	=	((GridElement)obj).getLabel();
-											if(!allLabels.contains(aLabel)){
-												allLabels.add(aLabel);
-											}
-										}
-									}
-									//top	=	top+((GridElement)aList.get(j)).getLabel();
-									if(k==0){
-										top	=	top+generateListViewer(fieldName,allLabels,labels,elements.get(k),buttonsId,false);
-									}
-									else{
-										for(String label:labels){
-											top	=	top	+"<br>"+label;
+							//if(aList.get(0) instanceof GridElement){
+							logger.info("test assignment "+listClass.getSimpleName()+" "+GridElement.class.isAssignableFrom(listClass));
+							if(GridElement.class.isAssignableFrom(listClass)){
+								ArrayList<String> labels	=	new ArrayList<String>();
+								ArrayList<String> allLabels	=	new ArrayList<String>();
+								for(Object o:aList){
+									labels.add(((GridElement)o).getLabel());
+								}
+								for(GridElement el:collElements){
+									List links	=(List)	fields[i].get(el);
+									for(Object obj:links){
+										String aLabel	=	((GridElement)obj).getLabel();
+										if(!allLabels.contains(aLabel)){
+											allLabels.add(aLabel);
 										}
 									}
 								}
+								//top	=	top+((GridElement)aList.get(j)).getLabel();
+								if(k==0){
+									top	=	top+generateListViewer(fieldName,allLabels,labels,elements.get(k),buttonsId,false);
+								}
 								else{
-									for(int j=0;j<aList.size();j++){
-										top = top+aList.get(j).toString();
+									for(String label:labels){
+										top	=	top	+"<br>"+label;
 									}
+								}
+							}
+							else{
+								for(int j=0;j<aList.size();j++){
+									top = top+aList.get(j).toString();
 								}
 							}
 							top	=	top+"";
