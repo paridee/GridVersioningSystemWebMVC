@@ -207,37 +207,6 @@ public class GVSWebController {
 		
 		if(Modification.minorUpdateClass.contains(workingGE.getClass())){
 			model.addAttribute("error", "You cannot access to this element (minor conflict)");
-			
-			//minor.conflict-verifico se sono tra gli autori
-			
-			/*
-			List<Practitioner> practList=new ArrayList<Practitioner>();
-			for(GridElement current: geList){
-				practList.addAll(current.getAuthors());
-			}
-			if(practList.size()==0){
-				practList.add(this.defaultResponsibleService.getResponsibleByClassName(workingGE.getClass().getSimpleName()).getPractitioner());
-			}
-			if(practList.contains(p)){
-				if (geList.size()>0&&workingGE!=null){
-					model.addAttribute("workingGE", workingGE);
-					model.addAttribute("updatingElements", geList);
-					
-				}
-				else if (workingGE!=null&&geList.size()==0){
-					model.addAttribute("error", "The requested Grid Element is in a consistent state");
-				}
-				else{
-					model.addAttribute("error", "The requested Grid Element is not available");
-				}
-			}
-			else{
-				model.addAttribute("error", "You cannot access to this element");
-			}
-			*/
-			
-			
-			
 		}
 		else {
 			Practitioner currentPract=this.projectService.getProjectById(pid).getProjectManager();
@@ -262,11 +231,7 @@ public class GVSWebController {
 			}
 			
 		}
-		
-		
-		
-		
-		
+		model.addAttribute("ProjectId", pid);
 		model.addAttribute("GEService", this.gridElementService);
 		return "GEResolution";
 	}
