@@ -577,11 +577,13 @@ public class GridModificationService {
 		for(Project p:projects){
 			Grid latest	=	this.gridService.getLatestWorkingGrid(p.getId());
 			try{
-				logger.info("updating element on grid id "+latest.getId());
-				this.applyAModificationToASingleElement(latest, newGridElement);
-				if(latest.obtainAllEmbeddedElements().containsKey(newGridElement.getLabel())){
-					logger.info("grid id "+latest.getId()+" contains the element "+newGridElement.getLabel());
-					moddedGrid++;
+				if(latest!=null){
+					logger.info("updating element on grid id "+latest.getId());
+					this.applyAModificationToASingleElement(latest, newGridElement);
+					if(latest.obtainAllEmbeddedElements().containsKey(newGridElement.getLabel())){
+						logger.info("grid id "+latest.getId()+" contains the element "+newGridElement.getLabel());
+						moddedGrid++;
+					}
 				}
 			}
 			catch(GridElementNotFoundInAGridException e){
