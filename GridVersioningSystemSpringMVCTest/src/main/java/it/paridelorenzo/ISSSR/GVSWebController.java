@@ -206,7 +206,11 @@ public class GVSWebController {
 	    Practitioner p	=	this.practitionerService.getPractitionerByEmail(email);
 		
 		if(Modification.minorUpdateClass.contains(workingGE.getClass())){
+			model.addAttribute("error", "You cannot access to this element (minor conflict)");
+			
 			//minor.conflict-verifico se sono tra gli autori
+			
+			/*
 			List<Practitioner> practList=new ArrayList<Practitioner>();
 			for(GridElement current: geList){
 				practList.addAll(current.getAuthors());
@@ -230,7 +234,7 @@ public class GVSWebController {
 			else{
 				model.addAttribute("error", "You cannot access to this element");
 			}
-			
+			*/
 			
 			
 			

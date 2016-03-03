@@ -12,7 +12,7 @@
 	GridModificationService gms=(GridModificationService)request.getAttribute("GridModificationServiceInstance");
 	Practitioner currentUser=(Practitioner)request.getAttribute("Practitioner");
 	GridElementService ges=(GridElementService)request.getAttribute("GridElementServiceInstance");
-	DefaultResponsibleService drs=(DefaultResponsibleService)request.getAttribute("defaultResponsibleService");
+	DefaultResponsibleService drs=(DefaultResponsibleService)request.getAttribute("DefaultResponsibleServiceInstance");
 	List<Project> projPending=(List<Project>)request.getAttribute("PendingProjects");
 	Map <String, List<Grid>> projectPendingGrids=(Map <String, List<Grid>>)request.getAttribute("PendingProjectsGrids");	//map projid, list pending grids
 	Map <String, List<GridElement>> projectGridsMajorPendingElements=(Map <String, List<GridElement>>)request.getAttribute("MajorPendingProjectsGridsElements");
@@ -82,9 +82,19 @@
     					List<GridElement> geList=projectGridsMinorConflictElements.get(p.getId()+"-"+g.getId());
     					%><li class="list-group-item"><div style="float:left;">MinorConflicts</div> <div class="badge" style="float:left; margin-left:5px; margin-right: 5px;"><%out.print(geList.size()); %></div> <%
     					for(GridElement ge:geList){
-    						if (gms.isSolvable(ge)){
-    							out.print("<a style=\"text-decoration:none\" href=\"/ISSSR/GEResolution/"+p.getId()+"/"+ge.getClass().getSimpleName()+"/"+ge.getLabel()+"\">"+"<span class=\"label label-success\" style=\"margin-left: 5px;\">"+ge.getLabel()+"</span>"+"</a> ");
-					        }
+    						List<Practitioner> practList=new ArrayList<Practitioner>();
+    						if(ge.getAuthors().size()>0)practList.addAll(ge.getAuthors());
+    						if(practList.size()==0){
+    							DefaultResponsible tempdef=drs.getResponsibleByClassName(ge.getClass().getSimpleName());
+    							Practitioner tempPr=tempdef.getPractitioner();
+    							practList.add(tempPr);
+    						}
+    						if(!practList.contains(currentUser)){
+    							out.print("<span style=\"cursor: pointer\" class=\"label label-danger\" style=\"margin-left: 5px;\" data-toggle=\"tooltip\" data-placement=\"auto right\" title=\"You cannot solve this element\">"+ge.getLabel()+"</span>");
+    						}
+    						else if(gms.isSolvable(ge)){
+    							out.print("<a style=\"text-decoration:none\" href=\"/ISSSR/confEditor/"+ge.getClass().getSimpleName()+"/"+ge.getLabel()+"/"+p.getId()+"\">"+"<span class=\"label label-success\" style=\"margin-left: 5px;\">"+ge.getLabel()+"</span>"+"</a> ");
+    						}
     						else out.print("<span style=\"cursor: pointer\" class=\"label label-warning\" style=\"margin-left: 5px;\" data-toggle=\"tooltip\" data-placement=\"auto right\" title=\"You have to solve other pending Grid Elements before\">"+ge.getLabel()+"</span>");
     					}
     					out.print("</li>");
