@@ -83,7 +83,14 @@
     					%><li class="list-group-item"><div style="float:left;">MinorConflicts</div> <div class="badge" style="float:left; margin-left:5px; margin-right: 5px;"><%out.print(geList.size()); %></div> <%
     					for(GridElement ge:geList){
     						List<Practitioner> practList=new ArrayList<Practitioner>();
-    						if(ge.getAuthors().size()>0)practList.addAll(ge.getAuthors());
+    						
+    						if(ge.getAuthors().size()>0) practList.addAll(ge.getAuthors());
+    						List<GridElement> tempList=ges.getElementByLabelAndState(ge.getLabel(), ge.getClass().getSimpleName(), GridElement.State.MINOR_CONFLICTING);
+    						tempList.add(ges.getLatestWorking(ge.getLabel(), ge.getClass().getSimpleName()));
+    						for(GridElement currentGE: tempList){
+    							practList.addAll(currentGE.getAuthors());
+    						}
+    						
     						if(practList.size()==0){
     							DefaultResponsible tempdef=drs.getResponsibleByClassName(ge.getClass().getSimpleName());
     							Practitioner tempPr=tempdef.getPractitioner();
