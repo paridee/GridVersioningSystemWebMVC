@@ -14,7 +14,7 @@
     <%@ include file="navBar.jsp" %>
 	
 	<c:choose>
-    <c:when test="${error==null">
+    <c:when test="${error==null}">
     	<script type="text/javascript">
     	
     	

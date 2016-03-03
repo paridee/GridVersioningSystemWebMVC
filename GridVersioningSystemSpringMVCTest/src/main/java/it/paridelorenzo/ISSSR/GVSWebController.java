@@ -227,6 +227,9 @@ public class GVSWebController {
 					model.addAttribute("error", "The requested Grid Element is not available");
 				}
 			}
+			else{
+				model.addAttribute("error", "You cannot access to this element");
+			}
 			
 			
 			
@@ -250,8 +253,12 @@ public class GVSWebController {
 					model.addAttribute("error", "The requested Grid Element is not available");
 				}
 			}
+			else{
+				model.addAttribute("error", "You cannot access to this element");
+			}
 			
 		}
+		
 		
 		
 		
