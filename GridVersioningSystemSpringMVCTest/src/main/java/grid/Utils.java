@@ -193,7 +193,7 @@ public class Utils {
 			for(int i=0;i<authorsL.size();i++){
 				top=top+"if(approval"+elements.get(0).getLabel()+authorsL.get(i).getId()+"state!=\"approved\"){return false;}";
 			}
-			top	=	top+"return true;}</script>";
+			top	=	top+"return true;}";
 			top	=	top+"function allRej(){";
 			for(int i=0;i<authorsL.size();i++){
 				top=top+"approval"+elements.get(0).getLabel()+authorsL.get(i).getId()+".set({value:\"not approved\"});";
