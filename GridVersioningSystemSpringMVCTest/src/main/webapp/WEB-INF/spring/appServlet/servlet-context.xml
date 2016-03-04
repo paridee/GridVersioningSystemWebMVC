@@ -87,5 +87,9 @@
     <beans:bean id="subscriberPhaseDAO" class="grid.DAOImpl.SubscriberPhaseDAOImpl">
         <beans:property name="sessionFactory" ref="sessionFactory" />
     </beans:bean>
+    
+    <beans:bean id="jsonFactory" class="grid.JSONFactory">
+        <beans:property name="practitionerService" ref="practitionerService" />
+    </beans:bean>
 
 </beans:beans>

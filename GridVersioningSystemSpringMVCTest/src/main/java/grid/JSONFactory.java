@@ -25,12 +25,12 @@ import grid.entities.Project;
 import grid.entities.Question;
 import grid.entities.Strategy;
 import grid.entities.UserRole;
+import grid.interfaces.services.PractitionerService;
 import grid.interfaces.services.ProjectService;
 import grid.modification.elements.Modification;
 import grid.modification.elements.ObjectFieldModification;
 import grid.modification.elements.ObjectModificationService;
 import grid.modification.grid.GridElementAdd;
-import grid.services.PractitionerServiceImpl;
 
 /**
  * This class provides a method for parsing a Grid from JSON Representation 
@@ -49,7 +49,7 @@ public class JSONFactory {
 	public enum JSONType{
 		FIRST,SECOND
 	}
-	private static PractitionerServiceImpl practitionerService;
+	private PractitionerService practitionerService;
 	private static final Logger logger	=	LoggerFactory.getLogger(JSONFactory.class);
 	@SuppressWarnings("rawtypes")
 	public HashMap<Class,HashMap<String,String>> attributesMap	=	new HashMap<Class,HashMap<String,String>>();
@@ -57,10 +57,9 @@ public class JSONFactory {
 	
 	@Autowired(required=true)
 	@Qualifier(value="practitionerService")
-	public static void setPractitionerService(PractitionerServiceImpl practitionerService) {
-		JSONFactory.practitionerService = practitionerService;
+	public void setPractitionerService(PractitionerService practitionerService) {
+		this.practitionerService = practitionerService;
 	}
-
 
 	/**
 	 * Default constructor, needed to initialize some dictionaries
@@ -85,14 +84,14 @@ public class JSONFactory {
 		strategyMap.put("descrizione", "description");
 		attributesMap.put(Strategy.class, strategyMap);
 	}
-	
+
 	/**
 	 * This method takes a JSON string as parameter and parses and loads the contents in a Grid entity
 	 * @param json grid to be parsed
 	 * @return parsed Grid object
 	 * @throws Exception notifies error while loading a JSON
 	 */
-	public static Grid loadFromJson(String json,ProjectService projService) throws Exception{
+	public Grid loadFromJson(String json,ProjectService projService) throws Exception{
 		Grid returnGrid					=	new Grid();	//new Grid to be loaded
 		HashMap<String, Object> objects	=	new HashMap<String, Object>();
 		JSONArray 	metricList	=	new JSONArray();
@@ -112,7 +111,7 @@ public class JSONFactory {
 		}
 		ArrayList<Metric> metrics		=	new ArrayList<Metric>();
 		for(int i=0;i<metricList.length();i++){			//loads the Grid metrics, makes it Before other objects optimizing reading
-			Metric aMetric	=	JSONFactory.loadMetricFromJson(metricList.get(i).toString(), objects);
+			Metric aMetric	=	loadMetricFromJson(metricList.get(i).toString(), objects);
 			metrics.add(aMetric);
 			logger.info("Metric loaded "+aMetric.getLabel());
 		}
@@ -121,7 +120,7 @@ public class JSONFactory {
 		if(obj.has("measGoalList")){
 			JSONArray measGoalList					=	(JSONArray)obj.get("measGoalList");
 			for(int i=0;i<measGoalList.length();i++){
-				MeasurementGoal aMG					=	JSONFactory.loadMeasurementGoalFromJson(measGoalList.get(i).toString(), objects);
+				MeasurementGoal aMG					=	loadMeasurementGoalFromJson(measGoalList.get(i).toString(), objects);
 				measGoals.add(aMG);
 			}
 		}
@@ -130,7 +129,7 @@ public class JSONFactory {
 		if(obj.has("goalList")){
 			JSONArray goalList						=	(JSONArray)obj.get("goalList");
 			for(int i=0;i<goalList.length();i++){
-				goals.add(JSONFactory.loadGoalFromJson(goalList.get(i).toString(),objects));
+				goals.add(loadGoalFromJson(goalList.get(i).toString(),objects));
 			}
 		}
 		logger.info("MainClass.java goals loaded "+goals.size());
@@ -152,7 +151,7 @@ public class JSONFactory {
 		if(obj.has("questionList")){
 			JSONArray qList							=	(JSONArray) obj.get("questionList");//loads questions
 			for(int i=0;i<qList.length();i++){
-				Question aQ							=	JSONFactory.loadQuestionFromJson(qList.get(i).toString(),objects);
+				Question aQ							=	loadQuestionFromJson(qList.get(i).toString(),objects);
 				questionList.add(aQ);
 			}
 		}
@@ -161,7 +160,7 @@ public class JSONFactory {
 		if(obj.has("strategyList")){
 			JSONArray strategies					=	(JSONArray) obj.get("strategyList");//loads strategies
 			for(int i=0;i<strategies.length();i++){
-				Strategy aStr						=	JSONFactory.loadStrategyFromJson(strategies.get(i).toString(), objects);
+				Strategy aStr						=	loadStrategyFromJson(strategies.get(i).toString(), objects);
 				strategyList.add(aStr);
 			}	
 		}
@@ -338,26 +337,23 @@ public class JSONFactory {
 	 * @param loaded objects already loaded
 	 * @return proper object
 	 */
-	public static GridElement loadGridObj(String objectStr,HashMap<String,Object> loaded) {
+	public GridElement loadGridObj(String objectStr,HashMap<String,Object> loaded) {
 		JSONObject object	=	new JSONObject(objectStr);
 		GridElement loadedGE	=	null;
 		if(object.has("goalId")){
-			loadedGE	=	 JSONFactory.loadGoalFromJson(objectStr, loaded);
+			loadedGE	=	 loadGoalFromJson(objectStr, loaded);
 		}
 		else if(object.has("mgId")){
-			loadedGE	=	 JSONFactory.loadMeasurementGoalFromJson(objectStr, loaded);
+			loadedGE	=	 loadMeasurementGoalFromJson(objectStr, loaded);
 		}
 		else if(object.has("strategyId")){
-			loadedGE	=	 JSONFactory.loadStrategyFromJson(objectStr, loaded);
+			loadedGE	=	 loadStrategyFromJson(objectStr, loaded);
 		}
 		else if(object.has("metricId")){
-			loadedGE	=	 JSONFactory.loadMetricFromJson(objectStr, loaded);
+			loadedGE	=	 loadMetricFromJson(objectStr, loaded);
 		}
 		else if(object.has("questionId")){
-			loadedGE	=	 JSONFactory.loadMetricFromJson(objectStr, loaded);
-		}
-		if(object.has("authors")){
-			loadedGE.setAuthors(loadAuthors((JSONArray)(object.get("authors"))));
+			loadedGE	=	 loadQuestionFromJson(objectStr, loaded);
 		}
 		return loadedGE;
 	}
@@ -367,12 +363,17 @@ public class JSONFactory {
 	 * @param object with authors
 	 * @return authors
 	 */
-	private static ArrayList<Practitioner> loadAuthors(JSONArray authors) {
+	private ArrayList<Practitioner> loadAuthors(JSONArray authors) {
 		ArrayList<Practitioner> practitioners	=	new ArrayList<Practitioner>();
 		for(int i=0;i<authors.length();i++){
-			String email	=	((JSONObject)authors.get(i)).getString("email");
+			logger.info(authors.get(i).getClass()+" "+authors.get(i).toString());
+			JSONObject	thisObj	=	((JSONObject)authors.get(i));
+			String email		=	thisObj.getString("email");
+			logger.info(thisObj.getClass()+" "+thisObj.toString()+" "+email);
+			//String email		=	((JSONObject)authors.get(i)).getString("email");
 			Practitioner aPract	=	practitionerService.getPractitionerByEmail(email);
 			if(aPract==null){
+				logger.info("author not found in DB, creating a new practitioner "+((JSONObject)authors.get(i)).getString("email"));
 				aPract	=	new Practitioner();
 				aPract.setEmail(((JSONObject)authors.get(i)).getString("email"));
 				aPract.setName(((JSONObject)authors.get(i)).getString("name"));
@@ -381,6 +382,9 @@ public class JSONFactory {
 				aUserRole.setUser(aPract);
 				aUserRole.setRole("ROLE_USER");
 				practitionerService.add(aPract);
+			}
+			else{
+				logger.info("author found in DB "+aPract.getEmail());
 			}
 			practitioners.add(aPract);
 		}
@@ -424,7 +428,7 @@ public class JSONFactory {
 	 * @param loaded objects already loaded
 	 * @return loaded object
 	 */
-	public static Goal loadGoalFromJson(String json,HashMap<String, Object> loaded){
+	public Goal loadGoalFromJson(String json,HashMap<String, Object> loaded){
 		JSONObject obj		=	new JSONObject(json);
 		String assumption	=	"";
 		if(obj.has("assumptions")){
@@ -449,19 +453,22 @@ public class JSONFactory {
 			for(int i=0;i<strategies.length();i++){
 				JSONObject innerObj	=	(JSONObject)strategies.get(i);
 				logger.info("\n\n"+innerObj.toString()+"\n\n");
-				strategiesIDList.add(JSONFactory.loadStrategyFromJson(innerObj.toString(),loaded));
+				strategiesIDList.add(loadStrategyFromJson(innerObj.toString(),loaded));
 				logger.info("Goal.java added strategy "+innerObj.getString("strategyId"));
 			}
 			logger.info("Goal.java elementi caricati in array: "+strategies.length());
 		}
 		Goal newGoal		=	new Goal();
+		if(obj.has("authors")){
+			newGoal.setAuthors(loadAuthors((JSONArray)(obj.get("authors"))));
+		}
 		newGoal.setAssumption(assumption);
 		newGoal.setContext(context);
 		newGoal.setDescription(description);
 		newGoal.setLabel(goalID);
 		loaded.put(goalID, newGoal);	//added in loaded objects list
 		if(obj.has("measurementGoal")){
-			newGoal.setMeasurementGoal(JSONFactory.loadMeasurementGoalFromJson(obj.get("measurementGoal").toString(),loaded));
+			newGoal.setMeasurementGoal(loadMeasurementGoalFromJson(obj.get("measurementGoal").toString(),loaded));
 		}
 		newGoal.setStrategyList(strategiesIDList);
 		return newGoal;
@@ -473,7 +480,7 @@ public class JSONFactory {
 	 * @param loaded loaded objects
 	 * @return loaded strategy
 	 */
-	public static Strategy loadStrategyFromJson(String string, HashMap<String, Object> loaded) {
+	public Strategy loadStrategyFromJson(String string, HashMap<String, Object> loaded) {
 		JSONObject obj	=	new JSONObject(string);
 		String type	=	"";
 		if(obj.has("strategyType")){
@@ -493,6 +500,9 @@ public class JSONFactory {
 			return (Strategy)loaded.get(strategyID);	//if already loaded returns
 		}
 		Strategy aStrategy	= new Strategy();
+		if(obj.has("authors")){
+			aStrategy.setAuthors(loadAuthors((JSONArray)(obj.get("authors"))));
+		}
 		aStrategy.setDescription(description);
 		aStrategy.setLabel(strategyID);
 		aStrategy.setStrategyType(type);
@@ -502,7 +512,7 @@ public class JSONFactory {
 			JSONArray goals	=	(JSONArray)obj.get("goalList");
 			ArrayList<Goal> goalList	=	new ArrayList<Goal>();
 			for(int i=0;i<goals.length();i++){
-				goalList.add(JSONFactory.loadGoalFromJson(goals.get(i).toString(), loaded));
+				goalList.add(loadGoalFromJson(goals.get(i).toString(), loaded));
 			}
 			aStrategy.setGoalList(goalList);
 		}
@@ -515,7 +525,7 @@ public class JSONFactory {
 	 * @param loaded objects already loaded
 	 * @return loaded measurement goal
 	 */
-	public static MeasurementGoal loadMeasurementGoalFromJson(String string, HashMap<String, Object> loaded) {
+	public MeasurementGoal loadMeasurementGoalFromJson(String string, HashMap<String, Object> loaded) {
 		String first	=	string.substring(0,1);
 		if(!first.equals("{")){
 			if(loaded.containsKey(string)){
@@ -539,11 +549,14 @@ public class JSONFactory {
 			interpretationModel			=	obj.getString("interpretationModel");
 		}
 		MeasurementGoal temp				=	new MeasurementGoal();
+		if(obj.has("authors")){
+			temp.setAuthors(loadAuthors((JSONArray)(obj.get("authors"))));
+		}
 		if(obj.has("questionList")){
 			JSONArray	questions				=	(JSONArray)obj.get("questionList");
 			ArrayList<Question> questionList	=	new ArrayList<Question>();	
 			for(int i=0;i<questions.length();i++){
-				questionList.add(JSONFactory.loadQuestionFromJson(questions.get(i).toString(),loaded));
+				questionList.add(loadQuestionFromJson(questions.get(i).toString(),loaded));
 			}
 			temp.setQuestionList(questionList);
 		}
@@ -560,7 +573,7 @@ public class JSONFactory {
 	 * @param loaded objects already loaded
 	 * @return loaded question
 	 */
-	private static Question loadQuestionFromJson(String string, HashMap<String, Object> loaded) {
+	private Question loadQuestionFromJson(String string, HashMap<String, Object> loaded) {
 		JSONObject obj	=	new JSONObject(string);
 		String qId		=	obj.getString("questionId");
 		if(loaded.containsKey(qId)){
@@ -568,6 +581,9 @@ public class JSONFactory {
 			return (Question)loaded.get(qId);
 		}
 		Question aNewQuestion	=	new Question();
+		if(obj.has("authors")){
+			aNewQuestion.setAuthors(loadAuthors((JSONArray)(obj.get("authors"))));
+		}
 		if(obj.has("question")){
 			String question			=	obj.getString("question");
 			aNewQuestion.setQuestion(question);
@@ -579,7 +595,7 @@ public class JSONFactory {
 			ArrayList<Metric> metrics	=	new ArrayList<Metric>();
 			for(int i=0;i<metricList.length();i++){
 				logger.info(metricList.get(i).toString());
-				metrics.add(JSONFactory.loadMetricFromJson(metricList.get(i).toString(),loaded));
+				metrics.add(loadMetricFromJson(metricList.get(i).toString(),loaded));
 			}
 			aNewQuestion.setMetricList(metrics);
 		}
@@ -592,7 +608,7 @@ public class JSONFactory {
 	 * @param loaded objects already loaded
 	 * @return loaded metric
 	 */
-	private static Metric loadMetricFromJson(String string, HashMap<String, Object> loaded) {
+	private Metric loadMetricFromJson(String string, HashMap<String, Object> loaded) {
 		String first	=	string.substring(0,1);
 		if(!first.equals("{")){	//gestisco formato a non standard JSON
 			if(loaded.containsKey(string)){
@@ -608,6 +624,9 @@ public class JSONFactory {
 			return (Metric)loaded.get(metricId);
 		}
 		Metric aMetric			=	new Metric();
+		if(obj.has("authors")){
+			aMetric.setAuthors(loadAuthors((JSONArray)(obj.get("authors"))));
+		}
 		if(obj.has("count")){
 			aMetric.setCount(obj.getInt("count"));
 		}
