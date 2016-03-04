@@ -337,7 +337,13 @@ public class ModificationController {
 				parsed.put(label, value);
 				logger.info("data read "+label+" "+value);
 			}
-			GridElement subj	=	this.gridElementService.getElementById(Integer.parseInt(parsed.get("id")),parsed.get("class")).clone();
+			GridElement subj			=	this.gridElementService.getElementById(Integer.parseInt(parsed.get("id")),parsed.get("class")).clone();
+			List<GridElement> pending	=	this.gridElementService.getElementByLabelAndState(subj.getLabel(), subj.getClass().getSimpleName(), GridElement.State.MAJOR_CONFLICTING);
+			pending.addAll(this.gridElementService.getElementByLabelAndState(subj.getLabel(), subj.getClass().getSimpleName(), GridElement.State.MAJOR_UPDATING));
+			pending.addAll(this.gridElementService.getElementByLabelAndState(subj.getLabel(), subj.getClass().getSimpleName(), GridElement.State.MINOR_CONFLICTING));
+			if(pending.size()==0){
+				return;
+			}
 			subj.setState(GridElement.State.WORKING);
 			Field[] fields		=	subj.getClass().getDeclaredFields();
 			for(int i=0;i<fields.length;i++){

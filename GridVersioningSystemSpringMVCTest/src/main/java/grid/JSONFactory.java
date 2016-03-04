@@ -5,6 +5,7 @@ import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import org.json.JSONArray;
@@ -381,6 +382,9 @@ public class JSONFactory {
 				UserRole aUserRole	=	new UserRole();
 				aUserRole.setUser(aPract);
 				aUserRole.setRole("ROLE_USER");
+				HashSet<UserRole> roles	=	new HashSet<UserRole>();
+				roles.add(aUserRole);
+				aPract.setUserRole(roles);
 				practitionerService.add(aPract);
 			}
 			else{
