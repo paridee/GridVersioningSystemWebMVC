@@ -176,7 +176,12 @@
     
     
 	</div><!-- /.container -->
-    
+    <!--Include these script files in the <head> or <body> tag-->
+      <script src="<c:url value='/resources/lobibox/lib/jquery.1.11.min.js' />"></script>
+      <script src="<c:url value='/resources/lobibox/dist/js/lobibox.min.js' />"></script>
+      <!-- If you do not need both (messageboxes and notifications) you can inclue only one of them -->
+      <script src="<c:url value='/resources/lobibox/dist/js/messageboxes.min.js' />"></script> 
+      <script src="<c:url value='/resources/lobibox/dist/js/notifications.min.js' />"></script> 
  </body>
 	<%@ include file="footer.jsp" %>
 
