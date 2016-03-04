@@ -182,10 +182,8 @@ public class Utils {
 					 "if(allOK==true){"+
 					 //"document.getElementById(\"status\").innerHTML = generateString();"+
 					 "var postPayLoad = generateString();"+
-					 "$.post(\"../../../getConflictResolution\", generateString());"+
+					 "$.post(\"../../../getConflictResolution\", generateString(), function(response){location.href = '../../../resolutionDashBoard';});"+
 					 "console.log(postPayLoad);"+
-					 "alert(postPayLoad);"+ //DEBUG PURPOSE
-					 "location.href = '../../../resolutionDashBoard';"+
 					  "}"+
 					 "});"+
 				"</script>\n";
@@ -212,7 +210,7 @@ public class Utils {
 					top=	top	+ "\n<div class=\"panel panel-danger\"  style=\"float:right; width:49%;\"><div class=\"panel-heading\">\n";
 				}
 				GridElement editingElement	=	elements.get(k);
-				top					=	top+"<div id=\""+editingElement.getLabel()+"\"><b>"+editingElement.getClass().getSimpleName()+": "+editingElement.getLabel()+" v"+editingElement.getVersion()+"</b></div></div>";
+				top					=	top+"<div id=\""+editingElement.getLabel()+"\"><b>"+editingElement.getClass().getSimpleName()+": "+editingElement.getLabel()+" v"+editingElement.getVersion()+"</b></div></div><div class=\"panel-body\">";
 				Field[] fields				=	editingElement.getClass().getDeclaredFields();
 				for(int i=0;i<fields.length;i++){
 					fields[i].setAccessible(true);
@@ -323,7 +321,7 @@ public class Utils {
 						e.printStackTrace();
 					}
 				}
-				top=top+"</div>";
+				top=top+"</div></div>";
 				top	=	top+"<hr>";
 			}
 			top	=	top+"<script>"+
@@ -393,7 +391,6 @@ public class Utils {
 	 * @return
 	 */
 	public static String generateListViewer(String name,List<String> merged,List<String> actual,GridElement element, ArrayList<String> buttonsId,boolean isField){
-		//TODO OOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO 8=D
 		System.out.println(""+merged.toString());
 		String addL	=	"";
 		String remL	=	"";
@@ -411,7 +408,7 @@ public class Utils {
 		act	=	act+"]";
 		buttonsId.add("dropdown"+name+"rem");
 		buttonsId.add("dropdown"+name+"add");
-		String str	=	"<div class=\"panel-heading\"><div class=\"dropdown\" style=\"display: inline-block;\">"
+		String str	=	"<div style=\"float: left; width: 100%; background-color:#d9edf7;\"><div class=\"dropdown\" style=\"display: inline-block;\">"
 						+"<button class=\"btn btn-default dropdown-toggle\" type=\"button\" id=\"dropdown"+name+"add\" data-toggle=\"dropdown\" aria-haspopup=\"true\" aria-expanded=\"true\">"
 						+"Add"+
 						"<span class=\"caret\"></span></button>"+
@@ -427,13 +424,13 @@ public class Utils {
 						remL+
 						"</ul>"+
 						"</div>"+
-						"<div id=\""+name+"ListDiv\"></div></div>"
+						"<div style=\"background-color: #d9edf7; padding: 3px; float:left; width: 100%; margin-top: 5px;\" id=\""+name+"ListDiv\"></div></div>"
 						+ "<script>var "+name+"List = [];"+
 						"var list"+element.getLabel()+name+" = new Firebase('fiery-torch-6050.firebaseio.com/"+element.getLabel()+name+element.getIdElement()+"list');"+
 						"function drawMGList"+name+"(){"+
 						"var txt=\"\";"+
 						"for (var i = 0; i < "+name+"List.length; i++) {"+
-							"txt=txt+\"<span class=\'label label-success\'  style=\'margin-left: 5px;\'>\"+"+name+"List[i]+\"</span>\";"+
+							"txt=txt+\"<span class=\'label label-success\'  style=\'float: left;margin: auto;margin-left: 5px;\'>\"+"+name+"List[i]+\"</span>\";"+
 		    			"}"+
 		    			"document.getElementById(\""+name+"ListDiv\").innerHTML	=	txt ;"+
 		    			"}"+

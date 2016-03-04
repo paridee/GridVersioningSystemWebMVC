@@ -322,7 +322,7 @@ public class ModificationController {
 
 	@SuppressWarnings("unchecked")
 	@RequestMapping(value = "/getConflictResolution", method=RequestMethod.POST)
-    public void confRes(@RequestBody String data){
+    public @ResponseBody String  confRes(@RequestBody String data){
 		logger.info("arrived a resolution request");
 		logger.info("data "+data);
 		String escaped;
@@ -342,7 +342,7 @@ public class ModificationController {
 			pending.addAll(this.gridElementService.getElementByLabelAndState(subj.getLabel(), subj.getClass().getSimpleName(), GridElement.State.MAJOR_UPDATING));
 			pending.addAll(this.gridElementService.getElementByLabelAndState(subj.getLabel(), subj.getClass().getSimpleName(), GridElement.State.MINOR_CONFLICTING));
 			if(pending.size()==0){
-				return;
+				return "Gia salvato";
 			}
 			subj.setState(GridElement.State.WORKING);
 			Field[] fields		=	subj.getClass().getDeclaredFields();
@@ -396,6 +396,7 @@ public class ModificationController {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
+		return "ok";
 	}
 	
 	@RequestMapping(value = "/grids/update", method=RequestMethod.POST)
