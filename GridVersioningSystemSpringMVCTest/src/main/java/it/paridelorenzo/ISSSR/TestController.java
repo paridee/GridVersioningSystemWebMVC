@@ -100,6 +100,27 @@ public class TestController {
 
 	private static final Logger logger = LoggerFactory.getLogger(TestController.class);
 	
+	@RequestMapping(value = "/testaut", method = RequestMethod.GET)
+	public String homeGrdi(Locale locale, Model model) {
+		Practitioner pm	=	new Practitioner();
+		pm.setEmail("paride.casulli@gmail.com");
+		pm.setName("Paride Casulli");
+		pm.setPassword("$2a$10$04TVADrR6/SPLBjsK0N30.Jf5fNjBugSACeGv1S69dZALR7lSov0y");
+		Practitioner lorenzo	=	new Practitioner();
+		lorenzo.setEmail("lorenzo.labanca@gmail.com");
+		lorenzo.setName("Lorenzo La Banca");
+		lorenzo.setPassword("$2a$10$04TVADrR6/SPLBjsK0N30.Jf5fNjBugSACeGv1S69dZALR7lSov0y");
+		MeasurementGoal test	=	new MeasurementGoal();
+		test.setLabel("testMG");
+		test.getAuthors().add(pm);
+		test.getAuthors().add(lorenzo);
+		//this.practitionerService.add(pm);
+		//this.practitionerService.add(lorenzo);
+		this.gridElementService.addGridElement(test);
+		return "home";
+	}
+	
+	
 	@RequestMapping(value = "/step1", method = RequestMethod.GET)
 	public String homeGri(Locale locale, Model model) {
 		Practitioner pm	=	new Practitioner();
@@ -201,8 +222,8 @@ public class TestController {
 		}
 		Grid aGrid	=	null;
 		try {
-			aGrid	=	aFactory.loadFromJson(json, this.projectService);
-			this.logger.info(aGrid.toString());
+			aGrid	=	JSONFactory.loadFromJson(json, this.projectService);
+			logger.info(aGrid.toString());
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -210,6 +231,7 @@ public class TestController {
 		Grid start	=	aGrid;
 		try{
 			this.gridService.addGrid(start);
+			logger.info("grid saved");
 		}
 		catch(Exception e){
 			e.printStackTrace();
