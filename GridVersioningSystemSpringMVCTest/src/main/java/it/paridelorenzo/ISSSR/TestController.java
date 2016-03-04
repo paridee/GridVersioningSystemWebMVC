@@ -59,6 +59,14 @@ public class TestController {
 	private PractitionerService practitionerService;
 	private GridModificationService gridModificationService;
 	private DefaultResponsibleService defaultResponsibleService;
+	private JSONFactory 		aFactory;
+	
+	
+	@Autowired(required=true)
+	@Qualifier(value="jsonFactory")
+	public void setaFactory(JSONFactory aFactory) {
+		this.aFactory = aFactory;
+	}
 	
 	@Autowired(required=true)
 	@Qualifier(value="practitionerService")
@@ -212,7 +220,6 @@ public class TestController {
 	
 	@RequestMapping(value = "/testLorenzo2", method = RequestMethod.GET)
 	public String homeGrifddfdf(Locale locale, Model model) {
-		JSONFactory aFactory	=	new JSONFactory();
 		String json	=	null;
 		try {
 			json = new String(Files.readAllBytes(Paths.get("/home/paride/", "grid.txt")));
@@ -222,7 +229,7 @@ public class TestController {
 		}
 		Grid aGrid	=	null;
 		try {
-			aGrid	=	JSONFactory.loadFromJson(json, this.projectService);
+			aGrid	=	aFactory.loadFromJson(json, this.projectService);
 			logger.info(aGrid.toString());
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
@@ -275,6 +282,13 @@ public class TestController {
 		mg2	=	(MeasurementGoal) mg2.clone();
 		mg2.setInterpretationModel("un modello interpretativo");
 		mg2.setDescription("meassssssssssss");
+		mg2.getAuthors().add(lorenzo);
+		mg2.getAuthors().add(pm);
+		Practitioner newPract	=	new Practitioner();
+		newPract.setEmail("totti@gmail.com");
+		newPract.setName("Francesco Totti");
+		newPract.setPassword("$2a$10$04TVADrR6/SPLBjsK0N30.Jf5fNjBugSACeGv1S69dZALR7lSov0y");
+		mg2.getAuthors().add(newPract);
 		start	=	this.gridService.updateGridElement(start, mg2, true, true);
 		map	=	start.obtainAllEmbeddedElements();
 		Strategy s3	=	(Strategy) map.get("s3");
@@ -616,7 +630,6 @@ public class TestController {
 			
 			Date date = new Date();
 			DateFormat dateFormat = DateFormat.getDateTimeInstance(DateFormat.LONG, DateFormat.LONG, locale);
-			JSONFactory testFactory	=	new JSONFactory();
 			Project test	=	new Project();
 			test.setDescription("progetto di prova");
 			Grid testGrid	=	new Grid();
@@ -690,9 +703,9 @@ public class TestController {
 			newRel	=	this.gridService.updateGridElement(newRel, anotherGoal,false,true);
 			this.gridService.addGrid(newRel);
 			System.out.println("TEST JSON");
-			System.out.println(testFactory.obtainJson(firstGoal, JSONType.FIRST));
+			System.out.println(aFactory.obtainJson(firstGoal, JSONType.FIRST));
 			System.out.println("TEST JSON GRID");
-			System.out.println(testFactory.obtainJson(newRel, JSONType.FIRST,testGrid));
+			System.out.println(aFactory.obtainJson(newRel, JSONType.FIRST,testGrid));
 			System.out.println("TEST JSON GRID ref "+testGrid);
 			return "home";
 	}

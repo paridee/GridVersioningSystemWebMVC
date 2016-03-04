@@ -66,6 +66,14 @@ public class HomeController {
 	private GridElementService 	gridElementService;
 	private GridService			gridService;
 	private ProjectService		projectService;
+	private JSONFactory 		aFactory;
+	
+	
+	@Autowired(required=true)
+	@Qualifier(value="jsonFactory")
+	public void setaFactory(JSONFactory aFactory) {
+		this.aFactory = aFactory;
+	}
 	
 	@Autowired(required=true)
 	@Qualifier(value="gridElementService")
@@ -126,7 +134,7 @@ public class HomeController {
 		mg2.add(pippo2);
 		mg2.add(testMG);
 		test2.setMainGoals(mg2);
-		String jsonV	=	new JSONFactory().obtainJson(pippo2, JSONType.FIRST).toString();
+		String jsonV	=	aFactory.obtainJson(pippo2, JSONType.FIRST).toString();
 		System.out.println("JSON Ottenuto "+jsonV);
 		List<Modification> mod;
 		try {
@@ -183,7 +191,7 @@ public class HomeController {
 			}
 			Grid testGrid = null;
 			try {
-				testGrid = JSONFactory.loadFromJson(everything, projectService);
+				testGrid = aFactory.loadFromJson(everything, projectService);
 				System.out.println("CARICATA GRID DA JSON "+everything);
 			} catch (Exception e) {
 				// TODO Auto-generated catch block
@@ -209,7 +217,7 @@ public class HomeController {
 			}
 			Grid testGrid2 = null;
 			try {
-				testGrid2 = JSONFactory.loadFromJson(everything, projectService);
+				testGrid2 = aFactory.loadFromJson(everything, projectService);
 				System.out.println("CARICATA GRID DA JSON "+everything);
 			} catch (Exception e) {
 				// TODO Auto-generated catch block
@@ -517,7 +525,7 @@ public class HomeController {
 		}
 		Grid testGrid;
 		try {
-			testGrid = JSONFactory.loadFromJson(everything, projectService);
+			testGrid = aFactory.loadFromJson(everything, projectService);
 			this.gridService.addGrid(testGrid);
 			System.out.println("CARICATA GRID DA JSON "+everything);
 		} catch (Exception e) {

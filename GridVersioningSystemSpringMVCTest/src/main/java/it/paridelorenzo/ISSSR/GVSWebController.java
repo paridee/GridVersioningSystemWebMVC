@@ -44,9 +44,16 @@ public class GVSWebController {
 	private GridService			gridService;
 	private PractitionerService 	practitionerService;
 	private ProjectService		projectService;
-	private JSONFactory 		jFact;
 	private DefaultResponsibleService	defaultResponsibleService;
 	private int nMenuButtons=3;
+	private JSONFactory 		aFactory;
+	
+	
+	@Autowired(required=true)
+	@Qualifier(value="jsonFactory")
+	public void setaFactory(JSONFactory aFactory) {
+		this.aFactory = aFactory;
+	}
 	
 	@Autowired(required=true)
 	@Qualifier(value="gridElementService")
@@ -764,7 +771,7 @@ public class GVSWebController {
 		//System.out.println(jsonData.toString());
 		Grid temp;
 		try {
-			temp = JSONFactory.loadFromJson(jsonData, this.projectService);
+			temp = aFactory.loadFromJson(jsonData, this.projectService);
 			Grid latest	=	this.gridService.getLatestGrid(temp.getProject().getId());
 			if(latest	==	null){
 				this.gridService.addGrid(temp);

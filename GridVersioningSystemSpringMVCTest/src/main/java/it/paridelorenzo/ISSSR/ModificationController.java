@@ -63,6 +63,14 @@ public class ModificationController {
 	private SubscriberPhaseService		subscriberPhaseService;
 	private DefaultResponsibleService	defaultResponsibleService;
 	private static final Logger logger = LoggerFactory.getLogger(ModificationController.class);
+	private JSONFactory 		aFactory;
+	
+	
+	@Autowired(required=true)
+	@Qualifier(value="jsonFactory")
+	public void setaFactory(JSONFactory aFactory) {
+		this.aFactory = aFactory;
+	}
 	
 	@Autowired(required=true)
 	@Qualifier(value="defaultResponsibleService")
@@ -166,7 +174,7 @@ public class ModificationController {
 			logger.info("modded elements array sizev- "+jsonData.length());
 			for(int i=0;i<jsonData.length();i++){
 				logger.info("obj - "+jsonData.get(i).toString());
-				loadedElem.add(JSONFactory.loadGridObj(jsonData.get(i).toString(), modifiedEl));
+				loadedElem.add(aFactory.loadGridObj(jsonData.get(i).toString(), modifiedEl));
 			}
 			ArrayList<Modification> mods	=	new ArrayList<Modification>();
 			for(int i=0;i<loadedElem.size();i++){
@@ -183,7 +191,7 @@ public class ModificationController {
 					List<Goal> newMainGoals	=	new ArrayList<Goal>();
 					for(int r=0;r<mainGoalsJSONArray.length();r++){
 						String 	s		= 	(mainGoalsJSONArray.get(r)).toString();
-						Goal	aGoal	=	(Goal)JSONFactory.loadGridObj(s,Utils.convertHashMap(newVersion.obtainAllEmbeddedElements()));
+						Goal	aGoal	=	(Goal)aFactory.loadGridObj(s,Utils.convertHashMap(newVersion.obtainAllEmbeddedElements()));
 						newMainGoals.add(aGoal);
 					}
 					List<Modification> mgMods	=	GridModificationService.getMainGoalsModification(newVersion.getMainGoals(), newMainGoals);
@@ -329,7 +337,13 @@ public class ModificationController {
 				parsed.put(label, value);
 				logger.info("data read "+label+" "+value);
 			}
-			GridElement subj	=	this.gridElementService.getElementById(Integer.parseInt(parsed.get("id")),parsed.get("class")).clone();
+			GridElement subj			=	this.gridElementService.getElementById(Integer.parseInt(parsed.get("id")),parsed.get("class")).clone();
+			List<GridElement> pending	=	this.gridElementService.getElementByLabelAndState(subj.getLabel(), subj.getClass().getSimpleName(), GridElement.State.MAJOR_CONFLICTING);
+			pending.addAll(this.gridElementService.getElementByLabelAndState(subj.getLabel(), subj.getClass().getSimpleName(), GridElement.State.MAJOR_UPDATING));
+			pending.addAll(this.gridElementService.getElementByLabelAndState(subj.getLabel(), subj.getClass().getSimpleName(), GridElement.State.MINOR_CONFLICTING));
+			if(pending.size()==0){
+				return;
+			}
 			subj.setState(GridElement.State.WORKING);
 			Field[] fields		=	subj.getClass().getDeclaredFields();
 			for(int i=0;i<fields.length;i++){
@@ -399,7 +413,7 @@ public class ModificationController {
 			if(anObject.has("newGrid")){
 				jsonData	=	anObject.get("newGrid").toString();
 			}
-			temp = JSONFactory.loadFromJson(jsonData, this.projectService);
+			temp = aFactory.loadFromJson(jsonData, this.projectService);
 			Grid referenceGrid	=	null;
 			Grid latestGrid;
 			//TODO get latest grid deve tornare ultima working grid
@@ -540,11 +554,9 @@ public class ModificationController {
 			//test
 			HashMap<String,GridElement> elements	=	refGrid.obtainAllEmbeddedElements();
 			System.out.println("###elementi su grid "+elements.keySet());
-			
-			JSONFactory testFactory	=	new JSONFactory();
 			logger.info("JSON loaded "+text);
 			logger.info("loaded grid version "+refGrid.getVersion()+" for project "+refGrid.getProject().getProjectId());
-			mods	=	testFactory.loadModificationJson(text, refGrid);
+			mods	=	aFactory.loadModificationJson(text, refGrid);
 			logger.info("Final modification list:");
 			for(int i=0;i<mods.size();i++){
 				System.out.println(mods.get(i).toString());
