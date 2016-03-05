@@ -70,7 +70,7 @@
 												String geString=Utils.gridElementToHTMLString(we,ges,true);
 												out.println(geString);%>
 											<div class="panel-footer">
-												<input type="button" value="Accept" onclick="acceptGE('<%
+												<input type="button"class="btn btn-default" value="Accept" onclick="acceptGE('<%
 													JSONObject	obj	=	new JSONObject();
 													obj.put("type", we.getClass().getSimpleName());
 													obj.put("id", we.getIdElement());
@@ -102,7 +102,7 @@
 					       				<%out.println(Utils.gridElementToHTMLString(ge,ges,true));
 					       				%>
 					       					<div class="panel-footer">
-												<input type="button" value="Accept" onclick="acceptGE('<%
+												<input type="button" class="btn btn-default" value="Accept" onclick="acceptGE('<%
 														obj	=	new JSONObject();
 														obj.put("type", ge.getClass().getSimpleName());
 														obj.put("id", ge.getIdElement());

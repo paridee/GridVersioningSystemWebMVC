@@ -26,7 +26,7 @@
 			
 		  </ul>
 		  <c:if test="${pageContext.request.userPrincipal.name != null}">
-		  		<p ${navClass4} style="float: right; margin-top: 15px;"><a href="<c:url value='/j_spring_security_logout'/>">Logout</a></p>
+		  		<p ${navClass4} style="float: right; margin-top: 15px;"><a href="<c:url value='/j_spring_security_logout'/>">${pageContext.request.userPrincipal.name} Logout</a></p>
 		  	</c:if>
 		  
         </div><!--/.nav-collapse -->
