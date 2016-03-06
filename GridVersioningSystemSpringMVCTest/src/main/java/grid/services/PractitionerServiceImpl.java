@@ -8,7 +8,6 @@ import org.springframework.transaction.annotation.Transactional;
 import grid.entities.Practitioner;
 import grid.entities.Project;
 import grid.interfaces.DAO.PractitionerDAO;
-import grid.interfaces.services.GridElementService;
 import grid.interfaces.services.GridService;
 import grid.interfaces.services.PractitionerService;
 import grid.interfaces.services.ProjectService;

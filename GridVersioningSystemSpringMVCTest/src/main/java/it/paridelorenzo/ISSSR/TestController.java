@@ -55,7 +55,6 @@ public class TestController {
 	private GridElementService 	gridElementService;
 	private GridService			gridService;
 	private ProjectService		projectService;
-	private JSONFactory 		jFact;
 	private PractitionerService practitionerService;
 	private GridModificationService gridModificationService;
 	private DefaultResponsibleService defaultResponsibleService;
@@ -243,6 +242,7 @@ public class TestController {
 		catch(Exception e){
 			e.printStackTrace();
 		}
+		/*
 		Practitioner pm	=	new Practitioner();
 		pm.setEmail("paride.casulli@gmail.com");
 		pm.setName("Paride Casulli");
@@ -331,7 +331,47 @@ public class TestController {
 		}
 		modObj.put("mainGoalsList", anArray);
 		this.logger.info("JSON MODIFICHE NUOVE "+modObj.toString());
-		//this.gridService.addGrid(start);//*/
+		HashMap<String,GridElement> elements	=	start.obtainAllEmbeddedElements();
+		Goal g1	=	(Goal)elements.get("g1");
+		Strategy nStr1	=	new Strategy();
+		nStr1.setLabel("added strategy");
+		ArrayList<Practitioner> nStr1Authors	=	new ArrayList<Practitioner>();
+		nStr1Authors.add(lorenzo);
+		nStr1Authors.add(pm);
+		nStr1.setAuthors(nStr1Authors);
+		nStr1.setDescription("strategy a runtime");
+		nStr1.setStrategyType("NONTERMINAL");
+		g1.getStrategyList().add(nStr1);
+		Goal innerGoal = new Goal();
+		innerGoal.setLabel("leaf");
+		innerGoal.setAuthors(nStr1Authors);
+		innerGoal.setDescription("aggiunto in 3 step");
+		nStr1.getGoalList().add(innerGoal);
+		MeasurementGoal unMeasGoal	=	new MeasurementGoal();
+		unMeasGoal.setAuthors(nStr1Authors);
+		unMeasGoal.setLabel("mgwwwwww");
+		unMeasGoal.setDescription("pippozzzz");
+		Question aQuestion	=	new Question();
+		aQuestion.setLabel("tobe");
+		aQuestion.setAuthors(nStr1Authors);
+		unMeasGoal.getQuestionList().add(aQuestion);
+		Metric metric1	=	new Metric();
+		metric1.setAuthors(nStr1Authors);
+		metric1.setLabel("availability");
+		metric1.setMetricType("boh");
+		metric1.setScaleType("ordinal");
+		aQuestion.getMetricList().add(metric1);
+		s3	=	(Strategy)elements.get("s3");
+		//s3.getGoalList().add(g1);
+		Goal g9843	=	(Goal) elements.get("g9843");
+		Strategy newadded	=	new Strategy();
+		newadded.setDescription("new added");
+		newadded.setAuthors(nStr1Authors);
+		newadded.setStrategyType("NONTERMINAL");
+		newadded.getGoalList().add(g1);
+		g9843.getStrategyList().add(newadded);
+		this.logger.info("JSON PRODOTTO "+aFactory.obtainJson(start, JSONType.FIRST,original));
+		//this.gridService.addGrid(start);//
 		DefaultResponsible testpm	=	new DefaultResponsible();
 		testpm.setClassName("pm");
 		testpm.setPractitioner(pm);
@@ -380,7 +420,7 @@ public class TestController {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		
+		*/
 		return "home";
 	}
 	
@@ -398,6 +438,30 @@ public class TestController {
 		Set<UserRole> roles	=	new HashSet<UserRole>();
 		roles.add(aRole);
 		pm.setUserRole(roles);
+		DefaultResponsible testpm	=	new DefaultResponsible();
+		testpm.setClassName("pm");
+		testpm.setPractitioner(pm);
+		this.defaultResponsibleService.add(testpm);
+		DefaultResponsible aResp	=	new DefaultResponsible();
+		aResp.setClassName("Goal");
+		aResp.setPractitioner(pm);
+		this.defaultResponsibleService.add(aResp);
+		aResp	=	new DefaultResponsible();
+		aResp.setClassName("MeasurementGoal");
+		aResp.setPractitioner(pm);
+		this.defaultResponsibleService.add(aResp);
+		aResp	=	new DefaultResponsible();
+		aResp.setClassName("Strategy");
+		aResp.setPractitioner(pm);
+		this.defaultResponsibleService.add(aResp);
+		aResp	=	new DefaultResponsible();
+		aResp.setPractitioner(pm);
+		aResp.setClassName("Question");
+		this.defaultResponsibleService.add(aResp);
+		aResp	=	new DefaultResponsible();
+		aResp.setClassName("Metric");
+		aResp.setPractitioner(pm);
+		this.defaultResponsibleService.add(aResp);
 		this.practitionerService.add(pm);
 		return "home";
 	}

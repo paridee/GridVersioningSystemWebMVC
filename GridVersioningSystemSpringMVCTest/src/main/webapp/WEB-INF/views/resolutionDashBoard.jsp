@@ -30,6 +30,7 @@
     
     <%if(projPending.size()!=0){
     	for(Project p: projPending){
+    		System.out.println("test1 "+p);
     		Practitioner pm=p.getProjectManager();
     		if(pm==null){
     			pm=drs.getResponsibleByClassName("pm").getPractitioner();

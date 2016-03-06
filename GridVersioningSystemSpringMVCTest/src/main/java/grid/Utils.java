@@ -6,11 +6,7 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.lang.reflect.Field;
 import java.lang.reflect.ParameterizedType;
-import java.text.Format;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Properties;
@@ -109,6 +105,7 @@ public class Utils {
 	 * @param c class to be checked
 	 * @return field list
 	 */
+	@SuppressWarnings("rawtypes")
 	public static List<String> getFieldNamesForAClass(Class c){
 		ArrayList<String>	fieldsL	=	new ArrayList<String>();
 		Field[] fields	=	c.getDeclaredFields();

@@ -1,10 +1,6 @@
 package grid.interfaces.services;
 
 import java.util.List;
-
-import org.json.JSONObject;
-
-import grid.JSONFactory.JSONType;
 import grid.entities.Grid;
 import grid.entities.GridElement;
 import grid.entities.Practitioner;

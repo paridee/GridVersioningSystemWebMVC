@@ -4,11 +4,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
-
-import org.json.JSONObject;
 import org.springframework.transaction.annotation.Transactional;
-
-import grid.JSONFactory.JSONType;
 import grid.Utils;
 import grid.entities.DefaultResponsible;
 import grid.entities.Goal;
