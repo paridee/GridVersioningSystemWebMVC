@@ -4,6 +4,7 @@ import java.util.List;
 import grid.entities.Grid;
 import grid.entities.GridElement;
 import grid.entities.Practitioner;
+import grid.entities.Project;
 
 /**
  * Interface defining methods for a Grid service, following CRUD operations and more
@@ -107,4 +108,10 @@ public interface GridService {
 	 */
 	public boolean isAddUpdate(Grid oldGrid, Grid newGrid);
 	
+	/**
+	 * Returns a list with Grid Log within
+	 * @return Json Grid list
+	 */
+	public String getJsonWorkingGridLog(Project prj);
+		
 }

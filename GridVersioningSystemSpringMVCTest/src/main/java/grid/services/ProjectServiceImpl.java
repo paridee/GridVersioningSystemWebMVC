@@ -2,6 +2,8 @@ package grid.services;
 
 import java.util.List;
 
+import org.json.JSONArray;
+
 import grid.entities.Project;
 import grid.interfaces.DAO.ProjectDAO;
 import grid.interfaces.services.ProjectService;
@@ -37,6 +39,18 @@ public class ProjectServiceImpl implements ProjectService{
 	public Project getProjectByProjectId(String id) {
 		return this.projectDAO.getProjectByProjectId(id);
 	}
-	
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public String getJsonProjectList() {
+		JSONArray 		array		=	new JSONArray();
+		List<Project> 	projects	=	this.listProjects();
+		for(Project pr:projects){
+			array.put(pr.getProjectId());
+		}
+		return array.toString();
+	}
 
 }

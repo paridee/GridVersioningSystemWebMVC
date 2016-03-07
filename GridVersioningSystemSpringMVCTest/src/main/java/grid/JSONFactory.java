@@ -665,8 +665,19 @@ public class JSONFactory {
 	 * @param type type of JSON
 	 * @return JSON
 	 */
-	@SuppressWarnings("rawtypes")
 	public JSONObject obtainJson(GridElement element,JSONType type){
+		return obtainJson(element,type,false);
+	}
+	
+	/**
+	 * Obtain a JSON from an element
+	 * @param element element to be serialized
+	 * @param type type of JSON
+	 * @param extended if true show also element id and creation timestamp
+	 * @return
+	 */
+	@SuppressWarnings("rawtypes")
+	public JSONObject obtainJson(GridElement element,JSONType type,boolean extended){
 		JSONObject	returnObject	=	new JSONObject();
 		String		id				=	element.getLabel();
 		String		typeC			=	element.getClass().getSimpleName().toString();
@@ -716,14 +727,14 @@ public class JSONFactory {
 							Object listElement	=	list.get(j);
 							if(listElement instanceof Metric){
 								if(type	==	JSONType.FIRST){
-									array.put(this.obtainJson((GridElement)list.get(j), type));
+									array.put(this.obtainJson((GridElement)list.get(j), type,extended));
 								}
 								else if(type	==	JSONType.SECOND){
 									array.put(((GridElement)list.get(j)).getIdElement());
 								}
 							}
 							else if(listElement instanceof GridElement){
-								array.put(this.obtainJson((GridElement)list.get(j), type));
+								array.put(this.obtainJson((GridElement)list.get(j), type,extended));
 							}
 							else{
 								array.put(list.get(j));
@@ -738,11 +749,11 @@ public class JSONFactory {
 								innerObj	=	((MeasurementGoal)fieldValue).getLabel();	
 							}
 							else if(type	==	JSONType.SECOND){
-								innerObj	=	this.obtainJson(((MeasurementGoal)fieldValue),type);
+								innerObj	=	this.obtainJson(((MeasurementGoal)fieldValue),type,extended);
 							}
 						}
 						else if(fieldValue instanceof GridElement){
-							innerObj	=	this.obtainJson((GridElement)fieldValue, type);
+							innerObj	=	this.obtainJson((GridElement)fieldValue, type,extended);
 						}
 						else{
 							innerObj	=	fieldValue;
@@ -769,6 +780,10 @@ public class JSONFactory {
 		if(auth.length()>0){
 			returnObject.put("authors", auth);
 		}
+		if(extended==true){
+			returnObject.put("dbId", element.getIdElement());
+			returnObject.put("timestamp", element.getTimestamp());
+		}
 		return returnObject;
 	}
 	
@@ -780,11 +795,23 @@ public class JSONFactory {
 	 * @return JSON
 	 */
 	public JSONObject obtainJson(Grid aGrid,JSONType type,Grid refGrid){
+		return obtainJson(aGrid,type,refGrid,false);
+	}
+	
+	/**
+	 * Obtain a JSON from a grid
+	 * @param aGrid grid to be serialized
+	 * @param type type of JSON
+	 * @param refGrid (optional)
+	 * @param extended tell if include timestamps and id
+	 * @return JSON
+	 */
+	public JSONObject obtainJson(Grid aGrid,JSONType type,Grid refGrid,boolean extended){
 		JSONObject 	returnObject	=	new JSONObject();
 		List<Goal> 	mainGoal		=	aGrid.getMainGoals();
 		JSONArray	mainGoalArray	=	new JSONArray();
 		for(int i=0;i<mainGoal.size();i++){
-			mainGoalArray.put(this.obtainJson(mainGoal.get(i), type));
+			mainGoalArray.put(this.obtainJson(mainGoal.get(i), type,extended));
 		}
 		returnObject.put("goalList", mainGoalArray);
 		HashMap<String,GridElement> elements	=	aGrid.obtainAllEmbeddedElements();
@@ -816,7 +843,7 @@ public class JSONFactory {
 				destinationArray	=	strategyList;
 			}
 			if(destinationArray!=null){//may have goals, with null array
-				JSONObject anObj	=	this.obtainJson(anEl, type);
+				JSONObject anObj	=	this.obtainJson(anEl, type, extended);
 				destinationArray.put(anObj);
 			}
 		}
@@ -826,6 +853,10 @@ public class JSONFactory {
 		returnObject.put("questionList", questionList);
 		returnObject.put("strategyList", strategyList);
 		logger.info("reference grid "+refGrid);
+		if(extended==true){
+			returnObject.put("timestamp", aGrid.getTimestamp());
+			returnObject.put("dbId", aGrid.getId());
+		}
 		if (refGrid!=null){
 			logger.info("exists reference grid "+refGrid);
 			JSONObject shell	=	new JSONObject();

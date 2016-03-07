@@ -13,6 +13,7 @@ import org.javers.core.diff.Change;
 import org.javers.core.diff.Diff;
 import org.javers.core.diff.changetype.ValueChange;
 import org.javers.core.diff.changetype.container.ListChange;
+import org.json.JSONArray;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -253,6 +254,18 @@ public class GridElementServiceImpl implements GridElementService {
 			}
 		}
 		return latest;
+	}
+
+	@Override
+	public String getJsonWorkingLogList(String label, String classObj) {
+		JSONArray array	=	new JSONArray();
+		List<GridElement> list	=	this.getElementLog(label, classObj);
+		for(GridElement ge:list){
+			if(ge.getState()==GridElement.State.WORKING){
+				array.put(ge.getIdElement());
+			}
+		}
+		return array.toString();
 	}
 		
 }

@@ -30,5 +30,11 @@ public interface ProjectService {
 	 * @return a project
 	 */
 	public Project getProjectByProjectId(String id);
-
+	
+	/**
+	 * Obtain a JSON list with all the projects within
+	 * @return json with list
+	 */
+	public String getJsonProjectList();
+	
 }

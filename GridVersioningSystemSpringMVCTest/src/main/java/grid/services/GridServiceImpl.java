@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+
+import org.json.JSONArray;
 import org.springframework.transaction.annotation.Transactional;
 import grid.Utils;
 import grid.entities.DefaultResponsible;
@@ -288,5 +290,21 @@ public class GridServiceImpl implements GridService {
 		}
 		return practitioners;
 	}
+	
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public String getJsonWorkingGridLog(Project prj) {
+		JSONArray array		=	new JSONArray();
+		List<Grid> listG	=	this.getGridLog(prj.getId());
+		for(Grid aGrid:listG){
+			if(aGrid.obtainGridState()==Grid.GridState.WORKING){
+				array.put(aGrid.getId());
+			}
+		}
+		return array.toString();
+	}
+	
 
 }

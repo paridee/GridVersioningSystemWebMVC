@@ -91,6 +91,12 @@ public interface GridElementService {
 	 */
 	public List<GridElement> getAllLatestWorking();
 	
-	
+	/**
+	 * Returns a list with all the working version of an element within
+	 * @param label label of the element
+	 * @param classObj class of the Grid Element
+	 * @return json 
+	 */
+	public String getJsonWorkingLogList(String label, String classObj);
 	
 }
