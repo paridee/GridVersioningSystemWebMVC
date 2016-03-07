@@ -20,20 +20,22 @@ import it.ermes.Request;
 public class DemoController {
 	final static Logger logger = LoggerFactory.getLogger(DemoController.class);
 
-	@RequestMapping(value = "/DEMO/getLatestGrid", method = RequestMethod.POST, headers = "Accept=application/json")
+	@RequestMapping(value = "/DEMORequest", method = RequestMethod.POST, headers = "Accept=application/json")
 	public @ResponseBody String getGrid(@RequestBody String jsonData)
 			throws IOException {
 		logger.info("Entro in Demo get latest grid "+jsonData);
 		final String GRID_SERVICE_URL = "http://192.168.56.1:8080/Tesi/inboundChannel.html";
 		JSONObject obj=new JSONObject(jsonData);
 		String project=obj.getString("project");
+		String ermesRequest=obj.getString("request");
 		String result;
 		logger.info(project);
 		try {
 			RestTemplate restTemplate = new RestTemplate();
 			ArrayList<String> arr = new ArrayList<String>();
 			arr.add(project);
-			arr.add("LatestGrid");
+			arr.add(ermesRequest);
+			//TODO add parameters to data
 			Request request = new Request("level3Direct", arr, "http://192.168.56.101:8080", null, null);
 			Request requestOut = restTemplate.postForObject(GRID_SERVICE_URL, request, Request.class);
 			result = requestOut.getContent().get(0);

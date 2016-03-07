@@ -38,10 +38,10 @@
     	function getGrid() {
 			$.ajax({
 				type : "POST",
-				url : "/ISSSR/DEMO/getLatestGrid",
+				url : "/ISSSR/DEMORequest",
 				contentType: "application/json; charset=utf-8",
 		  	    dataType: "json",
-		  	   	data : JSON.stringify({"project":"ProjectMorpheus"}),
+		  	   	data : JSON.stringify({"project":"ProjectMorpheus","request":"LatestGrid"}),
 		  	  	success: function (msg) 
             	{ alert(JSON.stringify(msg)) },
     			error: function (err)
