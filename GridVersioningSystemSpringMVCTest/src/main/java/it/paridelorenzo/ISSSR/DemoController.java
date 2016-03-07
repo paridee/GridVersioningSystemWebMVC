@@ -20,34 +20,41 @@ import it.ermes.Request;
 public class DemoController {
 	final static Logger logger = LoggerFactory.getLogger(DemoController.class);
 
-	@RequestMapping(value = "/DEMOgetLatestGrid", method = RequestMethod.POST, headers = "Accept=application/json")
-	public @ResponseBody boolean getGrid(@RequestBody String jsonData)
+	@RequestMapping(value = "/DEMO/getLatestGrid", method = RequestMethod.POST, headers = "Accept=application/json")
+	public @ResponseBody String getGrid(@RequestBody String jsonData)
 			throws IOException {
 		logger.info("Entro in Demo get latest grid "+jsonData);
 		final String GRID_SERVICE_URL = "http://192.168.56.1:8080/Tesi/inboundChannel.html";
 		JSONObject obj=new JSONObject(jsonData);
 		String project=obj.getString("project");
 		String result;
+		logger.info(project);
 		try {
 			RestTemplate restTemplate = new RestTemplate();
-			//result = restTemplate.getForObject(GRID_SERVICE_URL, String.class);
-//LUCA FANELLI
 			ArrayList<String> arr = new ArrayList<String>();
 			arr.add(project);
 			arr.add("LatestGrid");
 			Request request = new Request("level3Direct", arr, "http://192.168.56.101:8080", null, null);
 			Request requestOut = restTemplate.postForObject(GRID_SERVICE_URL, request, Request.class);
 			result = requestOut.getContent().get(0);
-//LUCA FANELLI	
 		} catch (RestClientException ex) {
-			throw new IOException();
+			JSONObject jsonObject = new JSONObject();
+			jsonObject.put("type", "error");
+			jsonObject.put("msg", "Rest Client Exception");
+			return jsonObject.toString();
 		} catch (IllegalArgumentException ex) {
-			throw new IOException();
+			JSONObject jsonObject = new JSONObject();
+			jsonObject.put("type", "error");
+			jsonObject.put("msg", "Illegal Argument Exception");
+			return jsonObject.toString();
 		}
 
 		logger.info("Ricevuta griglia: " + result);
 		
-		return true;
+		JSONObject jsonObject = new JSONObject();
+		jsonObject.put("type", "grid");
+		jsonObject.put("msg", result);
+		return jsonObject.toString();
 	}
 
 }

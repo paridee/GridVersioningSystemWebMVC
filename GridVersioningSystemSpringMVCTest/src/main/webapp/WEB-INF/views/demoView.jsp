@@ -35,25 +35,17 @@
       <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js' />"></script>
     <![endif]-->
     <script type="text/javascript">
-    	//$.post("/grids/add", { jsonData: "testjsonData" });
     	function getGrid() {
-    		alert("ci sto");
-	$.ajax({
-		type : "POST",
-		url : "/ISSSR/DEMOgetLatestGrid",
-		data : JSON.stringify({"project":"ProjectMorpheus"}),
-		success : function() {
-			alert("ok");
-			
-			
-			
-			
-			
-			
-		},
-		error : function() {
-			alert("The System could not load a grid from GVS.");
-		}
+			$.ajax({
+				type : "POST",
+				url : "/ISSSR/DEMO/getLatestGrid",
+				contentType: "application/json; charset=utf-8",
+		  	    dataType: "json",
+		  	   	data : JSON.stringify({"project":"ProjectMorpheus"}),
+		  	  	success: function (msg) 
+            	{ alert(JSON.stringify(msg)) },
+    			error: function (err)
+    			{ alert(err.responseText)}
 	});
 }
     	

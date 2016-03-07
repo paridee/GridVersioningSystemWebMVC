@@ -706,7 +706,7 @@ public class JSONFactory {
 		//gets the fields list of the elemen
 		Field[]	fields	=	element.getClass().getDeclaredFields();
 		for(int i=0;i<fields.length;i++){
-			System.out.println("FIELD "+fields[i].getName());
+			//System.out.println("FIELD "+fields[i].getName());
 			String 	fieldName	=	fields[i].getName();
 			fields[i].setAccessible(true);
 			Object fieldValue	=	null;

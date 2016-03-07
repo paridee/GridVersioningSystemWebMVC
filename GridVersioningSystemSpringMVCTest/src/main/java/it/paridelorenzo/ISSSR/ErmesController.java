@@ -2,6 +2,7 @@ package it.paridelorenzo.ISSSR;
 
 import java.io.IOException;
 
+import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -58,23 +59,41 @@ public class ErmesController {
 				+ request.getObject() + " from project " + request.getProject());
 		Persistence persistence = new Persistence();
 		String tmp = "";
-		Project currentPrj=this.projectService.getProjectByProjectId(request.getProject());
-		int projid=currentPrj.getId();
 		if (request.getObject().equals("Project-info")) {  //TODO Deve andare su fase 6 (ora è simulata)
 			logger.info("PROJECT INFO");
 			tmp = persistence.obtainProject();
 		} else if (request.getObject().equals("LatestGrid")) {
-			Grid latest=this.gridService.getLatestWorkingGrid(projid);
-			tmp = this.jsonFactory.obtainJson(latest,JSONType.FIRST , null).toString();
-			logger.info(tmp);
+			Project currentPrj=this.projectService.getProjectByProjectId(request.getProject());
+			if(currentPrj!=null){
+				int projid=currentPrj.getId();
+				logger.info("projid: "+projid);
+				Grid latest=this.gridService.getLatestWorkingGrid(projid);
+				tmp = this.jsonFactory.obtainJson(latest,JSONType.FIRST , null).toString();
+				logger.info(tmp);
+			}
+			else{
+				JSONObject jsonObject = new JSONObject();
+				jsonObject.put("type", "error");
+				jsonObject.put("msg", "cannot find the requested project");
+				tmp =jsonObject.toString();
+			}
 		}
 		else if (request.getObject().equals("ProjectList")) {	//array con id delle grid working
 			tmp = this.projectService.getJsonProjectList();
 			logger.info(tmp);
 		}
 		else if (request.getObject().equals("GridHistory")) {	//array con id delle grid working
-			tmp = this.gridService.getJsonWorkingGridLog(currentPrj);
-			logger.info(tmp);
+			Project currentPrj=this.projectService.getProjectByProjectId(request.getProject());
+			if(currentPrj!=null){
+				tmp = this.gridService.getJsonWorkingGridLog(currentPrj);
+				logger.info(tmp);
+			}
+			else{
+				JSONObject jsonObject = new JSONObject();
+				jsonObject.put("type", "error");
+				jsonObject.put("msg", "cannot find the requested project");
+				tmp =jsonObject.toString();
+			}
 		}
 		else if (request.getObject().equals("Grid")) {	
 			int gid=Integer.parseInt(request.getData());
@@ -98,13 +117,12 @@ public class ErmesController {
 			tmp=this.gridElementService.getJsonWorkingLogList(label, type);
 			logger.info(tmp);
 		}
-		
-		
-		
-		
 		else{
 			logger.info(request.getObject());
 		}
+		
+		
+		
 		Level3Request out = new Level3Request(request.getTag(),
 				request.getProject(), request.getObject(),
 				request.getDestinationAdress(), tmp, request.getId(),

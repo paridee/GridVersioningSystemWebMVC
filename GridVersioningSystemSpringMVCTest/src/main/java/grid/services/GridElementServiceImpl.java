@@ -148,7 +148,7 @@ public class GridElementServiceImpl implements GridElementService {
 				ListChange	thisListChange	=	(ListChange) thisChange;
 				Field listField;
 				try {
-					System.out.println("OLD ELEMENT CLASS "+oldElement.getClass()+" FIELD "+thisListChange.getPropertyName());
+					//System.out.println("OLD ELEMENT CLASS "+oldElement.getClass()+" FIELD "+thisListChange.getPropertyName());
 					listField = oldElement.getClass().getDeclaredField(thisListChange.getPropertyName());
 					listField.setAccessible(true);
 					List<?> 	oldList		=	(List<?>)listField.get(oldElement);
