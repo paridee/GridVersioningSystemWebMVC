@@ -68,6 +68,10 @@ public class ErmesController {
 			tmp = this.jsonFactory.obtainJson(latest,JSONType.FIRST , null).toString();
 			logger.info(tmp);
 		}
+		else if (request.getObject().equals("ProjectList")) {	//array con id delle grid working
+			tmp = this.projectService.getJsonProjectList();
+			logger.info(tmp);
+		}
 		else if (request.getObject().equals("GridHistory")) {	//array con id delle grid working
 			tmp = this.gridService.getJsonWorkingGridLog(currentPrj);
 			logger.info(tmp);

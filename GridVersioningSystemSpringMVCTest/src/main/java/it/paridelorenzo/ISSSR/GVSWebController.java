@@ -102,6 +102,12 @@ public class GVSWebController {
 		return "GVShome";
     }
 	
+	@RequestMapping(value = "/demoView", method = RequestMethod.GET)
+    public String demoView(Model model) {
+		model.addAttribute("pageTitle", "demoView");
+		return "demoView";
+    }
+	
 	//======================================================================
 
 	
