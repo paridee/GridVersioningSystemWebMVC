@@ -403,6 +403,21 @@ public class GridModificationService {
 		}
 	}
 	
+	/**
+	 * Send a notificaton to PM for a new Grid availability
+	 * @param newGrid new Grid
+	 */
+	private void sendNewGridVersionNotification(Grid newGrid){
+		Practitioner pm	=	newGrid.getProject().getProjectManager();
+		if(pm==null){
+			logger.info("There is no PM!!! Use the default one");
+			pm	= this.defaultResponsibleService.getResponsibleByClassName("pm").getPractitioner();
+		}
+		if(pm!=null){
+			Utils.mailSender("GQM+S Versioning alert", "Dear "+pm.getName()+", the following Project: "+newGrid.getProject().getProjectId()+" has a new Grid available, please check on "+Utils.systemURL,pm.getEmail());
+		}
+	}
+	
 	private void sendGridElementNotification(GridElement modified,Grid aGrid) {
 		ArrayList<Practitioner> responsibles	=	new ArrayList<Practitioner>();
 		if(Modification.minorUpdateClass.contains(modified.getClass())){
