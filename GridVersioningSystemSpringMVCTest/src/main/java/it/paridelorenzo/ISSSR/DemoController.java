@@ -54,7 +54,7 @@ public class DemoController {
 		logger.info("Ricevuta griglia: " + result);
 		
 		JSONObject jsonObject = new JSONObject();
-		jsonObject.put("type", "grid");
+		jsonObject.put("type", "result");
 		jsonObject.put("msg", result);
 		return jsonObject.toString();
 	}
