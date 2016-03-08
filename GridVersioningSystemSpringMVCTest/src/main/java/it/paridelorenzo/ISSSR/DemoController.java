@@ -48,6 +48,7 @@ public class DemoController {
 			JSONObject jsonObject = new JSONObject();
 			jsonObject.put("type", "error");
 			jsonObject.put("msg", "Illegal Argument Exception");
+			logger.info("catched exception");
 			return jsonObject.toString();
 		}
 
