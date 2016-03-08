@@ -45,6 +45,11 @@ public class ErmesController {
 		this.gridService = gridService;
 	}
 	@Autowired(required=true)
+	@Qualifier(value="gridElementService")
+	public void setGridElementService(GridElementService gridElementService) {
+		this.gridElementService = gridElementService;
+	}
+	@Autowired(required=true)
 	@Qualifier(value="projectService")
 	public void setProjectService(ProjectService projectService) {
 		this.projectService = projectService;
@@ -56,7 +61,7 @@ public class ErmesController {
 			throws IOException {
 
 		logger.info("\nDATA from LEVEL 3 direct, requested object: "
-				+ request.getObject() + " from project " + request.getProject());
+				+ request.getObject() + " from project " + request.getProject()+" with data "+request.getData());
 		Persistence persistence = new Persistence();
 		String tmp = "";
 		if (request.getObject().equals("Project-info")) {  //TODO Deve andare su fase 6 (ora è simulata)
@@ -68,8 +73,17 @@ public class ErmesController {
 				int projid=currentPrj.getId();
 				logger.info("projid: "+projid);
 				Grid latest=this.gridService.getLatestWorkingGrid(projid);
-				tmp = this.jsonFactory.obtainJson(latest,JSONType.FIRST , null).toString();
-				logger.info(tmp);
+				if(latest==null){
+					JSONObject jsonObject = new JSONObject();
+					jsonObject.put("type", "error");
+					jsonObject.put("msg", "cannot find a grid for the requested project");
+					tmp =jsonObject.toString();
+					
+				}
+				else{
+					tmp = this.jsonFactory.obtainJson(latest,JSONType.FIRST , null).toString();
+					logger.info(tmp);
+				}
 			}
 			else{
 				JSONObject jsonObject = new JSONObject();
@@ -96,26 +110,120 @@ public class ErmesController {
 			}
 		}
 		else if (request.getObject().equals("Grid")) {	
-			int gid=Integer.parseInt(request.getData());
-			tmp =this.jsonFactory.obtainJson(this.gridService.getGridById(gid),JSONType.FIRST , null,true).toString();
+			if(request.getData()!=""){
+				int gid=Integer.parseInt(request.getData());
+				if(this.gridService.getGridById(gid)!=null){
+					tmp =this.jsonFactory.obtainJson(this.gridService.getGridById(gid),JSONType.FIRST , null,true).toString();
+				}
+				else{
+					JSONObject jsonObject = new JSONObject();
+					jsonObject.put("type", "error");
+					jsonObject.put("msg", "cannot find the requested Grid");
+					tmp =jsonObject.toString();
+				}
+			}
+			else{
+				JSONObject jsonObject = new JSONObject();
+				jsonObject.put("type", "error");
+				jsonObject.put("msg", "Grid ID cannot be empty");
+				tmp =jsonObject.toString();
+			}
+			
 			logger.info(tmp);
 		}
-		else if (request.getObject().equals("GridElement")) {	
-			String command=request.getData();
-			String[] items=command.split(",");
-			int id=Integer.parseInt(items[0]);
-			String type=items[1];
-			GridElement current=this.gridElementService.getElementById(id, type);
-			tmp =this.jsonFactory.obtainJson(current, JSONType.FIRST).toString();
+		else if (request.getObject().equals("GridElement")) {
+			if(!request.getData().equals(",")){
+				String command=request.getData();
+				String[] items=command.split(",");
+				if(items.length==2){
+					try{
+						int id=Integer.parseInt(items[0]);
+						String type=items[1];
+						logger.info(id+type);
+						try{
+							GridElement current=this.gridElementService.getElementById(id, type);
+							if(current!=null){
+								tmp =this.jsonFactory.obtainJson(current, JSONType.FIRST).toString();
+							}
+							else{
+								JSONObject jsonObject = new JSONObject();
+								jsonObject.put("type", "error");
+								jsonObject.put("msg", "cannot find the requested GridElement");
+								tmp =jsonObject.toString();
+							}
+						}
+						catch(org.hibernate.hql.internal.ast.QuerySyntaxException e){
+							JSONObject jsonObject = new JSONObject();
+							jsonObject.put("type", "error");
+							jsonObject.put("msg", "Wrong parameters");
+							tmp =jsonObject.toString();
+						}
+						
+						
+					}
+					catch(NumberFormatException e){
+						JSONObject jsonObject = new JSONObject();
+						jsonObject.put("type", "error");
+						jsonObject.put("msg", "Wrong parameters");
+						tmp =jsonObject.toString();
+					}
+				}
+				else{
+					JSONObject jsonObject = new JSONObject();
+					jsonObject.put("type", "error");
+					jsonObject.put("msg", "Wrong parameters");
+					tmp =jsonObject.toString();
+				}
+				
+			}
+			else{
+				JSONObject jsonObject = new JSONObject();
+				jsonObject.put("type", "error");
+				jsonObject.put("msg", "Wrong parameters");
+				tmp =jsonObject.toString();
+			}
+			
 			logger.info(tmp);
 		}
-		else if (request.getObject().equals("GridElementHistory")) {	
-			String command=request.getData();
-			String[] items=command.split(",");
-			String label=items[0];
-			String type=items[1];
-			tmp=this.gridElementService.getJsonWorkingLogList(label, type);
-			logger.info(tmp);
+		else if (request.getObject().equals("GridElementHistory")) {
+			if(!request.getData().equals(",")){
+				String command=request.getData();
+				String[] items=command.split(",");
+				if(items.length==2){
+					String label=items[0];
+					String type=items[1];
+					try{
+						if(this.gridElementService.getJsonWorkingLogList(label, type)!=null){
+							tmp=this.gridElementService.getJsonWorkingLogList(label, type);
+						}
+						else{
+							JSONObject jsonObject = new JSONObject();
+							jsonObject.put("type", "error");
+							jsonObject.put("msg", "cannot find the requested GridElement");
+							tmp =jsonObject.toString();
+						}
+					}
+					catch(org.hibernate.hql.internal.ast.QuerySyntaxException e){
+						JSONObject jsonObject = new JSONObject();
+						jsonObject.put("type", "error");
+						jsonObject.put("msg", "Wrong parameters");
+						tmp =jsonObject.toString();
+					}
+					
+					logger.info(tmp);
+				}else{
+					JSONObject jsonObject = new JSONObject();
+					jsonObject.put("type", "error");
+					jsonObject.put("msg", "Wrong parameters");
+					tmp =jsonObject.toString();
+				}
+			}
+			else{
+				JSONObject jsonObject = new JSONObject();
+				jsonObject.put("type", "error");
+				jsonObject.put("msg", "Wrong parameters");
+				tmp =jsonObject.toString();
+			}
 		}
 		else{
 			logger.info(request.getObject());

@@ -28,13 +28,16 @@ public class DemoController {
 		JSONObject obj=new JSONObject(jsonData);
 		String project=obj.getString("project");
 		String ermesRequest=obj.getString("request");
+		String parameter=obj.getString("parms");
 		String result;
 		logger.info(project);
+		logger.info(ermesRequest);
 		try {
 			RestTemplate restTemplate = new RestTemplate();
 			ArrayList<String> arr = new ArrayList<String>();
 			arr.add(project);
 			arr.add(ermesRequest);
+			arr.add(parameter);
 			//TODO add parameters to data
 			Request request = new Request("level3Direct", arr, "http://192.168.56.101:8080", null, null);
 			Request requestOut = restTemplate.postForObject(GRID_SERVICE_URL, request, Request.class);
@@ -52,9 +55,12 @@ public class DemoController {
 		}
 		logger.info("Result: " + result);
 		JSONObject jsonObject = new JSONObject();
-		jsonObject.put("type", "result");
-		jsonObject.put("msg", result);
-		return jsonObject.toString();
+		JSONObject jsonObjectTemp = new JSONObject(result);
+		/*jsonObject.put("type", "result");
+		jsonObject.put("msg", jsonObjectTemp);
+		logger.info(jsonObject.get("msg").toString());*/
+		//return jsonObject.toString();
+		return jsonObjectTemp.toString();
 	}
 
 }

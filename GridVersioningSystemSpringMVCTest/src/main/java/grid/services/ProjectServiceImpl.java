@@ -3,6 +3,7 @@ package grid.services;
 import java.util.List;
 
 import org.json.JSONArray;
+import org.json.JSONObject;
 
 import grid.entities.Project;
 import grid.interfaces.DAO.ProjectDAO;
@@ -50,7 +51,9 @@ public class ProjectServiceImpl implements ProjectService{
 		for(Project pr:projects){
 			array.put(pr.getProjectId());
 		}
-		return array.toString();
+		JSONObject list=new JSONObject();
+		list.put("projectList", array);
+		return list.toString();
 	}
 
 }

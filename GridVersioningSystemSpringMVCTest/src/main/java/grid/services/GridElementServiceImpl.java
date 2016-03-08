@@ -14,6 +14,7 @@ import org.javers.core.diff.Diff;
 import org.javers.core.diff.changetype.ValueChange;
 import org.javers.core.diff.changetype.container.ListChange;
 import org.json.JSONArray;
+import org.json.JSONObject;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -265,7 +266,9 @@ public class GridElementServiceImpl implements GridElementService {
 				array.put(ge.getIdElement());
 			}
 		}
-		return array.toString();
+		JSONObject listTemp=new JSONObject();
+		listTemp.put("GridElementHistory", array);
+		return listTemp.toString();
 	}
 		
 }

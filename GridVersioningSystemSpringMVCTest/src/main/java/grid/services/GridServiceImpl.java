@@ -6,6 +6,7 @@ import java.util.Iterator;
 import java.util.List;
 
 import org.json.JSONArray;
+import org.json.JSONObject;
 import org.springframework.transaction.annotation.Transactional;
 import grid.Utils;
 import grid.entities.DefaultResponsible;
@@ -303,7 +304,9 @@ public class GridServiceImpl implements GridService {
 				array.put(aGrid.getId());
 			}
 		}
-		return array.toString();
+		JSONObject list=new JSONObject();
+		list.put("GridList", array);
+		return list.toString();
 	}
 	
 
