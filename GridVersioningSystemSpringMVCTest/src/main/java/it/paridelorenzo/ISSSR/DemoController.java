@@ -50,9 +50,7 @@ public class DemoController {
 			jsonObject.put("msg", "Illegal Argument Exception");
 			return jsonObject.toString();
 		}
-
-		logger.info("Ricevuta griglia: " + result);
-		
+		logger.info("Result: " + result);
 		JSONObject jsonObject = new JSONObject();
 		jsonObject.put("type", "result");
 		jsonObject.put("msg", result);
