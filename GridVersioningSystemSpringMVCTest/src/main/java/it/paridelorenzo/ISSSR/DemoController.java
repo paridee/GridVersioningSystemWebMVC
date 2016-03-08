@@ -43,6 +43,7 @@ public class DemoController {
 			JSONObject jsonObject = new JSONObject();
 			jsonObject.put("type", "error");
 			jsonObject.put("msg", "Rest Client Exception");
+			logger.info("another test");
 			return jsonObject.toString();
 		} catch (IllegalArgumentException ex) {
 			JSONObject jsonObject = new JSONObject();
