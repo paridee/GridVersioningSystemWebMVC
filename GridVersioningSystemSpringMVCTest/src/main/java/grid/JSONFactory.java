@@ -99,6 +99,11 @@ public class JSONFactory {
 		JSONObject 	obj			=	null;
 		try{
 			obj					=	new JSONObject(json);
+			if(!obj.has("project")){
+				
+				return null;
+			}
+			
 			if(obj.has("metricList")){
 				metricList			=	(JSONArray)obj.get("metricList");
 			}

@@ -783,31 +783,37 @@ public class GVSWebController {
 	
 	@RequestMapping(value = "/grids/add", method=RequestMethod.POST)
     public @ResponseBody String addGrid(@RequestBody String jsonData) {
-		//System.out.println(jsonData.toString());
 		Grid temp;
 		try {
 			temp = aFactory.loadFromJson(jsonData, this.projectService);
+			if (temp==null){
+				logger.info("in blocco null");
+				JSONObject jsonObject = new JSONObject();
+				jsonObject.put("type", "error");
+				jsonObject.put("msg", "Wrong format");
+				return jsonObject.toString();
+			}
 			Grid latest	=	this.gridService.getLatestGrid(temp.getProject().getId());
 			if(latest	==	null){
 				this.gridService.addGrid(temp);
 			}
 			else{
 				JSONObject jsonObject = new JSONObject();
-				jsonObject.put("msg", "error");
-				jsonObject.put("resp", "grid esistente");
+				jsonObject.put("type", "error");
+				jsonObject.put("msg", "Already exists a gird for this project");
 				return jsonObject.toString();
 				
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
 			JSONObject jsonObject = new JSONObject();
-			jsonObject.put("msg", "error");
-			jsonObject.put("resp", "eccezione generica");
+			jsonObject.put("type", "error");
+			jsonObject.put("msg", "Generic exception");
 			return jsonObject.toString();
 		}
 		JSONObject jsonObject = new JSONObject();
-		jsonObject.put("msg", "result");
-		jsonObject.put("resp", "ok");
+		jsonObject.put("type", "result");
+		jsonObject.put("msg", "Grid added successfully");
 		return jsonObject.toString();
     }
 

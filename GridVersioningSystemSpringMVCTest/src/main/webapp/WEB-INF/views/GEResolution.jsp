@@ -41,7 +41,10 @@
 						Lobibox.alert("error", //AVAILABLE TYPES: "error", "info", "success", "warning"
 				    			{
 				    			    msg: err.responseText,
-				    			    hidden: window.location.href = "/ISSSR/resolutionDashBoard",
+				    			    closeButton     : false,
+				    			    callback: function ($this, type, ev) {
+				    			    	 window.location.href = "/ISSSR/resolutionDashBoard";
+				    			    }
 				    			});
 					}
 			    });
@@ -51,10 +54,7 @@
         <%
         	
         	GridElement we=(GridElement)request.getAttribute("workingGE");
-			System.out.println("-----------------prova");
-			
-        	
-        	List <GridElement> pendinglist=(List<GridElement>)request.getAttribute("updatingElements");
+			List <GridElement> pendinglist=(List<GridElement>)request.getAttribute("updatingElements");
         	int nConflicts=(Integer)request.getAttribute("nupdatingElements");
         		%>
        				<div class="panel panel-default">

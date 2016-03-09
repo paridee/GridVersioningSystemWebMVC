@@ -421,7 +421,10 @@ public class ModificationController {
 			String projectID	=	temp.getProject().getProjectId();
 			Project	aProject	=	this.projectService.getProjectByProjectId(projectID);
 			if(aProject==null){
-				return "project "+projectID+" not found in DB";
+				JSONObject jsonObject = new JSONObject();
+				jsonObject.put("type", "error");
+				jsonObject.put("msg", "project "+projectID+" not found in DB");
+				return jsonObject.toString();
 			}
 			referenceGrid	=	this.gridService.getLatestWorkingGrid(aProject.getId());
 			latestGrid		=	referenceGrid;
@@ -443,7 +446,10 @@ public class ModificationController {
 				}
 			}
 			if(referenceGrid	==	null){
-				return "no grid available for this project, please upload a first one through the phase 2 entry point";
+				JSONObject jsonObject = new JSONObject();
+				jsonObject.put("type", "error");
+				jsonObject.put("msg", "no grid available for this project, please upload a first one through the phase 2 entry point");
+				return jsonObject.toString();
 			}
 			else{
 				ArrayList<String> modifiedObjectLabels	=	modifiedObjects(referenceGrid,latestGrid);
@@ -457,17 +463,25 @@ public class ModificationController {
 					System.out.println("found modification "+mods.get(i).toString());
 				}
 				if(mods.size()==0){
-					return "non ci sono modifiche";
+					JSONObject jsonObject = new JSONObject();
+					jsonObject.put("type", "success");
+					jsonObject.put("msg", "Grid updated without modifications");
+					return jsonObject.toString();
 				}
 				else{
 					Grid newVersion	=	this.gridModificationService.applyModifications(mods, latestGrid, modifiedObjectLabels);
 					this.gridService.addGrid(newVersion);
-					return "modifiche";
+					JSONObject jsonObject = new JSONObject();
+					jsonObject.put("type", "success");
+					jsonObject.put("msg", "Grid updated with modifications");
+					return jsonObject.toString();
 				}
 			}
 		} catch (Exception e) {
-			e.printStackTrace();
-			return "error: generic exception";
+			JSONObject jsonObject = new JSONObject();
+			jsonObject.put("type", "error");
+			jsonObject.put("msg", "Generic Exception");
+			return jsonObject.toString();
 		}
 		
     }

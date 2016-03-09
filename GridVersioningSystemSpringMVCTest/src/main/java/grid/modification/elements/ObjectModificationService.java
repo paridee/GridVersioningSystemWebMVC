@@ -42,18 +42,18 @@ public class ObjectModificationService {
 		}
 		ArrayList<GridElementModification> modifications	=	new ArrayList<GridElementModification>();
 		Javers 					javers			=	JaversBuilder.javers().registerValueObject(GridElement.class).build();
-		logger.info("elements compared "+oldElement+","+newElement);
+		//logger.info("elements compared "+oldElement+","+newElement);
 		Diff 					diff			=	javers.compare(oldElement, newElement);
 		List<Change> changes	=	diff.getChanges();
-		System.out.println("DIFF "+diff);
+		//System.out.println("DIFF "+diff);
 		for(int i=0;i<changes.size();i++){
 			Change current	=	changes.get(i);
-			System.out.println(current.getClass().getName()+" "+current.getAffectedObject().get());
+			//System.out.println(current.getClass().getName()+" "+current.getAffectedObject().get());
 			if(current.getClass().equals(ValueChange.class)){
 				ValueChange 		thisChange	=	(ValueChange)current;
 				GridElement 		changed		=	(GridElement)thisChange.getAffectedObject().get();
 				if((!(thisChange.getPropertyName().equals("idElement")||thisChange.getPropertyName().equals("logger")||thisChange.getPropertyName().equals("timestamp")||(thisChange.getPropertyName().equals("version")||(thisChange.getPropertyName().equals("state")))))&&(!thisChange.getAffectedGlobalId().value().contains("#"))){
-					System.out.println("Adding modification on "+changed.getLabel()+" field "+thisChange.getPropertyName()+" old value "+thisChange.getLeft()+" new value "+thisChange.getRight());
+					//System.out.println("Adding modification on "+changed.getLabel()+" field "+thisChange.getPropertyName()+" old value "+thisChange.getLeft()+" new value "+thisChange.getRight());
 					ObjectFieldModification 	thisMod		=	new ObjectFieldModification();
 					thisMod.setSubjectLabel(changed.getLabel());
 					thisMod.setFieldToBeChanged(thisChange.getPropertyName());
@@ -61,7 +61,7 @@ public class ObjectModificationService {
 					modifications.add(thisMod);
 				}
 				if(thisChange.getAffectedGlobalId().value().contains("grid.entities.Goal/#measurementGoal")){//ad hoc solution for measurement goal
-					System.out.println("cambio measurement goal");
+					//System.out.println("cambio measurement goal");
 					MeasurementGoal newMeasGoal	=	((Goal)newElement).getMeasurementGoal();
 					MeasurementGoal oldMeasGoal	=	((Goal)oldElement).getMeasurementGoal();
 					ObjectFieldModification 	thisMod		=	new ObjectFieldModification();
@@ -71,7 +71,7 @@ public class ObjectModificationService {
 						if(newMeasGoal!=null){
 							if(!oldMeasGoal.getLabel().equals(newMeasGoal.getLabel())){
 								thisMod.setNewValue(newMeasGoal);
-								System.out.println("cambio measurement goal aggiunto in lista");
+								//System.out.println("cambio measurement goal aggiunto in lista");
 								modifications.add(thisMod);
 							}
 						}
@@ -95,7 +95,7 @@ public class ObjectModificationService {
 				}
 				field.setAccessible(true);
 				if(!thisChange.getAffectedGlobalId().value().contains("#")){//excludes inner changes
-					System.out.println(oldElement+" new "+newElement+" field "+field.getName()+" change "+current.toString());
+					//System.out.println(oldElement+" new "+newElement+" field "+field.getName()+" change "+current.toString());
 					@SuppressWarnings("rawtypes")
 					List 	oldList 	= 	(List)field.get(oldElement);
 					@SuppressWarnings("rawtypes")

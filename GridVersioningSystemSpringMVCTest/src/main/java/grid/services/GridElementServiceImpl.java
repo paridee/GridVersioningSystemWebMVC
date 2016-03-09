@@ -122,19 +122,19 @@ public class GridElementServiceImpl implements GridElementService {
 		List<Change> elementChanges	=	diffElem.getChanges();
 		for(int i=0;i<elementChanges.size();i++){
 			Change thisChange	=	elementChanges.get(i);
-			System.out.println("Change type "+thisChange.getClass());
+			//System.out.println("Change type "+thisChange.getClass());
 			//there is a value change in an attribute
 			if(thisChange.getClass().equals(ValueChange.class)){
-				System.out.println("Value change detected");
+				//System.out.println("Value change detected");
 				ValueChange thisValueChange	=	(ValueChange) thisChange;
 				try {
 					System.out.println("left "+thisValueChange.getLeft()+" right "+thisValueChange.getRight());
 					if(thisValueChange.getLeft().getClass().equals(String.class)){
 						String oldS	=	(String)thisValueChange.getLeft();
 						String newS	=	(String)thisValueChange.getRight();
-						System.out.println(newS+" e' upgrade di "+oldS+"?");
+						//System.out.println(newS+" e' upgrade di "+oldS+"?");
 						if(!newS.startsWith(oldS)){
-							System.out.println(newS+"non e' upgrade di "+oldS);
+							//System.out.println(newS+"non e' upgrade di "+oldS);
 							return false;
 						}
 					}
@@ -163,7 +163,7 @@ public class GridElementServiceImpl implements GridElementService {
 						newMap.put(((GridElement)newList.get(j)).getLabel(), (GridElement)newList.get(j));
 					}
 					Diff elementDiff			=	javers.compare(oldMap,newMap);
-					System.out.println("Element comparison result "+elementDiff);
+					//System.out.println("Element comparison result "+elementDiff);
 					Set<String> oldKeySet	=	oldMap.keySet();
 					Iterator<String> anIterator	=	oldKeySet.iterator();
 					while(anIterator.hasNext()){

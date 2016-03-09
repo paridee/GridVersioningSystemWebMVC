@@ -13,8 +13,8 @@
 <meta name="description" content="">
 <meta name="author" content="">
 <link rel="icon" href="resources/bootstrap/favicon.ico">
-
-<title>Add Grid</title>
+<link rel="stylesheet" href="<c:url value='/resources/lobibox/dist/css/Lobibox.min.css' />"/>
+<title>GQM+S GridVersioningSystem DEMO</title>
 
 <!-- Bootstrap core CSS -->
 <link
@@ -64,21 +64,53 @@
 	}
 
 	 function uploadGrid(filename) {
-		 	alert(filename);
-	 
-			$.ajax({url: "/ISSSR/resources/"+filename, success: function(data) {
-	    		alert(data);
-
+		 	$.ajax({url: "/ISSSR/resources/"+filename, success: function(data) {
 	    		jQuery.ajax({
 	           		type: "POST",
 	      	   		url: "grids/update",
 		      	   	contentType: "application/json; charset=utf-8",
 		      	    dataType: "json",
 	    	  	   	data: data,
-	    	  	  	success: function (msg) 
-	              	{ alert(msg) },
-	      			error: function (err)
-	      			{ alert(err.responseText)}
+	    	  	  	success: function (response) { 
+				  		Lobibox.alert(response.type, //AVAILABLE TYPES: "error", "info", "success", "warning"
+			    			{
+			    			    msg: response.msg,
+			    			    closeButton     : false,
+			    			});
+				  	},
+					error: function (err){
+						Lobibox.alert("error", //AVAILABLE TYPES: "error", "info", "success", "warning"
+				    			{
+				    			    msg: err.responseText,
+				    			});
+					}
+	                
+	            });
+	    	}, cache: false});
+			
+	 }
+	 function addGrid(filename) {
+			$.ajax({url: "/ISSSR/resources/"+filename, success: function(data) {
+	    		jQuery.ajax({
+	           		type: "POST",
+	      	   		url: "grids/add",
+		      	   	contentType: "application/json; charset=utf-8",
+		      	    dataType: "json",
+	    	  	   	data: data,
+	    	  	  	success: function (response) { 
+				  		Lobibox.alert(response.type, //AVAILABLE TYPES: "error", "info", "success", "warning"
+				    			{
+				    			    msg: response.msg,
+				    			    closeButton     : false,
+				    			});
+					  	},
+						error: function (err){
+							alert(err.responseText);
+							Lobibox.alert("error", //AVAILABLE TYPES: "error", "info", "success", "warning"
+					    			{
+					    			    msg: err.responseText,
+					    			});
+						}
 	                
 	            });
 	    	}, cache: false});
@@ -92,27 +124,27 @@
 </head>
 
 <body>
-
-	<div class="container">
+	<div class="container" style="margin-top: 0px;">
+		<h1>GQM+S GridVersioningSystem DEMO</h1>
 		<div class="panel panel-success">
 			<div class="panel-heading">Upload Grids to GVS</div>
 			<div class="panel-body" style="text-align: center;">
 				<div class="panel panel-success" style="width: 30%; display: inline-block;margin: auto;">
-					<div class="panel-heading">1) First Grid for a project</div>
+					<div class="panel-heading">1) First Grid for a project (Phase 2)</div>
 					<div class="panel-body">
-						<input type="button" value="Upload First Grid" onclick="uploadGrid('grid3.txt')"/>
+						<input class="btn btn-primary" type="button" value="Upload FIRST Grid" onclick="addGrid('grid.txt')"/>
 					</div>
 				</div>
 				<div class="panel panel-success" style="width: 30%; display: inline-block;margin: auto;">
 					<div class="panel-heading">2) First update</div>
 					<div class="panel-body">
-						<input type="button" value="Upload First Grid" onclick="uploadGrid('grid3.txt')"/>
+						<input class="btn btn-primary" type="button" value="Send first update" onclick="uploadGrid('grid3.txt')"/>
 					</div>
 				</div>
 				<div class="panel panel-success" style="width: 30%; display: inline-block;margin: auto;">
 					<div class="panel-heading">3) Second update</div>
 					<div class="panel-body">
-						<input type="button" value="Upload First Grid" onclick="uploadGrid('grid3.txt')"/>
+						<input class="btn btn-primary" type="button" value="Send second update" onclick="uploadGrid('grid3.txt')"/>
 					</div>
 				</div>
 				
@@ -129,7 +161,7 @@
 						<div class="panel panel-default">
 							<div class="panel-heading">Request the list of all projects available on GVS</div>
 							<div class="panel-body">
-								<input type="button" value="Get project list"
+								<input class="btn btn-primary" type="button" value="Get project list"
 									onclick="makeRequest('','ProjectList','')" />
 							</div>
 						</div>
@@ -137,7 +169,7 @@
 							<div class="panel-heading">Get the working grid for the selected project</div>
 							<div class="panel-body">
 								<input type="text" id="demoData1"/>
-								<input type="button" value="Get working Grid"
+								<input class="btn btn-primary" type="button" value="Get working Grid"
 									onclick="makeRequest(document.getElementById('demoData1').value,'LatestGrid','')" />
 							</div>
 						</div>
@@ -145,14 +177,14 @@
 							<div class="panel-heading">Get all grids stored on GVS for the selected project</div>
 							<div class="panel-body">
 								<input type="text" id="demoData2"/>
-								<input type="button" value="Get grid history"
+								<input class="btn btn-primary" type="button" value="Get grid history"
 									onclick="makeRequest(document.getElementById('demoData2').value,'GridHistory','')" />							</div>
 						</div>
 						<div class="panel panel-default">
 							<div class="panel-heading">Request a single grid</div>
 							<div class="panel-body">
 								<input type="text" id="demoData5"/>
-								<input type="button" value="Get Grid"
+								<input class="btn btn-primary" type="button" value="Get Grid"
 									onclick="makeRequest('','Grid', document.getElementById('demoData5').value)" />
 							</div>
 						</div>
@@ -160,10 +192,10 @@
 							<div class="panel-heading">Request a single grid element</div>
 							<div class="panel-body">
 								<div style="float: left; width: 100%; text-align: center;">
-									<div style="float:left; width: 50%;">id<br>
+									<div style="float:left; width: 50%;">ID<br>
 								 		<input type="text" id="demoData3"/>
 									</div>
-									<div style="float:left; width: 50%;">type<br>
+									<div style="float:left; width: 50%;">Type<br>
 										<select id="elementList1">
 										  <option value="Goal">Goal</option>
 										  <option value="MeasurementGoal">MeasurementGoal</option>
@@ -174,7 +206,7 @@
 									</div>
 								</div>
 								<div style="float: left; width: 100%; text-align: center; margin-top: 5px;">
-									<input type="button" value="Get GridElement"
+									<input class="btn btn-primary" type="button" value="Get GridElement"
 									onclick="makeRequest('','GridElement', document.getElementById('demoData3').value+','+document.getElementById('elementList1').value)" />
 								</div>
 							</div>
@@ -183,10 +215,10 @@
 							<div class="panel-heading">Get the list of all version of a grid element</div>
 							<div class="panel-body">
 								<div style="float: left; width: 100%; text-align: center;">
-									<div style="float:left; width: 50%;">label<br>
+									<div style="float:left; width: 50%;">Label<br>
 								 		<input type="text" id="demoData6"/>
 									</div>
-									<div style="float:left; width: 50%;">type<br>
+									<div style="float:left; width: 50%;">Type<br>
 										<select id="elementList2">
 										  <option value="Goal">Goal</option>
 										  <option value="MeasurementGoal">MeasurementGoal</option>
@@ -197,7 +229,7 @@
 									</div>
 								</div>
 								<div style="float: left; width: 100%; text-align: center; margin-top: 5px;">
-									<input type="button" value="Get GridElementHistory"
+									<input class="btn btn-primary" type="button" value="Get GridElementHistory"
 									onclick="makeRequest('','GridElementHistory', document.getElementById('demoData6').value+','+document.getElementById('elementList2').value)" />
 								</div>
 							</div>
@@ -252,6 +284,15 @@
 	<!-- IE10 viewport hack for Surface/desktop Windows 8 bug -->
 	<script
 		src="<c:url value='/resources/bootstrap/assets/js/ie10-viewport-bug-workaround.js' />"></script>
+	<!--Include these script files in the <head> or <body> tag-->
+      <script src="<c:url value='/resources/lobibox/lib/jquery.1.11.min.js' />"></script>
+      <script src="<c:url value='/resources/lobibox/dist/js/lobibox.min.js' />"></script>
+      <!-- If you do not need both (messageboxes and notifications) you can inclue only one of them -->
+      <script src="<c:url value='/resources/lobibox/dist/js/messageboxes.min.js' />"></script> 
+      <script src="<c:url value='/resources/lobibox/dist/js/notifications.min.js' />"></script> 
+
+
+
 </body>
 </html>
 
