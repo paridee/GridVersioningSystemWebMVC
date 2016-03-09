@@ -19,6 +19,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.util.SystemPropertyUtils;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -263,7 +264,8 @@ public class GVSWebController {
     public @ResponseBody String solveUpdate(@RequestBody String jsonData) {
 		JSONObject obj=new JSONObject(jsonData);
 		String type=obj.getString("type");
-		int id=obj.getInt("id");		
+		int id=obj.getInt("id");
+		System.out.println("-------------->>>>"+id);
 		int nconflict=obj.getInt("nconflict");
 		GridElement ge=null;
 		try {

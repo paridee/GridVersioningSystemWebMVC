@@ -138,7 +138,7 @@
 				<div class="panel panel-success" style="width: 30%; display: inline-block;margin: auto;">
 					<div class="panel-heading">2) First update</div>
 					<div class="panel-body">
-						<input class="btn btn-primary" type="button" value="Send first update" onclick="uploadGrid('grid3.txt')"/>
+						<input class="btn btn-primary" type="button" value="Send first update" onclick="uploadGrid('grid2.txt')"/>
 					</div>
 				</div>
 				<div class="panel panel-success" style="width: 30%; display: inline-block;margin: auto;">

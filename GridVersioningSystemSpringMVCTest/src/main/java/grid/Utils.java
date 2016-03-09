@@ -496,7 +496,7 @@ public class Utils {
 	 * @return html string to be embedded
 	 */
 	public static String gridElementToHTMLString(GridElement ge, GridElementService geservice, boolean updated){
-		String name=ge.getClass().getSimpleName()+" "+ge.getLabel()+" - <i>v"+ge.getVersion()+"</i><br>";
+		String name=ge.getClass().getSimpleName()+" "+ge.getLabel()+" - <i>v"+ge.getVersion()+"-"+ge.getIdElement()+"</i><br>";
 		String desc="";
 		Field[] fields=ge.getClass().getDeclaredFields();
 		for(int j=0; j<fields.length;j++){
