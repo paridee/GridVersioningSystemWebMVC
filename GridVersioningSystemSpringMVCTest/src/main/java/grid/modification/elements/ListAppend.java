@@ -88,16 +88,18 @@ public class ListAppend extends GridElementModification {
 		}
 		aField.setAccessible(true);
 		Object myList	=	aField.get(anElement);
+		//System.out.println("Going to apply a list append");
 		if(myList instanceof List){
 			List	aList						=	(List)myList;
 			HashMap<String,GridElement>	elMap	=	grid.obtainAllEmbeddedElements();
+			//System.out.println("list append details "+this.appendedObjectLabel+" "+this.newLoadedObject);
 			if(elMap.containsKey(this.appendedObjectLabel)){
-				logger.info("appending an object already existing on this grid");
+				//System.out.println("appending an object already existing on this grid");
 				GridElement	element	=	elMap.get(this.appendedObjectLabel);
 				aList.add(element);
 			}
 			else if(this.newLoadedObject!=null){	//i have to append a new object
-				logger.info("appending an object not existing on this grid");
+				//System.out.println("appending an object not existing on this grid");
 				if(!this.listNameToBeChanged.equals("authors")){
 					newLoadedObject	=	((GridElement) newLoadedObject).clone();
 					HashMap<String, GridElement> elements	=	grid.obtainAllEmbeddedElements();
@@ -108,7 +110,9 @@ public class ListAppend extends GridElementModification {
 						}
 					}
 				}
+				//System.out.println("size before "+aList.size());
 				aList.add(newLoadedObject);
+				//System.out.println("size after "+aList.size());
 			}
 			else{
 				throw new Exception("Object to be added not found in current Grid");	

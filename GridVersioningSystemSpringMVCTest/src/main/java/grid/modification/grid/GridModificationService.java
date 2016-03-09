@@ -494,7 +494,8 @@ public class GridModificationService {
 	private Grid applyAModification(GridElementModification gridElementModification, Grid newVersion,HashMap<String,GridElement> elements) throws Exception {
 		GridElement 	subj;
 		subj	=	elements.get(gridElementModification.getSubjectLabel());
-		logger.info("Grid Element Modification: involved class "+subj.getClass()+" label "+subj.getLabel()+" label in mod "+gridElementModification.getSubjectLabel());
+		System.out.println("GridModificationService.java going to apply a modification");
+		System.out.println("Grid Element Modification: involved class "+subj.getClass()+" label "+subj.getLabel()+" label in mod "+gridElementModification.getSubjectLabel());
 		//if is already in new grid use this one...
 		if(newVersion.obtainAllEmbeddedElements().containsKey(gridElementModification.getSubjectLabel())){
 			subj	=	newVersion.obtainAllEmbeddedElements().get(gridElementModification.getSubjectLabel());
@@ -508,6 +509,7 @@ public class GridModificationService {
 				subj.setState(GridElement.State.ABORTED);
 				this.gridElementService.updateGridElement(subj);
 			}
+			System.out.println("GridModificationService.java going to update element "+cloned.toString());
 			newVersion	=	this.gridService.updateGridElement(newVersion, cloned,false,false);
 		}
 		return newVersion;
@@ -655,8 +657,15 @@ public class GridModificationService {
 				for(Modification aMod : mods){
 					logger.info("found modification "+aMod.toString());
 					if(aMod instanceof GridElementModification){
-						logger.info("apply modification "+aMod.toString());
+						System.out.println("apply modification "+aMod.toString());
 						updated	=	this.applyAModification((GridElementModification)aMod, updated, updated.obtainAllEmbeddedElements());
+						
+						//TODO TEST to remove
+						if(updated.obtainAllEmbeddedElements().containsKey("g1")){
+							Goal g1inst	=	(Goal)updated.obtainAllEmbeddedElements().get("g1");
+							System.out.println("size str list g1 "+g1inst.getStrategyList().size());
+						}
+						//TODO end test to remove
 					}
 				}
 				
@@ -679,9 +688,25 @@ public class GridModificationService {
 				else{
 					logger.info("element not in grid");
 				}
+				
+				//begin workaround
+				HashMap<String,GridElement> newElements	=	updated.obtainAllEmbeddedElements();
+				if(newElements.containsKey(newGridElement.getLabel())){
+					//System.out.println("IN"+newGridElement.getLabel());
+					GridElement anElement	=	newElements.get(newGridElement.getLabel());
+					int latestVer			=			this.gridElementService.getLatestVersion(anElement.getLabel(), anElement.getClass().getSimpleName());
+					if(latestVer>=anElement.getVersion()){
+						anElement.setVersion(latestVer+1);
+					}
+					if(anElement.getIdElement()==0){
+						this.gridElementService.addGridElement(anElement);
+					}
+				}
+				//end workaround
 				updated	=	this.refreshLinks(updated);
 				//TODO set right state for all elements
 				this.gridService.addGrid(updated);
+				System.out.println("GridModificationService saving Grid id "+updated.getId()+" state "+updated.obtainGridState()+" "+updated.dateStringFromTimestamp());
 				sendJSONToPhases(updated);
 			}
 			else{
