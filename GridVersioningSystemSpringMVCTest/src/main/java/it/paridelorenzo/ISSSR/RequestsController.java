@@ -56,10 +56,6 @@ public class RequestsController {
 		logger.info("Result: " + result);
 		JSONObject jsonObject = new JSONObject();
 		JSONObject jsonObjectTemp = new JSONObject(result);
-		/*jsonObject.put("type", "result");
-		jsonObject.put("msg", jsonObjectTemp);
-		logger.info(jsonObject.get("msg").toString());*/
-		//return jsonObject.toString();
 		return jsonObjectTemp.toString();
 	}
 

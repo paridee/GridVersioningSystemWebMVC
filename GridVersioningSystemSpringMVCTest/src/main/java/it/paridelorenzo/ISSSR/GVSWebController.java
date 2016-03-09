@@ -26,6 +26,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import grid.JSONFactory;
+import grid.Utils;
 import grid.entities.*;
 import grid.entities.GridElement.State;
 import grid.interfaces.services.DefaultResponsibleService;
@@ -215,9 +216,6 @@ public class GVSWebController {
 	@RequestMapping(value = "/GEResolution/{pid}/{type}/{label}", method = RequestMethod.GET)
 	public String GEResolution(@PathVariable("type") String type,@PathVariable("pid") int pid,@PathVariable("label") String label,Model model) {
 		model.addAttribute("pageTitle", "Grids Versioning System");
-		List <GridElement> geList=this.gridElementService.getElementByLabelAndState(label, type, GridElement.State.MAJOR_UPDATING);
-		geList.addAll(this.gridElementService.getElementByLabelAndState(label, type, GridElement.State.MAJOR_CONFLICTING));
-		geList.addAll(this.gridElementService.getElementByLabelAndState(label, type, GridElement.State.MINOR_CONFLICTING));
 		GridElement workingGE=this.gridElementService.getLatestWorking(label, type);
 		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
 	    String email = auth.getName(); //get logged in username
@@ -232,12 +230,18 @@ public class GVSWebController {
 				currentPract=this.defaultResponsibleService.getResponsibleByClassName("pm").getPractitioner();
 			}
 			if(currentPract==p){
-				if (geList.size()>0&&workingGE!=null){
+				List <GridElement> geList=this.gridElementService.getElementByLabelAndState(label, type, GridElement.State.MAJOR_UPDATING);
+				geList.addAll(this.gridElementService.getElementByLabelAndState(label, type, GridElement.State.MAJOR_CONFLICTING));
+				geList.addAll(this.gridElementService.getElementByLabelAndState(label, type, GridElement.State.MINOR_CONFLICTING));
+				List <GridElement> newGeList=Utils.removeDuplicates(geList);
+				
+				if (newGeList.size()>0&&workingGE!=null){
 					model.addAttribute("workingGE", workingGE);
-					model.addAttribute("updatingElements", geList);
+					model.addAttribute("updatingElements", newGeList);
+					model.addAttribute("nupdatingElements", geList.size());
 					
 				}
-				else if (workingGE!=null&&geList.size()==0){
+				else if (workingGE!=null&&newGeList.size()==0){
 					model.addAttribute("error", "The requested Grid Element is in a consistent state");
 				}
 				else{

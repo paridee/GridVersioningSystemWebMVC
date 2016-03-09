@@ -63,32 +63,27 @@
 		});
 	}
 
-	function submitForm() {
-		jQuery.get('http://localhost:8080/ISSSR/resources/grid.txt', function(
-				data) {
-			//alert(data);
-			/*$.post("grids/add",
-					data,
-				    function(resp, status){
-				        alert("Data: " + resp + "\nStatus: " + status);
-				    });*/
-			jQuery.ajax({
-				type : "POST",
-				url : "grids/add",
-				contentType : "application/json; charset=utf-8",
-				dataType : "json",
-				data : data,
-				success : function(msg) {
-					alert(JSON.stringify(msg))
-				},
-				error : function(err) {
-					alert(err.responseText)
-				}
+	 function uploadGrid(filename) {
+		 	alert(filename);
+	 
+			$.ajax({url: "/ISSSR/resources/"+filename, success: function(data) {
+	    		alert(data);
 
-			});
-		});
-
-	}
+	    		jQuery.ajax({
+	           		type: "POST",
+	      	   		url: "grids/update",
+		      	   	contentType: "application/json; charset=utf-8",
+		      	    dataType: "json",
+	    	  	   	data: data,
+	    	  	  	success: function (msg) 
+	              	{ alert(msg) },
+	      			error: function (err)
+	      			{ alert(err.responseText)}
+	                
+	            });
+	    	}, cache: false});
+			
+	 }
 </script>
 
 
@@ -105,22 +100,19 @@
 				<div class="panel panel-success" style="width: 30%; display: inline-block;margin: auto;">
 					<div class="panel-heading">1) First Grid for a project</div>
 					<div class="panel-body">
-						test
-						
+						<input type="button" value="Upload First Grid" onclick="uploadGrid('grid3.txt')"/>
 					</div>
 				</div>
 				<div class="panel panel-success" style="width: 30%; display: inline-block;margin: auto;">
 					<div class="panel-heading">2) First update</div>
 					<div class="panel-body">
-						test
-						
+						<input type="button" value="Upload First Grid" onclick="uploadGrid('grid3.txt')"/>
 					</div>
 				</div>
 				<div class="panel panel-success" style="width: 30%; display: inline-block;margin: auto;">
 					<div class="panel-heading">3) Second update</div>
 					<div class="panel-body">
-						test
-						
+						<input type="button" value="Upload First Grid" onclick="uploadGrid('grid3.txt')"/>
 					</div>
 				</div>
 				

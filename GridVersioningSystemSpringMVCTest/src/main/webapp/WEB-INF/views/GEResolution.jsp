@@ -55,7 +55,7 @@
 			
         	
         	List <GridElement> pendinglist=(List<GridElement>)request.getAttribute("updatingElements");
-        	
+        	int nConflicts=(Integer)request.getAttribute("nupdatingElements");
         		%>
        				<div class="panel panel-default">
 						<div class="panel-heading"><span style="font-size: 22px;">New versions available</span></div>
@@ -74,7 +74,7 @@
 													JSONObject	obj	=	new JSONObject();
 													obj.put("type", we.getClass().getSimpleName());
 													obj.put("id", we.getIdElement());
-													obj.put("nconflict", pendinglist.size());
+													obj.put("nconflict", nConflicts);
 				      								String s=obj.toString();
 				      								s=s.replaceAll("\"", "#"); 
 				      								out.print(s);%>')"/>
@@ -106,7 +106,7 @@
 														obj	=	new JSONObject();
 														obj.put("type", ge.getClass().getSimpleName());
 														obj.put("id", ge.getIdElement());
-														obj.put("nconflict", pendinglist.size());
+														obj.put("nconflict", nConflicts);
 					      								s=obj.toString(); 
 														s=s.replaceAll("\"", "#"); 
 														out.print(s);%>')"/>

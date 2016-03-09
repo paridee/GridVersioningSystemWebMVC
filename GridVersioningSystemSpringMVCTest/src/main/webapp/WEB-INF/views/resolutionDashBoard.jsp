@@ -56,12 +56,12 @@
     					%><li class="list-group-item"><div style="float:left;">MajorUpdates</div> <div class="badge" style="float:left; margin-left:5px; margin-right: 5px;"><%out.print(geList.size()); %></div> <%
     					for(GridElement ge:geList){
     						if(currentUser!=pm){
-    							out.print("<span style=\"cursor: pointer\" class=\"label label-danger\" style=\"margin-left: 5px;\" data-toggle=\"tooltip\" data-placement=\"auto right\" title=\"You cannot solve this element\">"+ge.getLabel()+"</span>");
+    							out.print("<span class=\"label label-danger\" style=\"margin-left: 5px;\" data-toggle=\"tooltip\" data-placement=\"auto right\" title=\"You cannot solve this element\">"+ge.getLabel()+"</span>");
     						}
     						else if (gms.isSolvable(ge)){
     							out.print("<a style=\"text-decoration:none\" href=\"/ISSSR/GEResolution/"+p.getId()+"/"+ge.getClass().getSimpleName()+"/"+ge.getLabel()+"\">"+"<span class=\"label label-success\"  style=\"margin-left: 5px;\">"+ge.getLabel()+"</span>"+"</a> ");
 					        }
-    						else out.print("<span style=\"cursor: pointer\" class=\"label label-warning\" style=\"margin-left: 5px;\" data-toggle=\"tooltip\" data-placement=\"auto right\" title=\"You have to solve other pending Grid Elements before\">"+ge.getLabel()+"</span>");
+    						else out.print("<span class=\"label label-warning\" style=\"margin-left: 5px;\" data-toggle=\"tooltip\" data-placement=\"auto right\" title=\"You have to solve other pending Grid Elements before\">"+ge.getLabel()+"</span>");
     					}
     					out.print("</li>");
     				}
@@ -70,12 +70,12 @@
     					%><li class="list-group-item"><div style="float:left;">MajorConflicts</div> <div class="badge" style="float:left; margin-left:5px; margin-right: 5px;"><%out.print(geList.size()); %></div> <%
     					for(GridElement ge:geList){
     						if(currentUser!=pm){
-    							out.print("<span style=\"cursor: pointer\" class=\"label label-danger\" style=\"margin-left: 5px;\" data-toggle=\"tooltip\" data-placement=\"auto right\" title=\"You cannot solve this element\">"+ge.getLabel()+"</span>");
+    							out.print("<span class=\"label label-danger\" style=\"margin-left: 5px;\" data-toggle=\"tooltip\" data-placement=\"auto right\" title=\"You cannot solve this element\">"+ge.getLabel()+"</span>");
     						}
     						else if(gms.isSolvable(ge)){
     							out.print("<a style=\"text-decoration:none\" href=\"/ISSSR/GEResolution/"+p.getId()+"/"+ge.getClass().getSimpleName()+"/"+ge.getLabel()+"\">"+"<span class=\"label label-success\" style=\"margin-left: 5px;\">"+ge.getLabel()+"</span>"+"</a> ");
 					        }
-    						else out.print("<span style=\"cursor: pointer\" class=\"label label-warning\" style=\"margin-left: 5px;\" data-toggle=\"tooltip\" data-placement=\"auto right\" title=\"You have to solve other pending Grid Elements before\">"+ge.getLabel()+"</span>");
+    						else out.print("<span class=\"label label-warning\" style=\"margin-left: 5px;\" data-toggle=\"tooltip\" data-placement=\"auto right\" title=\"You have to solve other pending Grid Elements before\">"+ge.getLabel()+"</span>");
     					}
     					out.print("</li>");
     				}
@@ -98,12 +98,12 @@
     							practList.add(tempPr);
     						}
     						if(!practList.contains(currentUser)){
-    							out.print("<span style=\"cursor: pointer\" class=\"label label-danger\" style=\"margin-left: 5px;\" data-toggle=\"tooltip\" data-placement=\"auto right\" title=\"You cannot solve this element\">"+ge.getLabel()+"</span>");
+    							out.print("<span class=\"label label-danger\" style=\"margin-left: 5px;\" data-toggle=\"tooltip\" data-placement=\"auto right\" title=\"You cannot solve this element\">"+ge.getLabel()+"</span>");
     						}
     						else if(gms.isSolvable(ge)){
     							out.print("<a style=\"text-decoration:none\" href=\"/ISSSR/confEditor/"+ge.getClass().getSimpleName()+"/"+ge.getLabel()+"/"+p.getId()+"\">"+"<span class=\"label label-success\" style=\"margin-left: 5px;\">"+ge.getLabel()+"</span>"+"</a> ");
     						}
-    						else out.print("<span style=\"cursor: pointer\" class=\"label label-warning\" style=\"margin-left: 5px;\" data-toggle=\"tooltip\" data-placement=\"auto right\" title=\"You have to solve other pending Grid Elements before\">"+ge.getLabel()+"</span>");
+    						else out.print("<span class=\"label label-warning\" style=\"margin-left: 5px;\" data-toggle=\"tooltip\" data-placement=\"auto right\" title=\"You have to solve other pending Grid Elements before\">"+ge.getLabel()+"</span>");
     					}
     					out.print("</li>");
     				}
@@ -126,7 +126,7 @@
     					}
     					out.print("<li class=\"list-group-item\">");
     					if(solvable) out.print("<a style=\"text-decoration:none\" href=\"/ISSSR/MGResolution/"+p.getId()+"/"+g.getId()+"\"><span class=\"label label-success\">Main Goal List changed</span></a><br>");
-    					else out.print("<span  style=\"cursor: pointer\" class=\"label label-danger\" data-toggle=\"tooltip\" data-placement=\"auto right\" title=\"You have to solve other pending Grid Elements before\">MainGoalList changed</span><br>");
+    					else out.print("<span class=\"label label-danger\" data-toggle=\"tooltip\" data-placement=\"auto right\" title=\"You have to solve other pending Grid Elements before\">MainGoalList changed</span><br>");
     					out.print("</li>");
     				}
     				

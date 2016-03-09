@@ -214,7 +214,9 @@ public class Utils {
 					String fieldName	=	fields[i].getName();
 					try {
 						Object value		=	fields[i].get(editingElement);
-						if(k==0&&(!((value instanceof GridElement)||(value instanceof List)||(fieldName.equals("strategyType"))))){
+						if(k==0&&(!fieldName.equals("logger"))&&(!((value instanceof GridElement)||(value instanceof List)||(fieldName.equals("strategyType"))))){
+							String temp="";
+							if(value!=null) temp=value.toString();
 							top				=	top+  
 												"<div style=\"padding-left: 3px;float:left; width:100%; font-weight: bolder; font-size: 18px;\">"+fieldName+"</div>"+
 												"<div style=\"float:left; width:100%;\" id=\""+editingElement.getIdElement()+fieldName+"\" class=\"firepad-container\">"+
@@ -230,7 +232,7 @@ public class Utils {
 												"});"+
 												//"codeMirror"+editingElement.getLabel()+fieldName+editingElement.getVersion()+""+".setOption(\"readOnly\",true);"+
 												"firepad"+editingElement.getIdElement()+fieldName+" = Firepad.fromCodeMirror(firepadRef"+editingElement.getIdElement()+fieldName+", codeMirror"+editingElement.getLabel()+fieldName+editingElement.getVersion()+", {"+
-												"defaultText: '"+value.toString()+"'"+
+												"defaultText: '"+temp+"'"+
 												"});"+
 												"}"+
 												"init();"+
@@ -311,8 +313,10 @@ public class Utils {
 							top	=	top+"";
 						}
 						else{
-							top				=	top+  
+							if(!fieldName.equals("logger")){
+								top				=	top+  
 											"<div style=\"padding-left: 3px;float:left; width:100%; font-weight: bolder; font-size: 18px;\">"+fieldName+"</div><p>"+value.toString()+"</p>";
+							}
 						}
 					} catch (IllegalArgumentException | IllegalAccessException e) {
 						e.printStackTrace();
@@ -554,6 +558,18 @@ public class Utils {
 		}
 		String gridElementString="<div class=\"panel-heading\">"+name+"</div><div class=\"panel-body\">"+desc+"</div>";
 		return gridElementString;
+	}
+
+	public static List<GridElement> removeDuplicates(List<GridElement> geList) {
+		List<GridElement> temp=new ArrayList<GridElement>();
+		for(GridElement ge:geList){
+			if(!temp.contains(ge)){
+				temp.add(ge);
+			}
+		}
+		
+		
+		return temp;
 	}
 	
 }
