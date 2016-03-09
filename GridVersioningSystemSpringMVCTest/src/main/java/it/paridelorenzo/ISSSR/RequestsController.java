@@ -17,10 +17,10 @@ import org.springframework.web.client.RestTemplate;
 import it.ermes.Request;
 
 @Controller
-public class DemoController {
-	final static Logger logger = LoggerFactory.getLogger(DemoController.class);
+public class RequestsController {
+	final static Logger logger = LoggerFactory.getLogger(RequestsController.class);
 
-	@RequestMapping(value = "/DEMORequest", method = RequestMethod.POST, headers = "Accept=application/json")
+	@RequestMapping(value = "/Requests", method = RequestMethod.POST, headers = "Accept=application/json")
 	public @ResponseBody String getGrid(@RequestBody String jsonData)
 			throws IOException {
 		logger.info("Entro in Demo get latest grid "+jsonData);

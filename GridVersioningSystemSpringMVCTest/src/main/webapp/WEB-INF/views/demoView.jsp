@@ -44,7 +44,7 @@
 	function makeRequest(project,request, parms) {
 		$.ajax({
 			type : "POST",
-			url : "/ISSSR/DEMORequest",
+			url : "/ISSSR/Requests",
 			contentType : "application/json; charset=utf-8",
 			dataType : "json",
 			data : JSON.stringify({
@@ -172,12 +172,18 @@
 								 		<input type="text" id="demoData3"/>
 									</div>
 									<div style="float:left; width: 50%;">type<br>
-										<input type="text" id="demoData4"/>					
+										<select id="elementList1">
+										  <option value="Goal">Goal</option>
+										  <option value="MeasurementGoal">MeasurementGoal</option>
+										  <option value="Metric">Metric</option>
+										  <option value="Question">Question</option>
+										  <option value="Strategy">Strategy</option>
+										</select>					
 									</div>
 								</div>
 								<div style="float: left; width: 100%; text-align: center; margin-top: 5px;">
 									<input type="button" value="Get GridElement"
-									onclick="makeRequest('','GridElement', document.getElementById('demoData3').value+','+document.getElementById('demoData4').value)" />
+									onclick="makeRequest('','GridElement', document.getElementById('demoData3').value+','+document.getElementById('elementList1').value)" />
 								</div>
 							</div>
 						</div>
@@ -189,12 +195,18 @@
 								 		<input type="text" id="demoData6"/>
 									</div>
 									<div style="float:left; width: 50%;">type<br>
-										<input type="text" id="demoData7"/>					
+										<select id="elementList2">
+										  <option value="Goal">Goal</option>
+										  <option value="MeasurementGoal">MeasurementGoal</option>
+										  <option value="Metric">Metric</option>
+										  <option value="Question">Question</option>
+										  <option value="Strategy">Strategy</option>
+										</select>					
 									</div>
 								</div>
 								<div style="float: left; width: 100%; text-align: center; margin-top: 5px;">
 									<input type="button" value="Get GridElementHistory"
-									onclick="makeRequest('','GridElementHistory', document.getElementById('demoData6').value+','+document.getElementById('demoData7').value)" />
+									onclick="makeRequest('','GridElementHistory', document.getElementById('demoData6').value+','+document.getElementById('elementList2').value)" />
 								</div>
 							</div>
 						</div>
