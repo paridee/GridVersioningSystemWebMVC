@@ -9,7 +9,12 @@
 	    		<div style="width: 100%; float: left; text-align: left;"  class="page-header">
 					<h1><b>Project</b> ${reqproject.projectId}<small> - <b>creation date</b> ${reqproject.creationDate}</small></h1>
 					<h3><small><b>Description:</b> ${reqproject.description}</small></h3>
+					<c:if test="${reqproject.projectManager!=null}">
 					<h3><small><b>Project Manager:</b> ${reqproject.projectManager.name}</small></h3>
+					</c:if>
+					<c:if test="${reqproject.projectManager==null}">
+					<h3><small><b>Project Manager:</b> Not available</small></h3>
+					</c:if>					
 				</div>
 	    	
 	    		<c:if test="${!empty listProjectGrids}">
@@ -20,9 +25,9 @@
 								<thead>
 								    <tr>
 								        <th>Grid ID</th>
-								        <th>Grid Version</th>
 								        <th>Project</th>
 								        <th>State</th>
+								        <th>Creation date</th>
 								    </tr>
 							    </thead>
 							    <tbody>
@@ -37,9 +42,9 @@
 								    		</c:otherwise>
 								    	</c:choose>
 								            <td>${listgriditem.id}</td>
-								            <td>${listgriditem.version}</td>
 								            <td><a href="<c:url value='/projects/${listgriditem.project.id}' />" >${listgriditem.project.projectId}</a></td>
 								        	<td>${status[currentGridId]}</td>
+								        	<td>${listgriditem.dateStringFromTimestamp()}</td>
 								        </tr>
 								    </c:forEach>
 							    </tbody>

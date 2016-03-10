@@ -6,7 +6,10 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.lang.reflect.Field;
 import java.lang.reflect.ParameterizedType;
+import java.text.Format;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Properties;
@@ -496,7 +499,7 @@ public class Utils {
 	 * @return html string to be embedded
 	 */
 	public static String gridElementToHTMLString(GridElement ge, GridElementService geservice, boolean updated){
-		String name=ge.getClass().getSimpleName()+" "+ge.getLabel()+" - <i>v"+ge.getVersion()+"-"+ge.getIdElement()+"</i><br>";
+		String name=ge.getClass().getSimpleName()+" "+ge.getLabel()+" - <i> "+Utils.dateStringFromTimestamp(ge.getTimestamp())+"</i><br>";
 		String desc="";
 		Field[] fields=ge.getClass().getDeclaredFields();
 		for(int j=0; j<fields.length;j++){
@@ -567,9 +570,17 @@ public class Utils {
 				temp.add(ge);
 			}
 		}
-		
-		
 		return temp;
+	}
+	
+	/**
+	 * Converts a timestamp to date format
+	 * @return string representation
+	 */
+	public static String dateStringFromTimestamp(long timestamp){
+	    Date date = new Date(timestamp);
+	    Format format = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
+	    return format.format(date);
 	}
 	
 }

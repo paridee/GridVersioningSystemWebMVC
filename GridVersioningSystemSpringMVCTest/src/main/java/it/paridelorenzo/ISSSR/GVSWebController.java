@@ -603,8 +603,8 @@ public class GVSWebController {
 		if(g.getMainGoals().size()!=0){
 			List<Object> stack = new ArrayList<Object>();
 			stack.addAll(g.getMainGoals());
-			String chart="chart_config = {chart: { connectors: {type: \"bCurve\",style: {\"stroke-width\": 2}}, container: \"#gridChart\", siblingSeparation:70, rootOrientation:'WEST',  subTeeSeparation:70, animateOnInit: true,node: {collapsable: true},animation: {nodeAnimation: \"easeInSine\",nodeSpeed: 500,connectorsAnimation: \"linear\",connectorsSpeed: 500}},";		
-			chart=chart+"nodeStructure: {innerHTML:\"<div class=\'nodeTxt\'><div class='txtProjectTitle'>"+g.getProject().getProjectId()+"</div><div class='txtElement'>"+g.getProject().getDescription()+"</div></div>\",children: [";
+			String chart="chart_config = {chart: { connectors: {type: \"bCurve\",style: {\"stroke-width\": 2}}, container: \"#gridChart\", siblingSeparation:70, rootOrientation:'WEST',  subTeeSeparation:70, animateOnInit: true,node: {collapsable: true, HTMLclass: 'nodeExample1'},animation: {nodeAnimation: \"easeInSine\",nodeSpeed: 500,connectorsAnimation: \"linear\",connectorsSpeed: 500}},";		
+			chart=chart+"nodeStructure: {HTMLclass: 'project',innerHTML:\"<div class='nodeTxt'><div class='txtProjectTitle'>"+g.getProject().getProjectId()+"</div><div class='txtElement'>"+g.getProject().getDescription()+"</div></div>\",children: [";
 			chart=chart+updateChart(stack)+"]}};";
 			return chart;
 		}
@@ -627,7 +627,7 @@ public class GVSWebController {
 			String desc="";
 			List<Object> newStack=new ArrayList<Object>();
 			GridElement ge=(GridElement)stack.get(i);
-			name=stack.get(i).getClass().getSimpleName()+" "+ge.getLabel()+" - <i>v"+ge.getVersion()+"</i>";
+			name=stack.get(i).getClass().getSimpleName()+" "+ge.getLabel()+" - <i>"+Utils.dateStringFromTimestamp(ge.getTimestamp())+"</i>";
 			desc="<div class='txtElement'><i>"+ge.getState().name()+"</i></div>";
 			//TODO this part is not the same in utils?? (obtain HTML)
 			Field[] fields=ge.getClass().getDeclaredFields();
@@ -668,7 +668,14 @@ public class GVSWebController {
 					e.printStackTrace();
 				}
 			}
-			chart=chart+"{ innerHTML:\"<div class=\'nodeTxt\'><div class='txtElementTitle'><div class='nodeImg' ></div>"+name+"</div>"+desc+"</div>\", ";
+			String geType="";
+			if(ge.getClass().getSimpleName().equals("Goal")||ge.getClass().getSimpleName().equals("Strategy")){
+				geType="HTMLclass: 'gqmplusstrategy',";
+			}
+			else{
+				geType="HTMLclass: 'gqmgraph',";
+			}
+			chart=chart+"{"+geType+" innerHTML:\"<div class=\'nodeTxt\'><div class='txtElementTitle'><div class='nodeImg' ></div>"+name+"</div>"+desc+"</div>\", ";
 			//chart=chart+"{text: { name: \""+name+"\", desc: \""+desc+"\" },innerHTML:\"<div><h1>test</h1></div>\", collapsed: true";
 			if(newStack.size()>0){
 				chart=chart+" collapsed: true ,children: [";
@@ -768,7 +775,7 @@ public class GVSWebController {
 			model.addAttribute("element", ge);
 			List<Object> newStack=new ArrayList<Object>();
 			newStack.add(ge);
-			String chart="chart_config = {chart: { connectors: {type: \"bCurve\",style: {\"stroke-width\": 2}}, container: \"#gridChart\", siblingSeparation:70, rootOrientation:'WEST',  subTeeSeparation:70, animateOnInit: true,node: {collapsable: true},animation: {nodeAnimation: \"easeInSine\",nodeSpeed: 500,connectorsAnimation: \"linear\",connectorsSpeed: 500}},";		
+			String chart="chart_config = {chart: { connectors: {type: \"bCurve\",style: {\"stroke-width\": 2}}, container: \"#gridChart\", siblingSeparation:70, rootOrientation:'WEST',  subTeeSeparation:70, animateOnInit: true,node: {collapsable: true, HTMLclass: 'nodeExample1'},animation: {nodeAnimation: \"easeInSine\",nodeSpeed: 500,connectorsAnimation: \"linear\",connectorsSpeed: 500}},";		
 			chart=chart+"nodeStructure: "+updateChart(newStack)+"};";
 			//System.out.println(chart);
 			model.addAttribute("gridTreeString",chart);
@@ -798,6 +805,10 @@ public class GVSWebController {
 			Grid latest	=	this.gridService.getLatestGrid(temp.getProject().getId());
 			if(latest	==	null){
 				this.gridService.addGrid(temp);
+				JSONObject jsonObject = new JSONObject();
+				jsonObject.put("type", "success");
+				jsonObject.put("msg", "Grid successfully uploaded");
+				return jsonObject.toString();
 			}
 			else{
 				JSONObject jsonObject = new JSONObject();
@@ -813,11 +824,7 @@ public class GVSWebController {
 			jsonObject.put("msg", "Generic exception");
 			return jsonObject.toString();
 		}
-		JSONObject jsonObject = new JSONObject();
-		jsonObject.put("type", "result");
-		jsonObject.put("msg", "Grid added successfully");
-		return jsonObject.toString();
-    }
+	}
 
 	
 	

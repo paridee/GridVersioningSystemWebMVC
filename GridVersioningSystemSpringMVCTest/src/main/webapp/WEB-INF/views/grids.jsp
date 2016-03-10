@@ -11,8 +11,9 @@
     	<c:choose>
 	    	<c:when test="${grid!= null}">
 	    		<div style="width: 100%; float: left; text-align: left;"  class="page-header">
-					<h1><b>Grid ID</b> ${grid.id}<small> - <b>project</b> <a href="<c:url value='/projects/${grid.project.id}' />" >${grid.project.projectId}</a></small></h1>
-					<h3><b>creation date:</b> </h3>
+					<h1><b>Grid ID</b> ${grid.id}<small> - 
+					<b>project</b> <a href="<c:url value='/projects/${grid.project.id}' />" >${grid.project.projectId}</a></small></h1>
+					<h3><b>creation date:</b> ${grid.dateStringFromTimestamp()}</h3>
 					<div class="panel panel-default">
 					<div class="panel-heading"><b>Grid Chart</b></div>
 					<div class="panel-body">
@@ -29,7 +30,6 @@
 						<thead>
 						    <tr>
 						        <th>Grid ID</th>
-						        <th>Grid Version</th>
 						        <th>Project</th>
 						        <th>State</th>
 						        <th>Creation date</th>
@@ -48,7 +48,6 @@
 						    	</c:choose>
 						    	
 						            <td>${listgriditem.id}</td>
-						            <td>${listgriditem.version}</td>
 						            <td><a href="<c:url value='/projects/${listgriditem.project.id}' />" >${listgriditem.project.projectId}</a></td>
 						        	<td>${status[currentGridId]}</td>
 						        	<td>${listgriditem.dateStringFromTimestamp()}</td>

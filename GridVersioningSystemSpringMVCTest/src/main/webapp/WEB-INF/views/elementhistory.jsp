@@ -10,8 +10,8 @@
 						<thead>
 						    <tr>
 						        <th>ID</th>
-						        <th>Version</th>
 						        <th>State</th>
+						        <th>Creation date</th>
 						    </tr>
 					    </thead>
 					    <tbody>
@@ -26,8 +26,8 @@
 						    	</c:choose>
 						    	
 						            <td>${listgriditem.idElement}</td>
-						            <td>${listgriditem.version}</td>
 						            <td>${listgriditem.state}</td>
+						            <td>${listgriditem.dateStringFromTimestamp()}</td>
 						        </tr>
 						    </c:forEach>
 					    </tbody>
