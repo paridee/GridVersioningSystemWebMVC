@@ -37,6 +37,7 @@ caption, th {
 	-moz-border-radius: 6px;
 	border-radius: 6px;
 	color: black;
+	z-index: 1;position:relative;
 }
 
 .project {
