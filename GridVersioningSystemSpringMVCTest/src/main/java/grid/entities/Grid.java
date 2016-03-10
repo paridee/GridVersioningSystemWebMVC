@@ -213,6 +213,9 @@ public class Grid implements Updatable{
 				returnState	=	GridState.UPDATING;
 			}
 		}
+		if(this.isMainGoalsChanged()){
+			return GridState.UPDATING;
+		}
 		return returnState;
 	}
 	
