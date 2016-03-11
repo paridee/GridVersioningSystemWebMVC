@@ -16,7 +16,7 @@ public class Persistence {
 		
 		String out="";
 		out=readFile("project.txt", Charset.defaultCharset());
-		System.out.println(">>>>>>>>>>>>>>>>JSON="+out);
+		//System.out.println(">>>>>>>>>>>>>>>>JSON="+out);
 		return out;
 	}
 public String obtainGrid() throws IOException{

@@ -57,7 +57,7 @@ public class ErmesController {
 	
 	@RequestMapping(headers = { "content-type=application/json" }, method = RequestMethod.POST, value = "/level3Direct", produces = "application/json")
 	@ResponseBody
-	public Level3Request testLevel1Direct(@RequestBody Level3Request request)
+	public Level3Request ermesLevel3Direct(@RequestBody Level3Request request)
 			throws IOException {
 
 		logger.info("\nDATA from LEVEL 3 direct, requested object: "
