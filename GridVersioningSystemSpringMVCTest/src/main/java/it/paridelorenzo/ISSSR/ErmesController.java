@@ -62,9 +62,12 @@ public class ErmesController {
 
 		logger.info("\nDATA from LEVEL 3 direct, requested object: "
 				+ request.getObject() + " from project " + request.getProject()+" with data "+request.getData());
+		System.out.print("\nDATA from LEVEL 3 direct, requested object: "
+				+ request.getObject() + " from project " + request.getProject()+" with data "+request.getData());
 		Persistence persistence = new Persistence();
 		String tmp = "";
-		if (request.getObject().equals("Project-info")) {  //TODO Deve andare su fase 6 (ora è simulata)
+		if (request.getObject().equals("Project-info")) {  
+			//TODO Deve andare su fase 6 (ora è simulata)
 			logger.info("PROJECT INFO");
 			tmp = persistence.obtainProject();
 		} else if (request.getObject().equals("LatestGrid")) {

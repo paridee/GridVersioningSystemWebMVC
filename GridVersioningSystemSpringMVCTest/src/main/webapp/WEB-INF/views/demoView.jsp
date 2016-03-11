@@ -166,6 +166,13 @@
 							</div>
 						</div>
 						<div class="panel panel-default">
+							<div class="panel-heading">Request Project-info</div>
+							<div class="panel-body">
+								<input class="btn btn-primary" type="button" value="Get project info"
+									onclick="makeRequest('','Project-info','')" />
+							</div>
+						</div>
+						<div class="panel panel-default">
 							<div class="panel-heading">Get the working grid for the selected project</div>
 							<div class="panel-body">
 								<input type="text" id="demoData1"/>

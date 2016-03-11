@@ -1,0 +1,71 @@
+{
+    "assignDate": null,
+    "attachments": [
+    ],
+    "creationDate": "18/02/2015",
+    "creator": {
+        "firstName": "Riccardo",
+        "id": 7,
+        "lastName": "Paolillo",
+        "password": "qwerty",
+        "role": "ROLE_MANAGER",
+        "socialSecurityNumber": "PLLRCC128131231",
+        "version": 1
+    },
+    "currentEmployeeSelected": {
+        "firstName": "Matteo",
+        "id": 1,
+        "lastName": "Caruso",
+        "password": "qwerty",
+        "role": "ROLE_STRATEGIST",
+        "socialSecurityNumber": "CRSMTT90D25H501M",
+        "version": 1
+    },
+    "description": "Project Description",
+    "firstStrategy": null,
+    "history": [
+                {
+                "comment": null,
+                "date": "18/02/2015",
+                "id": 20,
+                "proposer": {
+                "firstName": "Riccardo",
+                "id": 7,
+                "lastName": "Paolillo",
+                "password": "qwerty",
+                "role": "ROLE_MANAGER",
+                "socialSecurityNumber": "PLLRCC128131231",
+                "version": 1
+                },
+                "recipient": {
+                "firstName": "Matteo",
+                "id": 1,
+                "lastName": "Caruso",
+                "password": "qwerty",
+                "role": "ROLE_STRATEGIST",
+                "socialSecurityNumber": "CRSMTT90D25H501M",
+                "version": 1
+                },
+                "sender": {
+                "firstName": "Riccardo",
+                "id": 7,
+                "lastName": "Paolillo",
+                "password": "qwerty",
+                "role": "ROLE_MANAGER",
+                "socialSecurityNumber": "PLLRCC128131231",
+                "version": 1
+                },
+                "status": "PROPOSED",
+                "version": 1
+                }
+                ],
+    "id": 1,
+    "manager": null,
+    "name": "Project Morpheus",
+    "sponsor": null,
+    "sponsoredDate": null,
+    "status": "PROPOSED",
+    "tags": "tags, tr,ds",
+    "uniqueID": "sr9pnhqp2j",
+    "version": 1
+}

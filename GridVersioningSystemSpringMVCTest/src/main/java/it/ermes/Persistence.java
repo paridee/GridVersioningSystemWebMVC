@@ -15,15 +15,15 @@ public class Persistence {
 	public String obtainProject() throws IOException{
 		
 		String out="";
-		out=readFile("/home/virtual/workspace/RESTServer/src/project.txt", Charset.defaultCharset());
-		//System.out.println("JSON="+out);
+		out=readFile("project.txt", Charset.defaultCharset());
+		System.out.println(">>>>>>>>>>>>>>>>JSON="+out);
 		return out;
 	}
 public String obtainGrid() throws IOException{
 		
 		String out="";
 		out=readFile("/home/virtual/workspace/RESTServer/src/grid.txt", Charset.defaultCharset());
-		//System.out.println("JSON="+out);
+		System.out.println(">>>>>>>>>>>>>>>>JSON="+out);
 		return out;
 	}
 	static String readFile(String path, Charset encoding) 

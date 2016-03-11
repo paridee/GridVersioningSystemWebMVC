@@ -196,6 +196,9 @@ public class GVSWebController {
 			
 			}
 		}
+		else{
+			//TODO reset firebase variables
+		}
 		
 		System.out.println(projectPendingGrids.toString());
 		
@@ -661,10 +664,8 @@ public class GVSWebController {
 						}
 					}
 				} catch (IllegalArgumentException e) {
-					// TODO Auto-generated catch block
 					e.printStackTrace();
 				} catch (IllegalAccessException e) {
-					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}
 			}
@@ -875,7 +876,6 @@ public class GVSWebController {
 							
 							
 						}
-						//TODO gestire array stringhe
 					}
 				}
 				else{
@@ -889,10 +889,8 @@ public class GVSWebController {
 					}
 				}
 			} catch (IllegalArgumentException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			} catch (IllegalAccessException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 		}
