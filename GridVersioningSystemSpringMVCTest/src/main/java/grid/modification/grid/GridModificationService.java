@@ -316,6 +316,7 @@ public class GridModificationService {
 								GridElement newElement	=	anAddition.getGridElementAdded();
 								//newElement.setState(GridElement.State.MAJOR_UPDATING);
 								this.sendGridElementNotification(newElement,newVersion);
+								this.sendGridElementNotification(newElement,newVersion);
 								sentNotificationLabel.add(anAddition.getAppendedObjectLabel());
 							}
 						}
@@ -424,7 +425,11 @@ public class GridModificationService {
 			responsibles.addAll(modified.getAuthors());
 		}
 		else{
-			responsibles.add(aGrid.getProject().getProjectManager());
+			if(aGrid.getProject()!=null){
+				if(aGrid.getProject().getProjectManager()!=null){
+					responsibles.add(aGrid.getProject().getProjectManager());
+				}
+			}
 		}
 		for(int i=0;i<responsibles.size();i++){
 			if(responsibles.get(i)!=null){
@@ -625,6 +630,7 @@ public class GridModificationService {
 			this.gridElementService.addGridElement(newGridElement);
 			logger.info("added working element "+newGridElement.getLabel()+" version "+newGridElement.getVersion()+" with ID "+newGridElement.getIdElement());
 		}
+		this.sendGridElementNotification(newGridElement,new Grid());
 		logger.info("modded grids "+moddedGrid);
 		this.abortAllPending(newGridElement);
 	}
@@ -718,6 +724,7 @@ public class GridModificationService {
 				thisG.setState(GridElement.State.WORKING);
 				this.gridService.updateGridElement(updatedg, thisG, false, false);
 				this.gridService.addGrid(updatedg);
+				sendJSONToPhases(updated);
 			}
 			return updated;
 		}
