@@ -97,6 +97,7 @@ public class JSONFactory {
 		HashMap<String, Object> objects	=	new HashMap<String, Object>();
 		JSONArray 	metricList	=	new JSONArray();
 		JSONObject 	obj			=	null;
+		System.out.println(json);
 		try{
 			obj					=	new JSONObject(json);
 			if(!obj.has("project")){

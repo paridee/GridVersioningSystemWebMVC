@@ -1,5 +1,7 @@
 package it.paridelorenzo.ISSSR;
 
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.security.core.Authentication;
@@ -10,13 +12,24 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.ModelAndView;
 
+import com.firebase.client.Firebase;
+
+import grid.entities.Grid;
 import grid.entities.Practitioner;
+import grid.interfaces.services.GridService;
 import grid.interfaces.services.PractitionerService;
 
 @Controller
 public class LoginController {
 
 	private PractitionerService 	practitionerService;
+	private GridService			gridService;
+	
+	@Autowired(required=true)
+	@Qualifier(value="gridService")
+	public void setGridService(GridService gridService) {
+		this.gridService = gridService;
+	}
 	
 	@Autowired(required=true)
 	@Qualifier(value="practitionerService")
@@ -38,7 +51,13 @@ public class LoginController {
 			model.addObject("msg", "You've been logged out successfully.");
 		}
 		model.setViewName("login");
-
+		List<Grid> grids=this.gridService.listAllGrids();
+		for(Grid current: grids){
+			if(current.obtainGridState().equals(Grid.GridState.UPDATING)){
+				return model;
+			}
+		}
+		this.resetfirebaseVariables();
 		return model;
 
 	}
@@ -54,6 +73,11 @@ public class LoginController {
 		model.setViewName("logout");
 
 		return model;
+	}
+	
+	public void resetfirebaseVariables(){
+	    Firebase myFirebaseRef = new Firebase("https://fiery-torch-6050.firebaseio.com/");
+	    myFirebaseRef.removeValue();
 	}
 	
 }

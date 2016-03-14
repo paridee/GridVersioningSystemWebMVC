@@ -63,14 +63,48 @@
 		});
 	}
 
-	 function uploadGrid(filename) {
-		 	$.ajax({url: "/ISSSR/resources/"+filename, success: function(data) {
+	function uploadGrid(filename) {
+	 	$.ajax({url: "/ISSSR/resources/"+filename, success: function(jsongrid) {
+    		jQuery.ajax({
+           		type: "POST",
+      	   		url: "/ISSSR/Requests",
+	      	   	contentType: "application/json; charset=utf-8",
+	      	    dataType: "json",
+	      	  	data : JSON.stringify({
+					"project" : "",
+					"request" : "UpdateGrid",
+					"parms" : jsongrid
+				}),
+    	  	  	success: function (response) { 
+			  		Lobibox.alert(response.type, //AVAILABLE TYPES: "error", "info", "success", "warning"
+		    			{
+		    			    msg: response.msg,
+		    			    closeButton     : false,
+		    			});
+			  	},
+				error: function (err){
+					Lobibox.alert("error", //AVAILABLE TYPES: "error", "info", "success", "warning"
+			    			{
+			    			    msg: err.responseText,
+			    			});
+				}
+                
+            });
+    	}, cache: false});
+		
+ }
+	 function addGrid(filename) {
+		 	$.ajax({url: "/ISSSR/resources/"+filename, success: function(jsongrid) {
 	    		jQuery.ajax({
 	           		type: "POST",
-	      	   		url: "grids/update",
+	      	   		url: "/ISSSR/Requests",
 		      	   	contentType: "application/json; charset=utf-8",
 		      	    dataType: "json",
-	    	  	   	data: data,
+		      	  	data : JSON.stringify({
+						"project" : "",
+						"request" : "AddGrid",
+						"parms" : jsongrid
+					}),
 	    	  	  	success: function (response) { 
 				  		Lobibox.alert(response.type, //AVAILABLE TYPES: "error", "info", "success", "warning"
 			    			{
@@ -89,33 +123,8 @@
 	    	}, cache: false});
 			
 	 }
-	 function addGrid(filename) {
-			$.ajax({url: "/ISSSR/resources/"+filename, success: function(data) {
-	    		jQuery.ajax({
-	           		type: "POST",
-	      	   		url: "grids/add",
-		      	   	contentType: "application/json; charset=utf-8",
-		      	    dataType: "json",
-	    	  	   	data: data,
-	    	  	  	success: function (response) { 
-				  		Lobibox.alert(response.type, //AVAILABLE TYPES: "error", "info", "success", "warning"
-				    			{
-				    			    msg: response.msg,
-				    			    closeButton     : false,
-				    			});
-					  	},
-						error: function (err){
-							alert(err.responseText);
-							Lobibox.alert("error", //AVAILABLE TYPES: "error", "info", "success", "warning"
-					    			{
-					    			    msg: err.responseText,
-					    			});
-						}
-	                
-	            });
-	    	}, cache: false});
 			
-	 }
+	 
 </script>
 
 

@@ -1,6 +1,5 @@
 package it.paridelorenzo.ISSSR;
 
-import java.io.IOException;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -19,17 +18,22 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.util.SystemPropertyUtils;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import com.firebase.client.Firebase;
+
 import grid.JSONFactory;
 import grid.Utils;
-import grid.entities.*;
+import grid.entities.Goal;
+import grid.entities.Grid;
+import grid.entities.GridElement;
 import grid.entities.GridElement.State;
+import grid.entities.Practitioner;
+import grid.entities.Project;
 import grid.interfaces.services.DefaultResponsibleService;
 import grid.interfaces.services.GridElementService;
 import grid.interfaces.services.GridService;
@@ -37,10 +41,6 @@ import grid.interfaces.services.PractitionerService;
 import grid.interfaces.services.ProjectService;
 import grid.modification.elements.Modification;
 import grid.modification.grid.GridModificationService;
-import it.ermes.Level1Request;
-import it.ermes.Level2Request;
-import it.ermes.Level3Request;
-import it.ermes.Persistence;
  
  
 @Controller
@@ -122,6 +122,8 @@ public class GVSWebController {
 		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
 	    String email = auth.getName(); //get logged in username
 	    Practitioner p	=	this.practitionerService.getPractitionerByEmail(email);
+	    
+	       
 	    List<Project> projList = this.practitionerService.getProjectsForPractitioner(p);
 	    
 		
@@ -196,9 +198,7 @@ public class GVSWebController {
 			
 			}
 		}
-		else{
-			//TODO reset firebase variables
-		}
+		
 		
 		System.out.println(projectPendingGrids.toString());
 		
@@ -821,6 +821,11 @@ public class GVSWebController {
 				JSONObject jsonObject = new JSONObject();
 				jsonObject.put("type", "success");
 				jsonObject.put("msg", "Grid successfully uploaded");
+				Firebase myFirebaseRef = new Firebase("https://fiery-torch-6050.firebaseio.com/");
+				myFirebaseRef.child("ISSSR/"+temp.getProject().getProjectId()).setValue("timestamp");
+				
+				
+				
 				return jsonObject.toString();
 			}
 			else{

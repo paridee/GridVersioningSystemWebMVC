@@ -8,6 +8,7 @@ import java.lang.reflect.ParameterizedType;
 import java.net.URLDecoder;
 import java.text.DateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -30,6 +31,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.ModelAndView;
+
+import com.firebase.client.Firebase;
 
 import grid.JSONFactory;
 import grid.Utils;
@@ -471,6 +474,11 @@ public class ModificationController {
 				else{
 					Grid newVersion	=	this.gridModificationService.applyModifications(mods, latestGrid, modifiedObjectLabels);
 					this.gridService.addGrid(newVersion);
+					Firebase myFirebaseRef = new Firebase("https://fiery-torch-6050.firebaseio.com/");
+					Calendar calendar = Calendar.getInstance();
+					long timestamp=calendar.getTime().getTime();
+					myFirebaseRef.child("ISSSR/"+temp.getProject().getProjectId()).setValue(timestamp);
+					
 					JSONObject jsonObject = new JSONObject();
 					jsonObject.put("type", "success");
 					jsonObject.put("msg", "Grid updated with modifications");
