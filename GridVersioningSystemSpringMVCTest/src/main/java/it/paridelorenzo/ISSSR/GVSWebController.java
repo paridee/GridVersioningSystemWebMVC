@@ -761,8 +761,20 @@ public class GVSWebController {
 	@RequestMapping(value = "/elementhistory/{type}/{label}")
     public String getElementHistory(@PathVariable("label") String label, @PathVariable("type") String type, Model model) {
 		List <GridElement> tempList=this.gridElementService.getElementLog(label, type);
+		GridElement workingGe=this.gridElementService.getLatestWorking(label, type);
+		Map<String, String> status=new HashMap<String,String>();
+		for(GridElement ge: tempList){
+			if(!(ge.getIdElement()==workingGe.getIdElement())&&ge.getState().equals(GridElement.State.WORKING)){
+				status.put(ge.getIdElement()+"", "ARCHIVED");
+			}
+			else{
+				status.put(ge.getIdElement()+"", ge.getState().toString());
+			}
+		}
+		logger.info(status.toString());
 		model.addAttribute("nGridElements", tempList.size());
         model.addAttribute("listGridElements", tempList);
+        model.addAttribute("status", status);
         model.addAttribute("type", type);
         model.addAttribute("label", label);
         //System.out.println(tempList.toString());

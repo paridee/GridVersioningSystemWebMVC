@@ -92,7 +92,7 @@ public class GridElementDAOImpl implements GridElementDao {
 	@Override
 	public List<GridElement> getElementLog(String id, String table) {
 		Session session				=	this.sessionFactory.getCurrentSession();
-		List<GridElement> gElList	=	session.createQuery("from "+table+" where label = '"+id+"' order by version asc,timestamp asc").list();
+		List<GridElement> gElList	=	session.createQuery("from "+table+" where label = '"+id+"' order by timestamp desc").list();
 		for(GridElement g : gElList){
 			logger.info("GridElement List:"+g);
 		}

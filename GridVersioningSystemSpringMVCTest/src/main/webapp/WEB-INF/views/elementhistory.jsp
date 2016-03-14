@@ -16,6 +16,7 @@
 					    </thead>
 					    <tbody>
 						    <c:forEach items="${listGridElements}" var="listgriditem">
+						    	<c:set var="currentGEId">${listgriditem.getIdElement()}</c:set>
 						    	<c:choose>
 						    		<c:when test="${listgriditem.state=='MAJOR_UPDATING'||gridElement.state=='MAJOR_CONFLICTING'||gridElement.state=='MINOR_CONFLICTING'}">
 						    			<tr class='clickable-row danger' data-href='<c:url value='/element/${listgriditem.getClass().getSimpleName()}/${listgriditem.idElement}' />' >
@@ -26,7 +27,7 @@
 						    	</c:choose>
 						    	
 						            <td>${listgriditem.idElement}</td>
-						            <td>${listgriditem.state}</td>
+						            <td>${status[currentGEId]}</td>
 						            <td>${listgriditem.dateStringFromTimestamp()}</td>
 						        </tr>
 						    </c:forEach>
