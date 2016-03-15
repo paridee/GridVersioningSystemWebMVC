@@ -303,6 +303,7 @@ public class ModificationController {
 		registered.setUrl(data);
 		try {
 			prjId = URLDecoder.decode(StringEscapeUtils.unescapeHtml4(prjId),"UTF-8");
+			logger.info("project id "+prjId);
 		} catch (UnsupportedEncodingException e) {
 			response.put("error", "project format error");
 			e.printStackTrace();

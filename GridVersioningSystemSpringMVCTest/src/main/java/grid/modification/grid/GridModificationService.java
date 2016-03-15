@@ -3,14 +3,13 @@ package grid.modification.grid;
 import java.io.BufferedReader;
 import java.io.DataOutputStream;
 import java.io.InputStreamReader;
+import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
-
-import javax.net.ssl.HttpsURLConnection;
 
 import org.javers.core.Javers;
 import org.javers.core.JaversBuilder;
@@ -328,6 +327,7 @@ public class GridModificationService {
 				logger.info("going to update version numbers (3)");
 				this.updateVersionNumbersAndStatus(latestOriginal,newVersion);
 				this.gridService.addGrid(newVersion);
+				System.out.println("GridModificationService.java going to send notification (3)");
 				sendJSONToPhases(newVersion);
 				if(newVersion.isMainGoalsChanged()){
 					this.sendMainGoalChangeNotification(newVersion);
@@ -347,15 +347,16 @@ public class GridModificationService {
 			List<SubscriberPhase> subscribers	=	this.subscriberPhaseService.getSubscribersByProject(aPrj);
 			for(SubscriberPhase sp : subscribers){
 				try{
+					System.out.println("GridModificationService.java going to send Grid step 1");
 					String url = sp.getUrl();
 					URL obj = new URL(url);
-					HttpsURLConnection con = (HttpsURLConnection) obj.openConnection();
-
+					HttpURLConnection con = (HttpURLConnection) obj.openConnection();
 					//add reuqest header
 					con.setRequestMethod("POST");
 					con.setRequestProperty("User-Agent", "Mozilla/5.0");
 					con.setRequestProperty("Accept-Language", "en-US,en;q=0.5");
 					JSONFactory af	=	new JSONFactory();
+					System.out.println("GridModificationService.java going to send Grid step 2");
 					String urlParameters = af.obtainJson(newVersion, JSONFactory.JSONType.FIRST, null).toString();				
 					// Send post request
 					con.setDoOutput(true);
@@ -363,11 +364,10 @@ public class GridModificationService {
 					wr.writeBytes(urlParameters);
 					wr.flush();
 					wr.close();
-
+					System.out.println("GridModificationService.javaSending 'POST' request to URL : " + url);
+					System.out.println("GridModificationService.java Post parameters : " + urlParameters);
 					int responseCode = con.getResponseCode();
-					logger.info("\nSending 'POST' request to URL : " + url);
-					logger.info("Post parameters : " + urlParameters);
-					logger.info("Response Code : " + responseCode);
+					System.out.println("GridModificationService.java Response Code : " + responseCode);
 
 					BufferedReader in = new BufferedReader(
 					        new InputStreamReader(con.getInputStream()));
@@ -713,6 +713,7 @@ public class GridModificationService {
 				//TODO set right state for all elements
 				this.gridService.addGrid(updated);
 				System.out.println("GridModificationService saving Grid id "+updated.getId()+" state "+updated.obtainGridState()+" "+updated.dateStringFromTimestamp());
+				System.out.println("GridModificationService.java going to send notification (1)");
 				sendJSONToPhases(updated);
 			}
 			else{
@@ -724,6 +725,7 @@ public class GridModificationService {
 				thisG.setState(GridElement.State.WORKING);
 				this.gridService.updateGridElement(updatedg, thisG, false, false);
 				this.gridService.addGrid(updatedg);
+				System.out.println("GridModificationService.java going to send notification (2)");
 				sendJSONToPhases(updated);
 			}
 			return updated;

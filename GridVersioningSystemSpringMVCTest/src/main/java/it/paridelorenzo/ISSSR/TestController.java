@@ -1,6 +1,8 @@
 package it.paridelorenzo.ISSSR;
 
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
+import java.net.URLDecoder;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.text.DateFormat;
@@ -12,6 +14,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Set;
 
+import org.apache.commons.lang3.StringEscapeUtils;
 import org.apache.log4j.Level;
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -23,8 +26,10 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.ResponseBody;
 
 import grid.JSONFactory;
 import grid.Utils;
@@ -127,6 +132,30 @@ public class TestController {
 		return "home";
 	}
 	
+	
+	@RequestMapping(value = "/notificationURL", method = RequestMethod.POST)
+	public @ResponseBody String testNot(@RequestBody String jsonData) {
+		try {
+			jsonData = URLDecoder.decode(StringEscapeUtils.unescapeHtml4(jsonData),"UTF-8");
+			jsonData =	jsonData.replace("=", "");
+			logger.info("received new Grid(POST): "+jsonData);
+			JSONObject json	=	new JSONObject(jsonData);
+			if(json.has("project")){
+				JSONObject inner	=	(JSONObject) json.get("project");
+				if(inner!=null){
+					if(inner.has("creationDate")){
+						logger.info("found creation date: "+inner.getString("creationDate"));
+					}
+				}
+			}
+			
+		} catch (UnsupportedEncodingException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
+		return "ok";
+	}
 	
 	@RequestMapping(value = "/step1", method = RequestMethod.GET)
 	public String homeGri(Locale locale, Model model) {

@@ -45,12 +45,12 @@ public class RequestsController {
 		} catch (RestClientException ex) {
 			JSONObject jsonObject = new JSONObject();
 			jsonObject.put("type", "error");
-			jsonObject.put("msg", "Rest Client Exception");
+			jsonObject.put("msg", "Rest Client Exception "+ex.getMessage());
 			return jsonObject.toString();
 		} catch (IllegalArgumentException ex) {
 			JSONObject jsonObject = new JSONObject();
 			jsonObject.put("type", "error");
-			jsonObject.put("msg", "Illegal Argument Exception");
+			jsonObject.put("msg", "Illegal Argument Exception "+ex.getMessage());
 			return jsonObject.toString();
 		}
 		logger.info("Result: " + result);
