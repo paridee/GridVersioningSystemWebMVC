@@ -7,6 +7,7 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.text.DateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -30,6 +31,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
+
+import com.firebase.client.Firebase;
 
 import grid.JSONFactory;
 import grid.Utils;
@@ -141,10 +144,19 @@ public class TestController {
 			logger.info("received new Grid(POST): "+jsonData);
 			JSONObject json	=	new JSONObject(jsonData);
 			if(json.has("project")){
+				String temp = "";
 				JSONObject inner	=	(JSONObject) json.get("project");
+				if(inner.has("projectId")){
+					temp	=	inner.getString("projectId");
+				}
+				logger.info("project info "+inner);
 				if(inner!=null){
 					if(inner.has("creationDate")){
 						logger.info("found creation date: "+inner.getString("creationDate"));
+						Firebase myFirebaseRef = new Firebase("https://fiery-torch-6050.firebaseio.com/");
+						Calendar calendar	=	Calendar.getInstance();
+						long timestamp=calendar.getTime().getTime();
+						myFirebaseRef.child("ISSSR/"+temp).setValue(timestamp);
 					}
 				}
 			}
