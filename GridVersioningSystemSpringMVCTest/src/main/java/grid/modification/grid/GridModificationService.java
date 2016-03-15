@@ -27,6 +27,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import grid.JSONFactory;
 import grid.Utils;
+import grid.Utils.PostSender;
 import grid.entities.Goal;
 import grid.entities.Grid;
 import grid.entities.GridElement;
@@ -315,7 +316,6 @@ public class GridModificationService {
 								GridElement newElement	=	anAddition.getGridElementAdded();
 								//newElement.setState(GridElement.State.MAJOR_UPDATING);
 								this.sendGridElementNotification(newElement,newVersion);
-								this.sendGridElementNotification(newElement,newVersion);
 								sentNotificationLabel.add(anAddition.getAppendedObjectLabel());
 							}
 						}
@@ -329,6 +329,7 @@ public class GridModificationService {
 				this.gridService.addGrid(newVersion);
 				System.out.println("GridModificationService.java going to send notification (3)");
 				sendJSONToPhases(newVersion);
+				sendNewGridVersionNotification(newVersion);
 				if(newVersion.isMainGoalsChanged()){
 					this.sendMainGoalChangeNotification(newVersion);
 				}
@@ -347,40 +348,12 @@ public class GridModificationService {
 			List<SubscriberPhase> subscribers	=	this.subscriberPhaseService.getSubscribersByProject(aPrj);
 			for(SubscriberPhase sp : subscribers){
 				try{
-					System.out.println("GridModificationService.java going to send Grid step 1");
 					String url = sp.getUrl();
-					URL obj = new URL(url);
-					HttpURLConnection con = (HttpURLConnection) obj.openConnection();
-					//add reuqest header
-					con.setRequestMethod("POST");
-					con.setRequestProperty("User-Agent", "Mozilla/5.0");
-					con.setRequestProperty("Accept-Language", "en-US,en;q=0.5");
 					JSONFactory af	=	new JSONFactory();
-					System.out.println("GridModificationService.java going to send Grid step 2");
-					String urlParameters = af.obtainJson(newVersion, JSONFactory.JSONType.FIRST, null).toString();				
-					// Send post request
-					con.setDoOutput(true);
-					DataOutputStream wr = new DataOutputStream(con.getOutputStream());
-					wr.writeBytes(urlParameters);
-					wr.flush();
-					wr.close();
-					System.out.println("GridModificationService.javaSending 'POST' request to URL : " + url);
-					System.out.println("GridModificationService.java Post parameters : " + urlParameters);
-					int responseCode = con.getResponseCode();
-					System.out.println("GridModificationService.java Response Code : " + responseCode);
-
-					BufferedReader in = new BufferedReader(
-					        new InputStreamReader(con.getInputStream()));
-					String inputLine;
-					StringBuffer response = new StringBuffer();
-
-					while ((inputLine = in.readLine()) != null) {
-						response.append(inputLine);
-					}
-					in.close();
-					
-					//print result
-					logger.info(response.toString());
+					String urlParameters = af.obtainJson(newVersion, JSONFactory.JSONType.FIRST, null).toString();
+					PostSender sender	=	new PostSender(url,urlParameters);
+					Thread aThread		=	new Thread(sender);
+					aThread.start();
 				}
 				catch(Exception e){
 					e.printStackTrace();
@@ -423,11 +396,23 @@ public class GridModificationService {
 		ArrayList<Practitioner> responsibles	=	new ArrayList<Practitioner>();
 		if(Modification.minorUpdateClass.contains(modified.getClass())){
 			responsibles.addAll(modified.getAuthors());
+			if(responsibles.size()==0){
+				Practitioner p	=	this.defaultResponsibleService.getResponsibleByClassName(modified.getClass().getSimpleName()).getPractitioner();
+				if(p!=null){
+					responsibles.add(p);
+				}
+			}
 		}
 		else{
 			if(aGrid.getProject()!=null){
 				if(aGrid.getProject().getProjectManager()!=null){
 					responsibles.add(aGrid.getProject().getProjectManager());
+				}
+				if(responsibles.size()==0){
+					Practitioner p	=	this.defaultResponsibleService.getResponsibleByClassName("pm").getPractitioner();
+					if(p!=null){
+						responsibles.add(p);
+					}
 				}
 			}
 		}
@@ -715,6 +700,7 @@ public class GridModificationService {
 				System.out.println("GridModificationService saving Grid id "+updated.getId()+" state "+updated.obtainGridState()+" "+updated.dateStringFromTimestamp());
 				System.out.println("GridModificationService.java going to send notification (1)");
 				sendJSONToPhases(updated);
+				sendNewGridVersionNotification(updated);
 			}
 			else{
 				logger.info("no modification needed ");
@@ -727,6 +713,7 @@ public class GridModificationService {
 				this.gridService.addGrid(updatedg);
 				System.out.println("GridModificationService.java going to send notification (2)");
 				sendJSONToPhases(updated);
+				sendNewGridVersionNotification(updated);
 			}
 			return updated;
 		}

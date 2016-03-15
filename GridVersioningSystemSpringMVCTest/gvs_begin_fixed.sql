@@ -3,7 +3,7 @@
 -- http://www.phpmyadmin.net
 --
 -- Host: localhost
--- Generato il: Mar 10, 2016 alle 16:18
+-- Generato il: Mar 15, 2016 alle 13:53
 -- Versione del server: 5.5.46-0ubuntu0.14.04.2
 -- Versione PHP: 5.5.9-1ubuntu4.14
 
@@ -301,12 +301,12 @@ CREATE TABLE IF NOT EXISTS `StrategyToGoalList` (
 --
 
 CREATE TABLE IF NOT EXISTS `SubscriberPhase` (
-  `id` int(11) NOT NULL,
+  `id` int(11) NOT NULL AUTO_INCREMENT,
   `phase` int(11) NOT NULL,
   `url` text NOT NULL,
   `aProject` int(11) NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB DEFAULT CHARSET=latin1 AUTO_INCREMENT=1 ;
 
 -- --------------------------------------------------------
 

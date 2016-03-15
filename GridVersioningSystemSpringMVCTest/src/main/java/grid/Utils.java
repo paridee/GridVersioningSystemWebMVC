@@ -1,11 +1,16 @@
 package grid;
 
 import java.io.BufferedReader;
+import java.io.DataOutputStream;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.lang.reflect.Field;
 import java.lang.reflect.ParameterizedType;
+import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.text.Format;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -36,6 +41,58 @@ import grid.modification.elements.Modification;
  * @author Lorenzo La Banca
  */
 public class Utils {
+	
+	public static class PostSender implements Runnable{
+		String url	=	"";
+		String body		=	"";
+		public PostSender(String url, String body) {
+			this.url	=	url;
+			this.body	=	body;
+		}
+		@Override
+		public void run() {
+			try {
+				System.out.println("GridModificationService.java going to send Grid step 1");
+				URL obj;
+				obj = new URL(url);
+				HttpURLConnection con = (HttpURLConnection) obj.openConnection();
+				//add reuqest header
+				con.setRequestMethod("POST");
+				con.setRequestProperty("User-Agent", "Mozilla/5.0");
+				con.setRequestProperty("Accept-Language", "en-US,en;q=0.5");
+				System.out.println("GridModificationService.java going to send Grid step 2");
+	//Send post request
+				con.setDoOutput(true);
+				DataOutputStream wr = new DataOutputStream(con.getOutputStream());
+				wr.writeBytes(body);
+				wr.flush();
+				wr.close();
+				System.out.println("GridModificationService.javaSending 'POST' request to URL : " + url);
+				System.out.println("GridModificationService.java Post parameters : " + body);
+				int responseCode = con.getResponseCode();
+				System.out.println("GridModificationService.java Response Code : " + responseCode);
+	
+				BufferedReader in = new BufferedReader(
+				        new InputStreamReader(con.getInputStream()));
+				String inputLine;
+				StringBuffer response = new StringBuffer();
+	
+				while ((inputLine = in.readLine()) != null) {
+					response.append(inputLine);
+				}
+				in.close();
+				
+				//print result
+				logger.info(response.toString());
+			} catch (MalformedURLException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
+	}
 	
 	/**
 	 * Inner Class implementing a thread for email sending
