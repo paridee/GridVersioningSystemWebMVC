@@ -1,6 +1,7 @@
 package it.paridelorenzo.ISSSR;
 
 import java.io.IOException;
+import java.util.Calendar;
 
 import org.json.JSONObject;
 import org.slf4j.Logger;
@@ -12,6 +13,9 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.client.RestTemplate;
+
+import com.firebase.client.Firebase;
 
 import grid.JSONFactory;
 import grid.JSONFactory.JSONType;
@@ -70,6 +74,56 @@ public class ErmesController {
 			//TODO Deve andare su fase 6 (ora è simulata)
 			logger.info("PROJECT INFO");
 			tmp = persistence.obtainProject();
+		}else if (request.getObject().equals("AddGrid")) {  
+			logger.info("AddGrid");
+			Grid temp;
+			try {
+				temp = jsonFactory.loadFromJson(request.getData(), this.projectService);
+				if (temp==null){
+					logger.info("in blocco null");
+					JSONObject jsonObject = new JSONObject();
+					jsonObject.put("type", "error");
+					jsonObject.put("msg", "Wrong format");
+					tmp = jsonObject.toString();
+				}
+				Grid latest	=	this.gridService.getLatestGrid(temp.getProject().getId());
+				if(latest	==	null){
+					this.gridService.addGrid(temp);
+					JSONObject jsonObject = new JSONObject();
+					jsonObject.put("type", "success");
+					jsonObject.put("msg", "Grid successfully uploaded");
+					tmp = jsonObject.toString();
+					Firebase myFirebaseRef = new Firebase("https://fiery-torch-6050.firebaseio.com/");
+					Calendar calendar = Calendar.getInstance();
+					long timestamp=calendar.getTime().getTime();
+					myFirebaseRef.child("ISSSR/"+temp.getProject().getProjectId()).setValue(timestamp);
+					
+				}
+				else{
+					JSONObject jsonObject = new JSONObject();
+					jsonObject.put("type", "error");
+					jsonObject.put("msg", "Already exists a gird for this project");
+					tmp = jsonObject.toString();
+					
+				}
+			} catch (Exception e) {
+				e.printStackTrace();
+				JSONObject jsonObject = new JSONObject();
+				jsonObject.put("type", "error");
+				jsonObject.put("msg", "Generic exception");
+				tmp = jsonObject.toString();
+			}
+			
+		}else if (request.getObject().equals("UpdateGrid")) {  
+			logger.info("UpdateGrid");
+			
+			
+			RestTemplate restTemplate = new RestTemplate();
+			tmp = restTemplate.postForObject("http://localhost:8080/ISSSR/grids/update", request.getData(), String.class);
+			
+			
+			
+			
 		} else if (request.getObject().equals("LatestGrid")) {
 			Project currentPrj=this.projectService.getProjectByProjectId(request.getProject());
 			if(currentPrj!=null){

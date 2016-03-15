@@ -65,6 +65,12 @@
 		<artifactId>spring-jdbc</artifactId>
 		<version>${org.springframework-version}</version>
 	</dependency>
+	
+	    <dependency>
+	      <groupId>com.firebase</groupId>
+	      <artifactId>firebase-client-jvm</artifactId>
+	      <version>[2.5.1,)</version>
+	    </dependency>
 		
 	        <dependency>
             <groupId>commons-dbcp</groupId>
