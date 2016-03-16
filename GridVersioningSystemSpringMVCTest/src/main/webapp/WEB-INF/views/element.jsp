@@ -19,7 +19,18 @@
 					</div>
 				</div>
 				<div class="panel panel-default">
-					<div class="panel-heading"><b>Grid Element Chart</b></div>
+					<div class="panel-heading"><b>Grid Element Chart</b><div style="float: right;">
+							<div style="float: right; margin-right: 3px;">
+								<span style="margin-right: 3px; float: left;height: 15px; width: 15px; background-color: #DEF82D;"></span>Expandables
+							</div>
+							<div style="float: right; margin-right: 3px;">
+								<span style="margin-right: 3px; float: left;height: 15px; width: 15px; background-color: #5bc0de;"></span>GQM Graph elements
+							</div>
+							<div style="float: right; margin-right: 3px;">
+								<span style="margin-right: 3px; float: left;height: 15px; width: 15px; background-color: #5cb85c;"></span>GQM+S elements
+							</div>
+						</div>
+						</div>
 					<div class="panel-body">
 						<div id="gridChart"> </div>
 					</div>

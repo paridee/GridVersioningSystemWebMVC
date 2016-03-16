@@ -21,11 +21,7 @@ caption, th {
 	
 }
 
-.Treant>.node img {
-	width: 30%;
-	float: left;
-	padding-right: 5px;
-}
+
 
 .nodeExample1 {
 	max-width: 400px;
@@ -116,11 +112,12 @@ caption, th {
 
 .nodeImg {
 	position: absolute;
-	margin-left: -38px;
-	margin-top: -23px;
+	left: -25px;
+	top: -20px;
 	width: 35px;
 	height: 35px;
-	background-color: red;
+	padding: 0;
+	margin: 0;
 }
 
 .txtProjectTitle {
