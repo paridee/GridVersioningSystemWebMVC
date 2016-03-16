@@ -2,6 +2,7 @@ package it.paridelorenzo.ISSSR;
 
 import java.lang.reflect.Field;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -481,6 +482,9 @@ public class GVSWebController {
 				this.gridService.addGrid(newGrid);
 				gridToSolve.setMainGoalsChanged(false);
 				this.gridService.updateGrid(gridToSolve);
+				this.gridModificationService.sendJSONToPhases(gridToSolve);
+				this.gridModificationService.sendNewGridVersionNotification(newGrid);
+				
 				
 				JSONObject jsonObject = new JSONObject();
 				jsonObject.put("type", "success");

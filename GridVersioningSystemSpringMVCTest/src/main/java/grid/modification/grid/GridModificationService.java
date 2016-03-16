@@ -6,6 +6,7 @@ import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -24,6 +25,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.transaction.annotation.Transactional;
+
+import com.firebase.client.Firebase;
 
 import grid.JSONFactory;
 import grid.Utils;
@@ -342,8 +345,9 @@ public class GridModificationService {
 		}
 	}
 	
-	private void sendJSONToPhases(Grid newVersion) {
+	public void sendJSONToPhases(Grid newVersion) {
 		Project aPrj	=	newVersion.getProject();
+		
 		if(aPrj!=null){
 			List<SubscriberPhase> subscribers	=	this.subscriberPhaseService.getSubscribersByProject(aPrj);
 			for(SubscriberPhase sp : subscribers){
@@ -381,7 +385,7 @@ public class GridModificationService {
 	 * Send a notificaton to PM for a new Grid availability
 	 * @param newGrid new Grid
 	 */
-	private void sendNewGridVersionNotification(Grid newGrid){
+	public void sendNewGridVersionNotification(Grid newGrid){
 		Practitioner pm	=	newGrid.getProject().getProjectManager();
 		if(pm==null){
 			logger.info("There is no PM!!! Use the default one");
@@ -699,6 +703,8 @@ public class GridModificationService {
 				this.gridService.addGrid(updated);
 				System.out.println("GridModificationService saving Grid id "+updated.getId()+" state "+updated.obtainGridState()+" "+updated.dateStringFromTimestamp());
 				System.out.println("GridModificationService.java going to send notification (1)");
+				
+				
 				sendJSONToPhases(updated);
 				sendNewGridVersionNotification(updated);
 			}

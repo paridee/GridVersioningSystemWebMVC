@@ -295,6 +295,12 @@ public class ModificationController {
 		logger.info("registered phase");
 		logger.info("data on post "+data);
 		JSONObject response	=	new JSONObject();
+		JSONObject obj=new JSONObject(data);
+		String url=obj.getString("url");
+		if(url==null){
+			response.put("error", "wrong url");
+			return response.toString();
+		}
 		SubscriberPhase registered	=	new SubscriberPhase();
 		try{
 			registered.setPhase(Integer.parseInt(phase));
@@ -303,7 +309,7 @@ public class ModificationController {
 			response.put("error", "wrong phase number");
 			return response.toString();
 		}
-		registered.setUrl(data);
+		registered.setUrl(url);
 		try {
 			prjId = URLDecoder.decode(StringEscapeUtils.unescapeHtml4(prjId),"UTF-8");
 			logger.info("project id "+prjId);

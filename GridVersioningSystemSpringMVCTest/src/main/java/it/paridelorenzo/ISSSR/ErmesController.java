@@ -93,6 +93,7 @@ public class ErmesController {
 					jsonObject.put("type", "success");
 					jsonObject.put("msg", "Grid successfully uploaded");
 					tmp = jsonObject.toString();
+					//TODO post alle fasi
 					Firebase myFirebaseRef = new Firebase("https://fiery-torch-6050.firebaseio.com/");
 					Calendar calendar = Calendar.getInstance();
 					long timestamp=calendar.getTime().getTime();
