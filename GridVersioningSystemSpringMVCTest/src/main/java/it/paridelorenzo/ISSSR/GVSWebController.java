@@ -680,7 +680,7 @@ public class GVSWebController {
 			else{
 				geType="HTMLclass: 'gqmgraph',";
 			}
-			chart=chart+"{"+geType+" innerHTML:\"<div class=\'nodeTxt\'><div class='txtElementTitle'><div class='nodeImg' ></div><a style='z-index: 10;position:relative; color:black;' href='/ISSSR/element/"+ge.getClass().getSimpleName()+"/"+ge.getIdElement()+"'>"+name+"</a></div>"+desc+"</div>\", ";
+			chart=chart+"{"+geType+" innerHTML:\"<div class=\'nodeTxt\'><div class='txtElementTitle'><div class='nodeImg' ><img src=\"resources/images/ImgGVS/"+ge.getClass().getSimpleName()+".png\"/></div><a style='z-index: 10;position:relative; color:black;' href='/ISSSR/element/"+ge.getClass().getSimpleName()+"/"+ge.getIdElement()+"'>"+name+"</a></div>"+desc+"</div>\", ";
 			//chart=chart+"{text: { name: \""+name+"\", desc: \""+desc+"\" },innerHTML:\"<div><h1>test</h1></div>\", collapsed: true";
 			if(newStack.size()>0){
 				chart=chart+" collapsed: true ,children: [";

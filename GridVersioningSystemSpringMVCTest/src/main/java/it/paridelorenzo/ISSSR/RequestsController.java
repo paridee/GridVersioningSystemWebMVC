@@ -41,7 +41,6 @@ public class RequestsController {
 			arr.add(ermesRequest);
 			arr.add(parameter);
 			logger.info(arr.toString());
-			//TODO add parameters to data
 			Request request = new Request("level3Direct", arr, "http://192.168.56.101:8080", null, null);
 			Request requestOut = restTemplate.postForObject(GRID_SERVICE_URL, request, Request.class);
 			result = requestOut.getContent().get(0);
