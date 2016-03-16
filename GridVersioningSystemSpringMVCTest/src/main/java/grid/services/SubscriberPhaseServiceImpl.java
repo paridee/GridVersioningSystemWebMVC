@@ -65,6 +65,12 @@ public class SubscriberPhaseServiceImpl implements SubscriberPhaseService {
 	@Transactional
 	@Override
 	public void add(SubscriberPhase p) {
+		List<SubscriberPhase> subscribers	=	this.getAllSubscribers();
+		for(SubscriberPhase sp:subscribers){
+			if(sp.getUrl().equals(p.getUrl())){
+				return;
+			}
+		}
 		this.subscriberPhaseDAO.add(p);
 	}
 
