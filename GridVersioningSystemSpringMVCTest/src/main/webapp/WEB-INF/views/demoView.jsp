@@ -54,11 +54,9 @@
 			}),
 			success : function(msg) {
 				$( "#ErmesResponse" ).html(JSON.stringify(msg));
-				//alert(JSON.stringify(msg))
 			},
 			error : function(err) {
 				$( "#ErmesResponse" ).html(JSON.stringify(msg));
-				//alert(err.responseText)
 			}
 		});
 	}
