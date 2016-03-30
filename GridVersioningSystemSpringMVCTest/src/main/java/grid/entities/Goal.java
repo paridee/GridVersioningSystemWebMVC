@@ -286,7 +286,7 @@ public class Goal extends GridElement{
 		return true;
 	}
 
-	/**TODO Auto-generated method stub
+	/**
 	 * {@inheritDoc}
 	 */
 	@Override

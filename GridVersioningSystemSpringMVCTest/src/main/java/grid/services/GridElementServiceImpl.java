@@ -111,7 +111,6 @@ public class GridElementServiceImpl implements GridElementService {
 	}
 
 	
-	//TODO check if is correct due to strange JAVERS behaviour (for example # etc...)
 	/**
 	 * {@inheritDoc}
 	 */
@@ -139,7 +138,6 @@ public class GridElementServiceImpl implements GridElementService {
 						}
 					}
 				} catch (Exception e) {
-					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}
 			}
@@ -162,7 +160,7 @@ public class GridElementServiceImpl implements GridElementService {
 					for(int j=0;j<newList.size();j++){
 						newMap.put(((GridElement)newList.get(j)).getLabel(), (GridElement)newList.get(j));
 					}
-					Diff elementDiff			=	javers.compare(oldMap,newMap);
+					//Diff elementDiff			=	javers.compare(oldMap,newMap);
 					//System.out.println("Element comparison result "+elementDiff);
 					Set<String> oldKeySet	=	oldMap.keySet();
 					Iterator<String> anIterator	=	oldKeySet.iterator();
@@ -224,7 +222,6 @@ public class GridElementServiceImpl implements GridElementService {
 				version	=	ge.getVersion();
 			}
 		}
-		// TODO Auto-generated method stub
 		return latestW;
 	}
 	/**

@@ -275,7 +275,7 @@ public class GridModificationService {
 						if(Modification.minorUpdateClass.contains(subj.getClass())){	//is a minor mod
 							if(modifiedObjectLabels.contains(subjLabel)){				//if is in conflict
 								modified.setState(State.MINOR_CONFLICTING);
-								//TODO check logically if this check is enough or is needed a check like this one below
+								//check logically if this check is enough or is needed a check like this one below
 							}
 						}
 						else if(!Modification.minorUpdateClass.contains(subj.getClass())){	//is a major conflict
@@ -471,7 +471,6 @@ public class GridModificationService {
 					if(!Modification.minorUpdateClass.contains(newElement.getClass())){
 						logger.info("found older element for "+newElement.getLabel()+" found in grid with Id "+latestGrid.getId()+" "+latestGrid.obtainGridState());
 						newElement.setState(GridElement.State.MAJOR_UPDATING);
-						//TODO testing
 						GridElement latestWorking	=	this.gridElementService.getLatestWorking(newElement.getLabel(), newElement.getClass().getSimpleName());
 						if(newElement.equals(latestWorking)){
 							newElement.setState(GridElement.State.WORKING);
@@ -535,7 +534,6 @@ public class GridModificationService {
 						//	updated.add(mostUp);
 						//}
 					} catch (Exception e) {
-						// TODO Auto-generated catch block
 						e.printStackTrace();
 					}*/
 					if(mostUp.getIdElement()!=current.getIdElement()){
@@ -655,12 +653,12 @@ public class GridModificationService {
 						System.out.println("apply modification "+aMod.toString());
 						updated	=	this.applyAModification((GridElementModification)aMod, updated, updated.obtainAllEmbeddedElements());
 						
-						//TODO TEST to remove
+						/* TEST to remove
 						if(updated.obtainAllEmbeddedElements().containsKey("g1")){
 							Goal g1inst	=	(Goal)updated.obtainAllEmbeddedElements().get("g1");
 							System.out.println("size str list g1 "+g1inst.getStrategyList().size());
 						}
-						//TODO end test to remove
+						end test to remove*/
 					}
 				}
 				
@@ -699,7 +697,6 @@ public class GridModificationService {
 				}
 				//end workaround
 				updated	=	this.refreshLinks(updated);
-				//TODO set right state for all elements
 				this.gridService.addGrid(updated);
 				System.out.println("GridModificationService saving Grid id "+updated.getId()+" state "+updated.obtainGridState()+" "+updated.dateStringFromTimestamp());
 				System.out.println("GridModificationService.java going to send notification (1)");
@@ -783,103 +780,7 @@ public class GridModificationService {
 		return true;
 	}
 
-		/*
-	public GridElement updateSingleElement(GridElement ge) {
-		int lastVersion=this.gridElementService.getLatestVersion(ge.getLabel(), ge.getClass().getSimpleName());
-		ge.setVersion(lastVersion+1);
-		ge.setIdElement(0);
-		ge.setState(GridElement.State.WORKING);
-		//update link to working GEs
-		Field[] fields=ge.getClass().getDeclaredFields();
-		for(int j=0; j<fields.length;j++){
-			Field tempField=fields[j];
-			tempField.setAccessible(true);
-			try {
-				Object fieldValue=tempField.get(ge);
-				if(fieldValue instanceof GridElement){
-					GridElement temp=(GridElement)fieldValue;
-					GridElement active=this.gridElementService.getLatestWorking(temp.getLabel(), temp.getClass().getSimpleName());
-					System.out.println("set "+ge.getLabel()+"-v"+ge.getVersion()+":"+tempField.getName()+"[old:"+temp.getLabel()+"-v"+temp.getVersion()+" , new:"+active.getLabel()+"-v"+active.getVersion());
-					tempField.set(ge, active);
-					
-				}
-				else if(fieldValue instanceof List){
-					List myList 	=	(List)fieldValue;
-					List<GridElement> newList=new ArrayList<GridElement>();
-					List<GridElement> toConnect=new ArrayList<GridElement>();
-					boolean gridElementList=false;
-					if(myList.size()>0){
-						Object	first	=	 myList.get(0);
-						if(first instanceof GridElement){
-							for(Object current:myList){
-								GridElement currentGE=(GridElement)current;
-								GridElement active=this.gridElementService.getLatestWorking(currentGE.getLabel(), currentGE.getClass().getSimpleName());   
-								System.out.println("set "+ge.getLabel()+"-v"+ge.getVersion()+":"+tempField.getName()+"[old:"+currentGE.getLabel()+"-v"+currentGE.getVersion()+" , new:"+active.getLabel()+"-v"+active.getVersion());
-								newList.add(active);
-							}
-							gridElementList=true;
-						}
-					}
-					if(gridElementList){
-						tempField.set(ge, newList);
-					}
-				}
-			} catch (IllegalArgumentException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			} catch (IllegalAccessException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-		}
-		//save grid element
-		this.gridElementService.addGridElement(ge);
-		return ge;
-		//List<GridElement> elementsToUpdate=new ArrayList<GridElement>();
-		//elementsToUpdate.add(ge);
-		//this.gridElementService.updateReferencesToGe(elementsToUpdate);
-		//for each last working grid element
-			//if GE is related to currentGE
-				//clone currentGE
-				//update references to GE
-				//update references to currentGE
-		
-		
-		
-		//for each project
-			//for each working grid
-				//update main goals
-		
-		
-					
-			
-	}
-	public void updateReferencesToGe(List<GridElement> geList) {
-		System.out.println(geList.toString());
-		List<GridElement> workingGEs=this.gridElementService.getLatestWorkingElements();
-		
-		List<GridElement> elementsToUpdate=new ArrayList<GridElement>();
-		for(GridElement currentGE: workingGEs){
-			HashMap<String,GridElement> elements=currentGE.obtainEmbeddedElements();
-			//check if it contains any reference to update
-			for (GridElement geToCheck: workingGEs){
-				if(elements.containsKey(geToCheck.getLabel())){
-					GridElement cloned=currentGE.clone();
-					if(!cloned.equals(geToCheck)){
-						this.updateSingleElement(cloned);
-						elementsToUpdate.add(cloned);
-					}
-					
-					
-				}
-			}
-		}
-		if(elementsToUpdate.size()>0){
-			this.updateReferencesToGe(elementsToUpdate);
-		}
-		
-		
-	}
+	/*REDUNDANT COMMENTED CODE, IF NEEDED REFER TO GIT
 	*/
 	
 }

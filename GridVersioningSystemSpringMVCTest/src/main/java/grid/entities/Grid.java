@@ -51,7 +51,6 @@ public class Grid implements Updatable{
 	private Project		project;
 	private boolean		mainGoalsChanged		=	false;
 	private static final Logger logger = LoggerFactory.getLogger(Grid.class);
-	//TODO mancano attributi della grid di Serena e Marco
 	protected long	timestamp	= (Calendar.getInstance()).getTime().getTime();
 	
 	/**
@@ -249,6 +248,9 @@ public class Grid implements Updatable{
 		return cloned;
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	public ArrayList<GridElement> updateReferences(GridElement ge, boolean autoupgrade, boolean recursive) {
 		return this.updateReferences(ge, autoupgrade);

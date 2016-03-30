@@ -67,7 +67,6 @@ public class GridServiceImpl implements GridService {
 	@Override
 	@Transactional
 	public Grid loadFromJson(String json) {
-		// TODO Auto-generated method stub
 		return null;
 	}
 

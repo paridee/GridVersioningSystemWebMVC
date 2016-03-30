@@ -42,6 +42,11 @@ import grid.modification.elements.Modification;
  */
 public class Utils {
 	
+	/**
+	 * Inner class, creates a thread for post sending, in order to avoid blocking
+	 * @author Paride Casulli
+	 * @author Lorenzo La Banca
+	 */
 	public static class PostSender implements Runnable{
 		String url	=	"";
 		String body		=	"";
@@ -85,10 +90,8 @@ public class Utils {
 				//print result
 				logger.info(response.toString());
 			} catch (MalformedURLException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			} catch (IOException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 		}
@@ -620,6 +623,11 @@ public class Utils {
 		return gridElementString;
 	}
 
+	/**
+	 * Removes duplicates from a GridElement list
+	 * @param geList list to be cleaned
+	 * @return cleaned list
+	 */
 	public static List<GridElement> removeDuplicates(List<GridElement> geList) {
 		List<GridElement> temp=new ArrayList<GridElement>();
 		for(GridElement ge:geList){

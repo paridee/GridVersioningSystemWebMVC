@@ -5,8 +5,8 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+//import org.slf4j.Logger;
+//import org.slf4j.LoggerFactory;
 
 import grid.Utils;
 import grid.entities.Grid;
@@ -23,7 +23,7 @@ public class ListAppend extends GridElementModification {
 	private String 	listNameToBeChanged;
 	private String	appendedObjectLabel;
 	private Object  newLoadedObject;
-	private static final Logger logger = LoggerFactory.getLogger(ListAppend.class);
+	//private static final Logger logger = LoggerFactory.getLogger(ListAppend.class);
 	
 	/**
 	 * Get the name of the list involved in this list append
