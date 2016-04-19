@@ -98,15 +98,16 @@
     <script src="<c:url value='/resources/Treant/Treant.min.js' />"></script>
     <script src="<c:url value='/resources/Treant/vendor/jquery.easing.js' />"></script>
 	<script src="<c:url value='/resources/Treant/vendor/perfect-scrollbar/jquery.mousewheel.js' />"></script>
-	<script src="<c:url value='/resources/Treant/vendor/perfect-scrollbar/perfect-scrollbar.js' />"></script><script>${gridTreeString};
-    	var my_chart = new Treant(chart_config);
-   	</script>
+	<script src="<c:url value='/resources/Treant/vendor/perfect-scrollbar/perfect-scrollbar.js' />"></script>
+	
 </c:if>
 <script type="text/javascript">
     jQuery(document).ready(function($) {
         $(".clickable-row").click(function() {
             window.document.location = $(this).data("href");
         });
+        ${gridTreeString};
+    	var my_chart = new Treant(chart_config);
     });
     </script>
    	 

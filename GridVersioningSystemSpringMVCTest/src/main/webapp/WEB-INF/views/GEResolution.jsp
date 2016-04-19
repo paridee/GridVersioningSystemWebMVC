@@ -85,11 +85,11 @@
 									
 								</div>
 								
-								<c:if test="${updatingElements.size()>1}">
+								<%if(pendinglist.size()>=1&&pendinglist.get(0).getState().equals(GridElement.State.MAJOR_CONFLICTING)){ %>
 									<div style="float: left; width: 100%; text-align: center">
 										<a href="<c:url value='/confEditor/${workingGE.getClass().getSimpleName()}/${workingGE.getLabel()}/${ProjectId}' />"><button type="button" class="btn btn-primary btn-lg" style="margin-top: 50px;">Create new Grid Element</button></a>
 									</div>
-								</c:if>
+								<% }%>
 								
 							</div>
 							<div style="width: 50%; float: left;">

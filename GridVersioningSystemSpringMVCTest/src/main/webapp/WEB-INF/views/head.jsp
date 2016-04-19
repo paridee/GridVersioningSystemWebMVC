@@ -23,9 +23,7 @@
     <!-- Bootstrap core CSS -->
     <link href="<c:url value='/resources/bootstrap/dist/css/bootstrap.min.css' />" rel="stylesheet">
 
-    <!-- IE10 viewport hack for Surface/desktop Windows 8 bug -->
-    <link href="<c:url value='/resources/bootstrap/assets/css/ie10-viewport-bug-workaround.css' />" rel="stylesheet">
-
+    
     <!-- Custom styles for this template -->
     <link href="<c:url value='/resources/bootstrap/starter-template.css' />" rel="stylesheet">
     

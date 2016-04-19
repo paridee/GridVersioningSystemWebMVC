@@ -610,7 +610,7 @@ public class GVSWebController {
 		if(g.getMainGoals().size()!=0){
 			List<Object> stack = new ArrayList<Object>();
 			stack.addAll(g.getMainGoals());
-			String chart="chart_config = {chart: { connectors: {type: \"bCurve\",style: {\"stroke-width\": 2}}, container: \"#gridChart\", siblingSeparation:70, rootOrientation:'WEST',  subTeeSeparation:70, animateOnInit: true,node: {collapsable: true, HTMLclass: 'nodeExample1'},animation: {nodeAnimation: \"easeInSine\",nodeSpeed: 500,connectorsAnimation: \"linear\",connectorsSpeed: 500}},";		
+			String chart="chart_config = {chart: { connectors: {type: \"bCurve\",style: {\"stroke-width\": 2}}, container: \"#gridChart\", siblingSeparation:70, rootOrientation:'WEST',  subTeeSeparation:70, animateOnInit: true,node: {collapsable: true, HTMLclass: 'nodeExample1'},animation: {nodeAnimation: \"easeOutBounce\",nodeSpeed: 500,connectorsAnimation: \"bounce\",connectorsSpeed: 700}},";		
 			chart=chart+"nodeStructure: {HTMLclass: 'project',innerHTML:\"<div class='nodeTxt'><div class='txtProjectTitle'>"+g.getProject().getProjectId()+"</div><div class='txtElement'>"+g.getProject().getDescription()+"</div></div>\",children: [";
 			chart=chart+updateChart(stack)+"]}};";
 			return chart;
@@ -680,7 +680,7 @@ public class GVSWebController {
 			else{
 				geType="HTMLclass: 'gqmgraph',";
 			}
-			chart=chart+"{"+geType+" innerHTML:\"<div class=\'nodeTxt\'><div class='txtElementTitle'><div class='nodeImg' ><img src='/ISSSR/resources/images/ImgGVS/"+ge.getClass().getSimpleName()+".png' /></div><a style='z-index: 10;position:relative; color:black;' href='/ISSSR/element/"+ge.getClass().getSimpleName()+"/"+ge.getIdElement()+"'>"+name+"</a></div>"+desc+"</div>\", ";
+			chart=chart+"\n{"+geType+" innerHTML:\"<div style=\'background-color: red;\'><div class=\'nodeTxt\'><div class='txtElementTitle'><div class='nodeImg' ><img src='/ISSSR/resources/images/ImgGVS/"+ge.getClass().getSimpleName()+".png' /></div><a style='z-index: 10;position:relative; color:black;' href='/ISSSR/element/"+ge.getClass().getSimpleName()+"/"+ge.getIdElement()+"'>"+name+"</a></div>"+desc+"</div></div>\", ";
 			//chart=chart+"{text: { name: \""+name+"\", desc: \""+desc+"\" },innerHTML:\"<div><h1>test</h1></div>\", collapsed: true";
 			if(newStack.size()>0){
 				chart=chart+" collapsed: true ,children: [";

@@ -17,9 +17,7 @@ caption, th {
 }
 
 /* optional Container STYLES */
-.Treant>.node {
-	
-}
+.Treant>.node {}
 
 
 
@@ -27,13 +25,12 @@ caption, th {
 	max-width: 400px;
 	border: 2px solid #484848;
 	text-align: center;
-	float: left;
 	min-height: 60px;
 	-webkit-border-radius: 6px;
 	-moz-border-radius: 6px;
 	border-radius: 6px;
 	color: black;
-	z-index: 1;position:relative;
+	z-index: 1;
 }
 
 .project {
@@ -92,6 +89,7 @@ caption, th {
 
 .txtElement {
 	float: left;
+	width: 100%;
 	text-align: left;
 	clear: both;
 	white-space: nowrap;
